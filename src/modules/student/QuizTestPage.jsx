@@ -1,21 +1,3 @@
-// import React, { useEffect, useContext } from 'react';
-// import { useQuiz } from './QuizContext';
- 
-// const QuizTestPage = () => {
-//   const { startQuiz, endQuiz } = useQuiz();
- 
-
-//   return (
-//     <div>
-//       <h1>Quiz Test Page</h1>
-//       {/* Quiz content goes here */}
-//     </div>
-//   );
-// };
- 
-// export default QuizTestPage;
-
-
 
 import React, { useEffect } from 'react';
 import { useQuiz } from './QuizContext';

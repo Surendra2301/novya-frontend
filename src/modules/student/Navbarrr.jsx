@@ -1,5 +1,4 @@
 
-
 // import React, { useState, useEffect } from 'react';
 // import { Link, useLocation, useNavigate } from 'react-router-dom';
 // import { motion, AnimatePresence } from 'framer-motion';
@@ -19,7 +18,8 @@
 //   FaHistory,
 //   FaPlus,
 //   FaMinus,
-//   FaTrash
+//   FaTrash,
+//   FaBars
 // } from 'react-icons/fa';
 // import { useTranslation } from 'react-i18next';
 // import './Navbarrr.css';
@@ -36,6 +36,11 @@
 //   const [calendarOpen, setCalendarOpen] = useState(false);
 //   const [notificationsOpen, setNotificationsOpen] = useState(false);
 //   const [rewardsHistoryOpen, setRewardsHistoryOpen] = useState(false);
+//   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+//   const [mobileDropdowns, setMobileDropdowns] = useState({
+//     learn: false,
+//     practice: false
+//   });
  
 //   // MARK: ADDED - Flying coins animation state
 //   const [showFlyingCoins, setShowFlyingCoins] = useState(false);
@@ -63,11 +68,23 @@
 //   const languages = [
 //     { code: 'en', label: 'English' },
 //     { code: 'te', label: 'తెలుగు' },
-//     { code: 'hi', label: 'హిందీ' },
+//     { code: 'hi', label: 'हिंदी' },
 //     { code: 'kn', label: 'ಕನ್ನಡ' },
 //     { code: 'ta', label: 'தமிழ்' },
 //     { code: 'ml', label: 'മലയാളം' },
 //   ];
+
+//   // MARK: ADDED - Mobile detection
+//   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+
+//   useEffect(() => {
+//     const handleResize = () => {
+//       setIsMobile(window.innerWidth <= 768);
+//     };
+
+//     window.addEventListener('resize', handleResize);
+//     return () => window.removeEventListener('resize', handleResize);
+//   }, []);
 
 //   // MARK: ADDED - Load rewards history
 //   const loadRewardsHistory = () => {
@@ -93,13 +110,13 @@
 //       // Clear rewards history from localStorage
 //       localStorage.removeItem('rewardsHistory');
 //       setRewardsHistory([]);
-      
+     
 //       // Dispatch storage event for cross-tab sync
 //       window.dispatchEvent(new StorageEvent('storage', {
 //         key: 'rewardsHistory',
 //         newValue: null
 //       }));
-      
+     
 //       console.log('Rewards history cleared successfully');
 //     } catch (error) {
 //       console.error('Error clearing rewards history:', error);
@@ -201,17 +218,32 @@
 //     };
 //   }, []);
 
-//   // MARK: UPDATED - Study plan functions with improved real-time loading
+//   // MARK: UPDATED - Study plan functions with improved real-time loading and data validation
 //   const loadStudyPlans = () => {
 //     try {
 //       const savedPlans = localStorage.getItem('studyPlans');
 //       if (savedPlans) {
 //         const plans = JSON.parse(savedPlans);
-//         // Remove duplicates based on ID
+       
+//         // Remove duplicates based on ID and also clean up any invalid dates
 //         const uniquePlans = plans.filter((plan, index, self) =>
 //           index === self.findIndex(p => p.id === plan.id)
-//         );
+//         ).map(plan => ({
+//           ...plan,
+//           // Ensure studySessions exist and have proper dates
+//           studySessions: (plan.studySessions || []).filter(session =>
+//             session && session.date && !isNaN(new Date(session.date).getTime())
+//           )
+//         }));
+       
 //         setStudyPlans(uniquePlans);
+       
+//         // Debug: Log study plans and their sessions
+//         console.log('Loaded study plans:', uniquePlans.map(plan => ({
+//           title: plan.title,
+//           created: plan.createdDate,
+//           sessions: plan.studySessions?.map(s => ({ date: s.date, title: s.title }))
+//         })));
 //       } else {
 //         setStudyPlans([]);
 //       }
@@ -328,6 +360,25 @@
 //     }
 //   };
 
+//   // MARK: ADDED - Delete single notification function
+//   const deleteNotification = (notificationId) => {
+//     try {
+//       const updatedNotifications = notifications.filter(notif => notif.id !== notificationId);
+//       localStorage.setItem('studyNotifications', JSON.stringify(updatedNotifications));
+//       setNotifications(updatedNotifications);
+//       const unread = updatedNotifications.filter(notif => !notif.read).length;
+//       setUnreadNotifications(unread);
+     
+//       // MARK: ADDED - Dispatch storage event for cross-tab sync
+//       window.dispatchEvent(new StorageEvent('storage', {
+//         key: 'studyNotifications',
+//         newValue: JSON.stringify(updatedNotifications)
+//       }));
+//     } catch (error) {
+//       console.error('Error deleting notification:', error);
+//     }
+//   };
+
 //   const markAllNotificationsAsRead = () => {
 //     try {
 //       const updatedNotifications = notifications.map(notif => ({ ...notif, read: true }));
@@ -359,6 +410,23 @@
 //     } catch (error) {
 //       console.error('Error clearing notifications:', error);
 //     }
+//   };
+
+//   // MARK: ADDED - Mobile dropdown toggle
+//   const toggleMobileDropdown = (dropdown) => {
+//     setMobileDropdowns(prev => ({
+//       ...prev,
+//       [dropdown]: !prev[dropdown]
+//     }));
+//   };
+
+//   // MARK: ADDED - Mobile menu close function
+//   const closeMobileMenu = () => {
+//     setMobileMenuOpen(false);
+//     setMobileDropdowns({
+//       learn: false,
+//       practice: false
+//     });
 //   };
 
 //   // MARK: ADDED - Get today's study plans
@@ -398,17 +466,21 @@
 //     });
 //   };
 
+//   // MARK: UPDATED - Enhanced study plan date filtering with fixed dates
 //   const getStudyPlansForDate = (date) => {
 //     const dateString = date.toISOString().split('T')[0];
 //     const plansForDate = [];
    
 //     studyPlans.forEach(plan => {
 //       plan.studySessions?.forEach(session => {
+//         // Compare the session date directly with the target date
 //         if (session.date === dateString) {
 //           plansForDate.push({
 //             ...session,
 //             planTitle: plan.title,
-//             subject: plan.subject
+//             subject: plan.subject,
+//             // Include creation date for debugging
+//             created: plan.createdDate
 //           });
 //         }
 //       });
@@ -575,6 +647,9 @@
 //     setLangDropdownOpen(false);
 //     setRewardsHistoryOpen(false);
 
+//     // Close mobile menu when route changes
+//     closeMobileMenu();
+
 //     // Hide navbar in fullscreen mode during tests
 //     if (isFullScreen) {
 //       setShowNavbar(false);
@@ -628,6 +703,8 @@
 //       dropdownItems: [
 //         { path: '/quick-practice', name: t('quick_practice', 'Quick Practice') },
 //         { path: '/mock-test', name: t('mock_test', 'Mock Test') },
+//           { path: '/spin-wheel', name: t('spin_wheel', 'Spin Wheel') },
+ 
 //       ],
 //     },
 //     { path: '/career', name: t('career', 'Career') },
@@ -872,6 +949,253 @@
 //           .clear-all-button:active {
 //             transform: scale(0.98);
 //           }
+
+//           /* MARK: ADDED - Delete notification button styles */
+//           .delete-notification-btn {
+//             background: none;
+//             border: none;
+//             color: #9ca3af;
+//             cursor: pointer;
+//             padding: 4px;
+//             border-radius: 4px;
+//             transition: all 0.2s ease;
+//             display: flex;
+//             alignItems: 'center';
+//             justifyContent: 'center';
+//           }
+         
+//           .delete-notification-btn:hover {
+//             background: #fee2e2;
+//             color: #dc2626;
+//           }
+
+//           /* MARK: ADDED - Mobile Responsive Styles */
+//           @media (max-width: 768px) {
+//             .navbar-desktop-links {
+//               display: none;
+//             }
+           
+//             .navbar-mobile-menu {
+//               display: flex;
+//             }
+           
+//             .navbar-container {
+//               padding: 0 16px;
+//             }
+           
+//             .navbar-end {
+//               gap: 8px;
+//             }
+           
+//             .mobile-menu-overlay {
+//               position: fixed;
+//               top: 0;
+//               left: 0;
+//               right: 0;
+//               bottom: 0;
+//               background: rgba(0, 0, 0, 0.5);
+//               z-index: 9995;
+//             }
+           
+//             .mobile-menu-content {
+//               position: fixed;
+//               top: 0;
+//               left: 0;
+//               width: 280px;
+//               height: 100vh;
+//               background: white;
+//               z-index: 9996;
+//               overflow-y: auto;
+//               padding: 20px 0;
+//             }
+           
+//             .mobile-menu-header {
+//               padding: 0 20px 20px;
+//               border-bottom: 1px solid #e5e7eb;
+//               display: flex;
+//               justify-content: space-between;
+//               align-items: center;
+//             }
+           
+//             .mobile-nav-links {
+//               padding: 20px;
+//             }
+           
+//             .mobile-nav-item {
+//               margin-bottom: 8px;
+//             }
+           
+//             .mobile-nav-link {
+//               display: flex;
+//               align-items: center;
+//               justify-content: space-between;
+//               padding: 12px 16px;
+//               background: #f8fafc;
+//               border-radius: 8px;
+//               text-decoration: none;
+//               color: #374151;
+//               font-weight: 500;
+//             }
+           
+//             .mobile-dropdown-content {
+//               padding-left: 20px;
+//               margin-top: 8px;
+//             }
+           
+//             .mobile-dropdown-link {
+//               display: block;
+//               padding: 10px 16px;
+//               text-decoration: none;
+//               color: #6b7280;
+//               border-left: 2px solid #e5e7eb;
+//               margin-bottom: 4px;
+//             }
+           
+//             .mobile-dropdown-link.active {
+//               color: #2D5D7B;
+//               border-left-color: #2D5D7B;
+//               background: #f0f7ff;
+//             }
+           
+//             .mobile-bottom-actions {
+//               padding: 20px;
+//               border-top: 1px solid #e5e7eb;
+//               margin-top: 20px;
+//             }
+           
+//             .mobile-avatar-section {
+//               display: flex;
+//               align-items: center;
+//               gap: 12px;
+//               padding: 16px;
+//               background: #f8fafc;
+//               border-radius: 8px;
+//               margin-bottom: 16px;
+//             }
+           
+//             .mobile-action-button {
+//               width: 100%;
+//               padding: 12px 16px;
+//               border: 1px solid #e5e7eb;
+//               border-radius: 8px;
+//               background: white;
+//               display: flex;
+//               align-items: center;
+//               gap: 8px;
+//               margin-bottom: 8px;
+//               font-size: 14px;
+//               color: #374151;
+//             }
+           
+//             .reward-points-mobile {
+//               display: flex;
+//               align-items: center;
+//               gap: 8px;
+//               padding: 12px 16px;
+//               background: linear-gradient(135deg, #FFD700, #FFA500);
+//               border-radius: 20px;
+//               color: #744210;
+//               font-weight: 600;
+//               font-size: 14px;
+//               margin: 16px 0;
+//             }
+           
+//             .mobile-icons-row {
+//               display: flex;
+//               gap: 12px;
+//               padding: 0 20px;
+//               margin-bottom: 16px;
+//             }
+           
+//             .mobile-icon-button {
+//               flex: 1;
+//               display: flex;
+//               flex-direction: column;
+//               align-items: center;
+//               gap: 4px;
+//               padding: 12px 8px;
+//               background: #f8fafc;
+//               border: 1px solid #e5e7eb;
+//               border-radius: 8px;
+//               font-size: 12px;
+//               color: #374151;
+//             }
+           
+//             .mobile-icon-button .badge {
+//               position: absolute;
+//               top: -5px;
+//               right: -5px;
+//               background: #ef4444;
+//               color: white;
+//               border-radius: 50%;
+//               width: 18px;
+//               height: 18px;
+//               font-size: 10px;
+//               display: flex;
+//               align-items: center;
+//               justify-content: center;
+//             }
+//           }
+
+//           @media (min-width: 769px) {
+//             .navbar-mobile-menu {
+//               display: none;
+//             }
+           
+//             .mobile-menu-overlay {
+//               display: none;
+//             }
+//           }
+
+//           @media (max-width: 480px) {
+//             .navbar-brand img {
+//               height: 28px;
+//             }
+           
+//             .navbar-brand span {
+//               font-size: 1.3rem;
+//               margin-left: 6px;
+//             }
+           
+//             .navbar-end {
+//               gap: 6px;
+//             }
+           
+//             .reward-points-display {
+//               padding: 6px 12px;
+//               font-size: 12px;
+//               min-width: 70px;
+//             }
+           
+//             .language-button, .calendar-button, .notification-button {
+//               padding: 6px 8px;
+//               min-width: auto;
+//             }
+           
+//             .language-button span {
+//               display: none;
+//             }
+           
+//             .mobile-menu-content {
+//               width: 100%;
+//             }
+//           }
+
+//           @media (max-width: 360px) {
+//             .navbar-container {
+//               padding: 0 12px;
+//             }
+           
+//             .reward-points-display {
+//               padding: 4px 8px;
+//               font-size: 11px;
+//               min-width: 60px;
+//             }
+           
+//             .navbar-avatar-container span {
+//               display: none;
+//             }
+//           }
 //         `}
 //       </style>
      
@@ -879,7 +1203,9 @@
 //         display: 'flex',
 //         justifyContent: 'space-between',
 //         alignItems: 'center',
-//         width: '100%'
+//         width: '100%',
+//         padding: '0 20px',
+//         boxSizing: 'border-box'
 //       }}>
 //         {/* Logo - Left Side */}
 //         <div className="navbar-brand">
@@ -913,124 +1239,178 @@
 //           </Link>
 //         </div>
 
-//         {/* Desktop Links - Center */}
-//         <div className="navbar-desktop-links">
-//           <ul style={{
-//             display: 'flex',
-//             alignItems: 'center',
-//             margin: 0,
-//             padding: 0,
-//             listStyle: 'none',
-//             gap: '20px'
-//           }}>
-//             {navLinks.map((link) => (
-//               <li
-//                 key={link.path}
-//                 className={`nav-item ${activeLink === link.path || (link.hasDropdown && activeLink.startsWith(link.path)) ? 'active' : ''} ${link.hasDropdown ? 'has-dropdown' : ''}`}
-//                 style={{ position: 'relative', display: 'flex', alignItems: 'center' }}
-//                 onMouseEnter={() => {
-//                   if (link.path === '/learn') setClassDropdownOpen(true);
-//                   if (link.path === '/practice') setPracticeDropdownOpen(true);
-//                 }}
-//                 onMouseLeave={() => {
-//                   if (link.path === '/learn') setClassDropdownOpen(false);
-//                   if (link.path === '/practice') setPracticeDropdownOpen(false);
-//                 }}
-//               >
-//                 {link.hasDropdown ? (
-//                   <div className="nav-link-wrapper" style={{ position: 'relative' }}>
-//                     <Link
-//                       to={link.path}
-//                       className={`nav-link ${activeLink === link.path || (link.hasDropdown && activeLink.startsWith(link.path)) ? 'nav-link-active' : ''}`}
-//                       style={{
-//                         display: 'flex',
-//                         alignItems: 'center',
-//                         gap: '5px',
-//                         textDecoration: 'none',
-//                         color: (activeLink === link.path || (link.hasDropdown && activeLink.startsWith(link.path))) ? '#2D5D7B' : 'inherit',
-//                         fontWeight: (activeLink === link.path || (link.hasDropdown && activeLink.startsWith(link.path))) ? '600' : '400',
-//                         borderBottom: (activeLink === link.path || (link.hasDropdown && activeLink.startsWith(link.path))) ? '2px solid #2D5D7B' : 'none',
-//                         padding: '8px 4px'
-//                       }}
-//                     >
-//                       {link.name}
-//                       <FaChevronDown size={10} />
-//                     </Link>
-//                     <AnimatePresence>
-//                       {(link.path === '/learn' ? classDropdownOpen : practiceDropdownOpen) && (
-//                         <motion.div
-//                           className="nav-dropdown"
-//                           initial={{ opacity: 0, y: -10 }}
-//                           animate={{ opacity: 1, y: 0 }}
-//                           exit={{ opacity: 0, y: -10 }}
-//                           style={{
-//                             position: 'absolute',
-//                             top: '100%',
-//                             left: 0,
-//                             background: 'white',
-//                             borderRadius: '8px',
-//                             boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
-//                             minWidth: '160px',
-//                             zIndex: 1000,
-//                             padding: '10px 0'
-//                           }}
-//                         >
-//                           <ul style={{ margin: 0, padding: 0, listStyle: 'none' }}>
-//                             {link.dropdownItems.map((dropdownItem) => (
-//                               <li key={dropdownItem.path}>
-//                                 <Link
-//                                   to={dropdownItem.path}
-//                                   className={`dropdown-link ${activeLink === dropdownItem.path ? 'dropdown-link-active' : ''}`}
-//                                   style={{
-//                                     display: 'block',
-//                                     padding: '8px 16px',
-//                                     textDecoration: 'none',
-//                                     color: activeLink === dropdownItem.path ? '#2D5D7B' : '#333',
-//                                     fontWeight: activeLink === dropdownItem.path ? '600' : '400',
-//                                     background: activeLink === dropdownItem.path ? '#f0f7ff' : 'transparent',
-//                                     transition: 'background 0.3s, color 0.3s'
-//                                   }}
-//                                   onMouseEnter={(e) => {
-//                                     if (activeLink !== dropdownItem.path) {
-//                                       e.target.style.background = '#f5f5f5';
-//                                     }
-//                                   }}
-//                                   onMouseLeave={(e) => {
-//                                     if (activeLink !== dropdownItem.path) {
-//                                       e.target.style.background = activeLink === dropdownItem.path ? '#f0f7ff' : 'transparent';
-//                                     }
-//                                   }}
-//                                 >
-//                                   {dropdownItem.name}
-//                                 </Link>
-//                               </li>
-//                             ))}
-//                           </ul>
-//                         </motion.div>
-//                       )}
-//                     </AnimatePresence>
-//                   </div>
-//                 ) : (
-//                   <Link
-//                     to={link.path}
-//                     className={`nav-link ${activeLink === link.path ? 'nav-link-active' : ''}`}
+//         {/* Desktop Links - Center (Hidden on Mobile) */}
+//       <div className="navbar-desktop-links">
+//   <ul
+//     style={{
+//       display: 'flex',
+//       alignItems: 'center',
+//       margin: 0,
+//       padding: 0,
+//       listStyle: 'none',
+//       gap: '20px',
+//     }}
+//   >
+//     {navLinks.map((link) => (
+//       <li
+//         key={link.path}
+//         className={`nav-item ${
+//           activeLink === link.path ||
+//           (link.hasDropdown && activeLink.startsWith(link.path))
+//             ? 'active'
+//             : ''
+//         } ${link.hasDropdown ? 'has-dropdown' : ''}`}
+//         style={{ position: 'relative', display: 'flex', alignItems: 'center' }}
+//         onMouseEnter={() => {
+//           if (link.path === '/learn') setClassDropdownOpen(true);
+//           if (link.path === '/practice') setPracticeDropdownOpen(true);
+//         }}
+//         onMouseLeave={() => {
+//           if (link.path === '/learn') setClassDropdownOpen(false);
+//           if (link.path === '/practice') setPracticeDropdownOpen(false);
+//         }}
+//       >
+//         {link.hasDropdown ? (
+//           <div className="nav-link-wrapper" style={{ position: 'relative' }}>
+//             {/* Prevent navigation for dropdown links */}
+//             <span
+//               className={`nav-link ${
+//                 activeLink === link.path ||
+//                 (link.hasDropdown && activeLink.startsWith(link.path))
+//                   ? 'nav-link-active'
+//                   : ''
+//               }`}
+//               style={{
+//                 display: 'flex',
+//                 alignItems: 'center',
+//                 gap: '5px',
+//                 textDecoration: 'none',
+//                 color:
+//                   activeLink === link.path ||
+//                   (link.hasDropdown && activeLink.startsWith(link.path))
+//                     ? '#2D5D7B'
+//                     : 'inherit',
+//                 fontWeight:
+//                   activeLink === link.path ||
+//                   (link.hasDropdown && activeLink.startsWith(link.path))
+//                     ? '600'
+//                     : '400',
+//                 borderBottom:
+//                   activeLink === link.path ||
+//                   (link.hasDropdown && activeLink.startsWith(link.path))
+//                     ? '2px solid #2D5D7B'
+//                     : 'none',
+//                 padding: '8px 4px',
+//                 cursor: 'pointer',
+//               }}
+//               onClick={(e) => e.preventDefault()} // ❌ Stop navigation
+//             >
+//               {link.name}
+//               <FaChevronDown size={10} />
+//             </span>
+ 
+//             <AnimatePresence>
+//               {(link.path === '/learn'
+//                 ? classDropdownOpen
+//                 : practiceDropdownOpen) && (
+//                 <motion.div
+//                   className="nav-dropdown"
+//                   initial={{ opacity: 0, y: -10 }}
+//                   animate={{ opacity: 1, y: 0 }}
+//                   exit={{ opacity: 0, y: -10 }}
+//                   style={{
+//                     position: 'absolute',
+//                     top: '100%',
+//                     left: 0,
+//                     background: 'white',
+//                     borderRadius: '8px',
+//                     boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
+//                     minWidth: '160px',
+//                     zIndex: 1000,
+//                     padding: '10px 0',
+//                   }}
+//                 >
+//                   <ul
 //                     style={{
-//                       display: 'block',
-//                       textDecoration: 'none',
-//                       color: activeLink === link.path ? '#2D5D7B' : 'inherit',
-//                       fontWeight: activeLink === link.path ? '600' : '400',
-//                       borderBottom: activeLink === link.path ? '2px solid #2D5D7B' : 'none',
-//                       padding: '8px 4px',
-//                       transition: 'all 0.3s ease'
+//                       margin: 0,
+//                       padding: 0,
+//                       listStyle: 'none',
 //                     }}
 //                   >
-//                     {link.name}
-//                   </Link>
-//                 )}
-//               </li>
-//             ))}
-//           </ul>
-//         </div>
+//                     {link.dropdownItems.map((dropdownItem) => (
+//                       <li key={dropdownItem.path}>
+//                         <Link
+//                           to={dropdownItem.path}
+//                           className={`dropdown-link ${
+//                             activeLink === dropdownItem.path
+//                               ? 'dropdown-link-active'
+//                               : ''
+//                           }`}
+//                           style={{
+//                             display: 'block',
+//                             padding: '8px 16px',
+//                             textDecoration: 'none',
+//                             color:
+//                               activeLink === dropdownItem.path
+//                                 ? '#2D5D7B'
+//                                 : '#333',
+//                             fontWeight:
+//                               activeLink === dropdownItem.path
+//                                 ? '600'
+//                                 : '400',
+//                             background:
+//                               activeLink === dropdownItem.path
+//                                 ? '#f0f7ff'
+//                                 : 'transparent',
+//                             transition: 'background 0.3s, color 0.3s',
+//                           }}
+//                           onMouseEnter={(e) => {
+//                             if (activeLink !== dropdownItem.path) {
+//                               e.target.style.background = '#f5f5f5';
+//                             }
+//                           }}
+//                           onMouseLeave={(e) => {
+//                             if (activeLink !== dropdownItem.path) {
+//                               e.target.style.background =
+//                                 activeLink === dropdownItem.path
+//                                   ? '#f0f7ff'
+//                                   : 'transparent';
+//                             }
+//                           }}
+//                         >
+//                           {dropdownItem.name}
+//                         </Link>
+//                       </li>
+//                     ))}
+//                   </ul>
+//                 </motion.div>
+//               )}
+//             </AnimatePresence>
+//           </div>
+//         ) : (
+//           <Link
+//             to={link.path}
+//             className={`nav-link ${
+//               activeLink === link.path ? 'nav-link-active' : ''
+//             }`}
+//             style={{
+//               display: 'block',
+//               textDecoration: 'none',
+//               color: activeLink === link.path ? '#2D5D7B' : 'inherit',
+//               fontWeight: activeLink === link.path ? '600' : '400',
+//               borderBottom:
+//                 activeLink === link.path ? '2px solid #2D5D7B' : 'none',
+//               padding: '8px 4px',
+//               transition: 'all 0.3s ease',
+//             }}
+//           >
+//             {link.name}
+//           </Link>
+//         )}
+//       </li>
+//     ))}
+//   </ul>
+// </div>
 
 //         {/* Right Side - Calendar, Notifications, Language, Reward Points & Profile */}
 //         <div className="navbar-end" style={{
@@ -1046,11 +1426,12 @@
 //               className="nav-link-wrapper"
 //               style={{ position: 'relative' }}
 //               onMouseEnter={() => {
-//                 // MARK: ADDED - Refresh study plans when hovering over calendar
-//                 loadStudyPlans();
-//                 setCalendarOpen(true);
+//                 if (!isMobile) {
+//                   loadStudyPlans();
+//                   setCalendarOpen(true);
+//                 }
 //               }}
-//               onMouseLeave={() => setCalendarOpen(false)}
+//               onMouseLeave={() => !isMobile && setCalendarOpen(false)}
 //             >
 //               <button
 //                 className="calendar-button"
@@ -1071,8 +1452,9 @@
 //                   justifyContent: 'center',
 //                   position: 'relative'
 //                 }}
-//                 onMouseEnter={(e) => { e.target.style.background = '#f8f9fa'; e.target.style.borderColor = '#2D5D7B'; }}
-//                 onMouseLeave={(e) => { e.target.style.background = 'transparent'; e.target.style.borderColor = '#ddd'; }}
+//                 onMouseEnter={(e) => { if (!isMobile) { e.target.style.background = '#f8f9fa'; e.target.style.borderColor = '#2D5D7B'; } }}
+//                 onMouseLeave={(e) => { if (!isMobile) { e.target.style.background = 'transparent'; e.target.style.borderColor = '#ddd'; } }}
+//                 onClick={() => isMobile && setCalendarOpen(!calendarOpen)}
 //               >
 //                 <FaCalendarAlt size={14} />
 //                 {getTodaysStudyPlans().length > 0 && (
@@ -1098,22 +1480,45 @@
 //                     animate={{ opacity: 1, y: 0 }}
 //                     exit={{ opacity: 0, y: -10 }}
 //                     style={{
-//                       position: 'absolute',
-//                       top: '100%',
-//                       right: 0,
+//                       position: isMobile ? 'fixed' : 'absolute',
+//                       top: isMobile ? '50%' : '100%',
+//                       left: isMobile ? '50%' : 'auto',
+//                       right: isMobile ? 'auto' : 0,
+//                       transform: isMobile ? 'translate(-50%, -50%)' : 'none',
 //                       background: 'white',
 //                       borderRadius: '12px',
 //                       boxShadow: '0 8px 30px rgba(0,0,0,0.15)',
-//                       width: '320px',
+//                       width: isMobile ? '90vw' : '320px',
+//                       maxWidth: isMobile ? '400px' : 'none',
 //                       zIndex: 1000,
 //                       padding: '16px',
-//                       marginTop: '8px'
+//                       marginTop: isMobile ? '0' : '8px'
 //                     }}
 //                   >
 //                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
 //                       <h3 style={{ fontSize: '16px', fontWeight: '600', color: '#1f2937', margin: 0 }}>
 //                         Study Calendar
 //                       </h3>
+//                       {isMobile && (
+//                         <button
+//                           onClick={() => setCalendarOpen(false)}
+//                           style={{
+//                             background: 'none',
+//                             border: 'none',
+//                             cursor: 'pointer',
+//                             padding: '4px',
+//                             borderRadius: '4px',
+//                             fontSize: '16px',
+//                             color: '#6b7280'
+//                           }}
+//                         >
+//                           <FaTimes />
+//                         </button>
+//                       )}
+//                     </div>
+
+//                     {/* Calendar Header */}
+//                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
 //                       <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
 //                         <button
 //                           onClick={() => navigateMonth(-1)}
@@ -1147,7 +1552,7 @@
 //                       </div>
 //                     </div>
 
-//                     {/* Calendar Header */}
+//                     {/* Calendar Header Days */}
 //                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '4px', marginBottom: '8px' }}>
 //                       {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
 //                         <div key={day} style={{ textAlign: 'center', fontSize: '11px', color: '#6b7280', fontWeight: '500' }}>
@@ -1227,11 +1632,12 @@
 //               className="nav-link-wrapper"
 //               style={{ position: 'relative' }}
 //               onMouseEnter={() => {
-//                 // MARK: ADDED - Refresh notifications when hovering over bell icon
-//                 loadNotifications();
-//                 setNotificationsOpen(true);
+//                 if (!isMobile) {
+//                   loadNotifications();
+//                   setNotificationsOpen(true);
+//                 }
 //               }}
-//               onMouseLeave={() => setNotificationsOpen(false)}
+//               onMouseLeave={() => !isMobile && setNotificationsOpen(false)}
 //             >
 //               <button
 //                 className="notification-button"
@@ -1252,8 +1658,9 @@
 //                   justifyContent: 'center',
 //                   position: 'relative'
 //                 }}
-//                 onMouseEnter={(e) => { e.target.style.background = '#f8f9fa'; e.target.style.borderColor = '#2D5D7B'; }}
-//                 onMouseLeave={(e) => { e.target.style.background = 'transparent'; e.target.style.borderColor = '#ddd'; }}
+//                 onMouseEnter={(e) => { if (!isMobile) { e.target.style.background = '#f8f9fa'; e.target.style.borderColor = '#2D5D7B'; } }}
+//                 onMouseLeave={(e) => { if (!isMobile) { e.target.style.background = 'transparent'; e.target.style.borderColor = '#ddd'; } }}
+//                 onClick={() => isMobile && setNotificationsOpen(!notificationsOpen)}
 //               >
 //                 <FaBell size={14} />
 //                 {unreadNotifications > 0 && (
@@ -1285,17 +1692,20 @@
 //                     animate={{ opacity: 1, y: 0 }}
 //                     exit={{ opacity: 0, y: -10 }}
 //                     style={{
-//                       position: 'absolute',
-//                       top: '100%',
-//                       right: 0,
+//                       position: isMobile ? 'fixed' : 'absolute',
+//                       top: isMobile ? '50%' : '100%',
+//                       left: isMobile ? '50%' : 'auto',
+//                       right: isMobile ? 'auto' : 0,
+//                       transform: isMobile ? 'translate(-50%, -50%)' : 'none',
 //                       background: 'white',
 //                       borderRadius: '12px',
 //                       boxShadow: '0 8px 30px rgba(0,0,0,0.15)',
-//                       width: '320px',
-//                       maxHeight: '400px',
+//                       width: isMobile ? '90vw' : '320px',
+//                       maxWidth: isMobile ? '400px' : 'none',
+//                       maxHeight: isMobile ? '80vh' : '400px',
 //                       zIndex: 1000,
 //                       padding: '0',
-//                       marginTop: '8px',
+//                       marginTop: isMobile ? '0' : '8px',
 //                       overflow: 'hidden'
 //                     }}
 //                   >
@@ -1309,7 +1719,24 @@
 //                       <h3 style={{ fontSize: '16px', fontWeight: '600', color: '#1f2937', margin: 0 }}>
 //                         Notifications
 //                       </h3>
-//                       <div style={{ display: 'flex', gap: '8px' }}>
+//                       <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+//                         {isMobile && (
+//                           <button
+//                             onClick={() => setNotificationsOpen(false)}
+//                             style={{
+//                               background: 'none',
+//                               border: 'none',
+//                               cursor: 'pointer',
+//                               padding: '4px',
+//                               borderRadius: '4px',
+//                               fontSize: '16px',
+//                               color: '#6b7280',
+//                               marginRight: '8px'
+//                             }}
+//                           >
+//                             <FaTimes />
+//                           </button>
+//                         )}
 //                         {unreadNotifications > 0 && (
 //                           <button
 //                             onClick={markAllNotificationsAsRead}
@@ -1343,7 +1770,7 @@
 //                       </div>
 //                     </div>
 
-//                     <div style={{ maxHeight: '300px', overflow: 'auto' }}>
+//                     <div style={{ maxHeight: isMobile ? '60vh' : '300px', overflow: 'auto' }}>
 //                       {notifications.length === 0 ? (
 //                         <div style={{ padding: '32px 16px', textAlign: 'center', color: '#6b7280' }}>
 //                           <FaBell size={24} style={{ marginBottom: '8px', opacity: 0.5 }} />
@@ -1359,17 +1786,56 @@
 //                               borderBottom: '1px solid #f3f4f6',
 //                               backgroundColor: notification.read ? 'transparent' : '#f0f9ff',
 //                               cursor: 'pointer',
-//                               transition: 'background 0.2s'
+//                               transition: 'background 0.2s',
+//                               position: 'relative'
 //                             }}
 //                             onClick={() => !notification.read && markNotificationAsRead(notification.id)}
 //                             onMouseEnter={(e) => {
-//                               e.target.style.backgroundColor = notification.read ? '#f9fafb' : '#e0f2fe';
+//                               if (!isMobile) {
+//                                 e.currentTarget.style.backgroundColor = notification.read ? '#f9fafb' : '#e0f2fe';
+//                               }
 //                             }}
 //                             onMouseLeave={(e) => {
-//                               e.target.style.backgroundColor = notification.read ? 'transparent' : '#f0f9ff';
+//                               if (!isMobile) {
+//                                 e.currentTarget.style.backgroundColor = notification.read ? 'transparent' : '#f0f9ff';
+//                               }
 //                             }}
 //                           >
-//                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '4px' }}>
+//                             {/* MARK: ADDED - Delete notification button */}
+//                             <button
+//                               className="delete-notification-btn"
+//                               onClick={(e) => {
+//                                 e.stopPropagation(); // Prevent marking as read when deleting
+//                                 deleteNotification(notification.id);
+//                               }}
+//                               style={{
+//                                 position: 'absolute',
+//                                 top: '8px',
+//                                 right: '8px',
+//                                 background: 'none',
+//                                 border: 'none',
+//                                 color: '#9ca3af',
+//                                 cursor: 'pointer',
+//                                 padding: '4px',
+//                                 borderRadius: '4px',
+//                                 transition: 'all 0.2s ease',
+//                                 display: 'flex',
+//                                 alignItems: 'center',
+//                                 justifyContent: 'center'
+//                               }}
+//                               onMouseEnter={(e) => {
+//                                 e.target.style.background = '#fee2e2';
+//                                 e.target.style.color = '#dc2626';
+//                               }}
+//                               onMouseLeave={(e) => {
+//                                 e.target.style.background = 'none';
+//                                 e.target.style.color = '#9ca3af';
+//                               }}
+//                             >
+//                               <FaTimes size={12} />
+//                             </button>
+
+//                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '4px', paddingRight: '20px' }}>
 //                               <div style={{ fontSize: '13px', fontWeight: '600', color: '#1f2937' }}>
 //                                 {notification.title}
 //                               </div>
@@ -1384,7 +1850,7 @@
 //                                 }} />
 //                               )}
 //                             </div>
-//                             <div style={{ fontSize: '12px', color: '#4b5563', marginBottom: '4px' }}>
+//                             <div style={{ fontSize: '12px', color: '#4b5563', marginBottom: '4px', paddingRight: '20px' }}>
 //                               {notification.message}
 //                             </div>
 //                             <div style={{ fontSize: '11px', color: '#9ca3af', display: 'flex', alignItems: 'center', gap: '4px' }}>
@@ -1406,8 +1872,8 @@
 //             <div
 //               className="nav-link-wrapper"
 //               style={{ position: 'relative' }}
-//               onMouseEnter={() => setLangDropdownOpen(true)}
-//               onMouseLeave={() => setLangDropdownOpen(false)}
+//               onMouseEnter={() => !isMobile && setLangDropdownOpen(true)}
+//               onMouseLeave={() => !isMobile && setLangDropdownOpen(false)}
 //             >
 //               <button
 //                 className="language-button"
@@ -1424,14 +1890,15 @@
 //                   fontWeight: '500',
 //                   color: '#333',
 //                   transition: 'all 0.3s ease',
-//                   minWidth: '90px',
+//                   minWidth: isMobile ? 'auto' : '90px',
 //                   justifyContent: 'center'
 //                 }}
-//                 onMouseEnter={(e) => { e.target.style.background = '#f8f9fa'; e.target.style.borderColor = '#2D5D7B'; }}
-//                 onMouseLeave={(e) => { e.target.style.background = 'transparent'; e.target.style.borderColor = '#ddd'; }}
+//                 onMouseEnter={(e) => { if (!isMobile) { e.target.style.background = '#f8f9fa'; e.target.style.borderColor = '#2D5D7B'; } }}
+//                 onMouseLeave={(e) => { if (!isMobile) { e.target.style.background = 'transparent'; e.target.style.borderColor = '#ddd'; } }}
+//                 onClick={() => isMobile && setLangDropdownOpen(!langDropdownOpen)}
 //               >
 //                 <FaGlobe size={12} />
-//                 <span>{i18n.language.toUpperCase()}</span>
+//                 {!isMobile && <span>{i18n.language.toUpperCase()}</span>}
 //                 <FaChevronDown size={8} />
 //               </button>
 
@@ -1443,29 +1910,40 @@
 //                     animate={{ opacity: 1, y: 0 }}
 //                     exit={{ opacity: 0, y: -10 }}
 //                     style={{
-//                       position: 'absolute',
-//                       top: '100%',
-//                       right: 0,
+//                       position: isMobile ? 'fixed' : 'absolute',
+//                       top: isMobile ? '50%' : '100%',
+//                       left: isMobile ? '50%' : 'auto',
+//                       right: isMobile ? 'auto' : 0,
+//                       transform: isMobile ? 'translate(-50%, -50%)' : 'none',
 //                       background: 'white',
 //                       borderRadius: '8px',
 //                       boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
-//                       minWidth: '140px',
+//                       minWidth: isMobile ? '80vw' : '140px',
+//                       maxWidth: isMobile ? '300px' : 'none',
 //                       zIndex: 1000,
 //                       padding: '8px 0',
-//                       marginTop: '5px'
+//                       marginTop: isMobile ? '0' : '5px'
 //                     }}
 //                   >
+//                     {isMobile && (
+//                       <div style={{ padding: '8px 16px', borderBottom: '1px solid #e5e7eb' }}>
+//                         <h4 style={{ margin: 0, fontSize: '14px', fontWeight: '600', color: '#1f2937' }}>Select Language</h4>
+//                       </div>
+//                     )}
 //                     <ul style={{ margin: 0, padding: 0, listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '2px' }}>
 //                       {languages.map((lang) => (
 //                         <li key={lang.code}>
 //                           <button
-//                             onClick={() => handleLanguageChange(lang.code)}
+//                             onClick={() => {
+//                               handleLanguageChange(lang.code);
+//                               if (isMobile) setLangDropdownOpen(false);
+//                             }}
 //                             className="dropdown-link"
 //                             style={{
 //                               width: '100%',
 //                               border: 'none',
 //                               background: 'transparent',
-//                               padding: '8px 16px',
+//                               padding: '12px 16px',
 //                               textAlign: 'left',
 //                               cursor: 'pointer',
 //                               fontSize: '14px',
@@ -1475,14 +1953,33 @@
 //                               alignItems: 'center',
 //                               borderRadius: '0'
 //                             }}
-//                             onMouseEnter={(e) => { e.target.style.background = '#2D5D7B'; e.target.style.color = 'white'; }}
-//                             onMouseLeave={(e) => { e.target.style.background = 'transparent'; e.target.style.color = '#333'; }}
+//                             onMouseEnter={(e) => { if (!isMobile) { e.target.style.background = '#2D5D7B'; e.target.style.color = 'white'; } }}
+//                             onMouseLeave={(e) => { if (!isMobile) { e.target.style.background = 'transparent'; e.target.style.color = '#333'; } }}
 //                           >
 //                             {lang.label}
 //                           </button>
 //                         </li>
 //                       ))}
 //                     </ul>
+//                     {isMobile && (
+//                       <div style={{ padding: '8px 16px', borderTop: '1px solid #e5e7eb' }}>
+//                         <button
+//                           onClick={() => setLangDropdownOpen(false)}
+//                           style={{
+//                             width: '100%',
+//                             padding: '8px',
+//                             background: '#f3f4f6',
+//                             border: 'none',
+//                             borderRadius: '4px',
+//                             cursor: 'pointer',
+//                             fontSize: '14px',
+//                             color: '#6b7280'
+//                           }}
+//                         >
+//                           Close
+//                         </button>
+//                       </div>
+//                     )}
 //                   </motion.div>
 //                 )}
 //               </AnimatePresence>
@@ -1495,10 +1992,12 @@
 //               className="nav-link-wrapper"
 //               style={{ position: 'relative' }}
 //               onMouseEnter={() => {
-//                 loadRewardsHistory();
-//                 setRewardsHistoryOpen(true);
+//                 if (!isMobile) {
+//                   loadRewardsHistory();
+//                   setRewardsHistoryOpen(true);
+//                 }
 //               }}
-//               onMouseLeave={() => setRewardsHistoryOpen(false)}
+//               onMouseLeave={() => !isMobile && setRewardsHistoryOpen(false)}
 //             >
 //               <motion.div
 //                 className="reward-points-display"
@@ -1515,14 +2014,15 @@
 //                   border: '2px solid #FFC107',
 //                   cursor: 'pointer',
 //                   boxShadow: '0 2px 8px rgba(255, 193, 7, 0.3)',
-//                   minWidth: '80px',
+//                   minWidth: isMobile ? '70px' : '80px',
 //                   justifyContent: 'center',
 //                   position: 'relative',
 //                   overflow: 'hidden'
 //                 }}
 //                 title="Your Reward Points - Click to view history"
-//                 whileHover={{ scale: 1.05, boxShadow: '0 4px 12px rgba(255, 193, 7, 0.5)' }}
+//                 whileHover={{ scale: isMobile ? 1 : 1.05, boxShadow: isMobile ? '0 2px 8px rgba(255, 193, 7, 0.3)' : '0 4px 12px rgba(255, 193, 7, 0.5)' }}
 //                 whileTap={{ scale: 0.95 }}
+//                 onClick={() => isMobile && setRewardsHistoryOpen(true)}
 //               >
 //                 {/* Animated background effect */}
 //                 <div style={{
@@ -1577,11 +2077,11 @@
 //                       top: 0,
 //                       right: 0,
 //                       height: '100vh',
-//                       width: '380px',
+//                       width: isMobile ? '100vw' : '380px',
 //                       background: '#fff',
 //                       boxShadow: '-4px 0 25px rgba(0,0,0,0.2)',
-//                       borderTopLeftRadius: '16px',
-//                       borderBottomLeftRadius: '16px',
+//                       borderTopLeftRadius: isMobile ? '0' : '16px',
+//                       borderBottomLeftRadius: isMobile ? '0' : '16px',
 //                       zIndex: 10000,
 //                       display: 'flex',
 //                       flexDirection: 'column',
@@ -1620,15 +2120,28 @@
 //                             margin: '4px 0 0 0',
 //                           }}
 //                         >
-//                        {/* <b>   Total: {currentRewardPoints.toLocaleString()} points </b> */}
-
-//                        <b style={{ color: '#8B5A2B' }}>
-//   Total: {currentRewardPoints.toLocaleString()} points
-// </b>
-
+//                           <b style={{ color: '#8B5A2B' }}>
+//                             Total: {currentRewardPoints.toLocaleString()} points
+//                           </b>
 //                         </p>
 //                       </div>
-//                       <FaHistory size={18} color="#8B5A2B" />
+//                       <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+//                         <FaHistory size={18} color="#8B5A2B" />
+//                         <button
+//                           onClick={() => setRewardsHistoryOpen(false)}
+//                           style={{
+//                             background: 'none',
+//                             border: 'none',
+//                             cursor: 'pointer',
+//                             padding: '4px',
+//                             borderRadius: '4px',
+//                             fontSize: '16px',
+//                             color: '#6b7280'
+//                           }}
+//                         >
+//                           <FaTimes />
+//                         </button>
+//                       </div>
 //                     </div>
 
 //                     {/* Clear All Button */}
@@ -1779,8 +2292,8 @@
 //               position: 'relative',
 //               cursor: 'pointer',
 //             }}
-//             onMouseEnter={() => setAvatarOpen(true)}
-//             onMouseLeave={() => setAvatarOpen(false)}
+//             onMouseEnter={() => !isMobile && setAvatarOpen(true)}
+//             onMouseLeave={() => !isMobile && setAvatarOpen(false)}
 //           >
 //             {/* Avatar with Name */}
 //             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -1808,9 +2321,11 @@
 //                   <FaUserCircle size={28} color="#4B5563" />
 //                 )}
 //               </div>
-//               <span style={{ fontWeight: 500, color: '#111827', fontSize: '14px' }}>
-//                 {name || 'User'}
-//               </span>
+//               {!isMobile && (
+//                 <span style={{ fontWeight: 500, color: '#111827', fontSize: '14px' }}>
+//                   {name || 'User'}
+//                 </span>
+//               )}
 //             </div>
 
 //             {/* Dropdown */}
@@ -1903,25 +2418,261 @@
 //               )}
 //             </AnimatePresence>
 //           </div>
+
+//           {/* MARK: ADDED - Mobile Menu Button */}
+//           <div className="navbar-mobile-menu">
+//             <button
+//               onClick={() => setMobileMenuOpen(true)}
+//               style={{
+//                 background: 'transparent',
+//                 border: '1px solid #ddd',
+//                 borderRadius: '6px',
+//                 padding: '8px',
+//                 cursor: 'pointer',
+//                 display: 'flex',
+//                 alignItems: 'center',
+//                 justifyContent: 'center'
+//               }}
+//             >
+//               <FaBars size={16} color="#333" />
+//             </button>
+//           </div>
 //         </div>
 //       </div>
+
+//       {/* MARK: ADDED - Mobile Menu Overlay and Content */}
+//       <AnimatePresence>
+//         {mobileMenuOpen && (
+//           <>
+//             <motion.div
+//               className="mobile-menu-overlay"
+//               initial={{ opacity: 0 }}
+//               animate={{ opacity: 1 }}
+//               exit={{ opacity: 0 }}
+//               onClick={closeMobileMenu}
+//             />
+//             <motion.div
+//               className="mobile-menu-content"
+//               initial={{ x: -280 }}
+//               animate={{ x: 0 }}
+//               exit={{ x: -280 }}
+//               transition={{ type: 'tween', duration: 0.3 }}
+//             >
+//               <div className="mobile-menu-header">
+//                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+//                   <img src={novyaLogo} alt="NOVYA Logo" style={{ height: '30px' }} />
+//                   <span style={{
+//                     background: 'linear-gradient(90deg, #2D5D7B 0%, #4a8db7 25%, #FF6B6B 50%, #FFD166 75%, #2D5D7B 100%)',
+//                     WebkitBackgroundClip: 'text',
+//                     backgroundClip: 'text',
+//                     color: 'transparent',
+//                     fontWeight: '800',
+//                     fontSize: '1.4rem',
+//                     fontFamily: "'Poppins', sans-serif",
+//                   }}>
+//                     NOVYA
+//                   </span>
+//                 </div>
+//                 <button
+//                   onClick={closeMobileMenu}
+//                   style={{
+//                     background: 'none',
+//                     border: 'none',
+//                     cursor: 'pointer',
+//                     padding: '4px',
+//                     borderRadius: '4px',
+//                     fontSize: '18px',
+//                     color: '#6b7280'
+//                   }}
+//                 >
+//                   <FaTimes />
+//                 </button>
+//               </div>
+
+//               {/* User Info Section */}
+//               <div className="mobile-avatar-section">
+//                 <div
+//                   style={{
+//                     width: '48px',
+//                     height: '48px',
+//                     borderRadius: '50%',
+//                     overflow: 'hidden',
+//                     boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+//                     display: 'flex',
+//                     alignItems: 'center',
+//                     justifyContent: 'center',
+//                     background: '#f0f0f0',
+//                   }}
+//                 >
+//                   {avatar ? (
+//                     <img
+//                       src={avatar}
+//                       alt="User Avatar"
+//                       style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+//                     />
+//                   ) : (
+//                     <FaUserCircle size={40} color="#4B5563" />
+//                   )}
+//                 </div>
+//                 <div>
+//                   <div style={{ fontWeight: 600, color: '#111827', fontSize: '16px' }}>
+//                     {name || 'User'}
+//                   </div>
+//                   <div style={{ fontSize: '14px', color: '#6b7280' }}>
+//                     Student
+//                   </div>
+//                 </div>
+//               </div>
+
+//               {/* Reward Points Display */}
+//               <div className="reward-points-mobile">
+//                 <FaCoins size={18} color="#744210" />
+//                 <span>{currentRewardPoints.toLocaleString()} Points</span>
+//               </div>
+
+//               {/* Quick Actions Row */}
+//               <div className="mobile-icons-row">
+//                 <button
+//                   className="mobile-icon-button"
+//                   onClick={() => {
+//                     loadStudyPlans();
+//                     setCalendarOpen(true);
+//                     closeMobileMenu();
+//                   }}
+//                   style={{ position: 'relative' }}
+//                 >
+//                   <FaCalendarAlt size={18} />
+//                   <span>Calendar</span>
+//                   {getTodaysStudyPlans().length > 0 && (
+//                     <span className="badge"></span>
+//                   )}
+//                 </button>
+//                 <button
+//                   className="mobile-icon-button"
+//                   onClick={() => {
+//                     loadNotifications();
+//                     setNotificationsOpen(true);
+//                     closeMobileMenu();
+//                   }}
+//                   style={{ position: 'relative' }}
+//                 >
+//                   <FaBell size={18} />
+//                   <span>Alerts</span>
+//                   {unreadNotifications > 0 && (
+//                     <span className="badge">{unreadNotifications}</span>
+//                   )}
+//                 </button>
+//                 <button
+//                   className="mobile-icon-button"
+//                   onClick={() => {
+//                     loadRewardsHistory();
+//                     setRewardsHistoryOpen(true);
+//                     closeMobileMenu();
+//                   }}
+//                 >
+//                   <FaHistory size={18} />
+//                   <span>History</span>
+//                 </button>
+//               </div>
+
+//               {/* Navigation Links */}
+//               <div className="mobile-nav-links">
+//                 {navLinks.map((link) => (
+//                   <div key={link.path} className="mobile-nav-item">
+//                     {link.hasDropdown ? (
+//                       <>
+//                         <button
+//                           className="mobile-nav-link"
+//                           onClick={() => toggleMobileDropdown(link.path === '/learn' ? 'learn' : 'practice')}
+//                         >
+//                           <span>{link.name}</span>
+//                           <FaChevronDown
+//                             size={12}
+//                             style={{
+//                               transform: mobileDropdowns[link.path === '/learn' ? 'learn' : 'practice'] ? 'rotate(180deg)' : 'none',
+//                               transition: 'transform 0.3s ease'
+//                             }}
+//                           />
+//                         </button>
+//                         <AnimatePresence>
+//                           {mobileDropdowns[link.path === '/learn' ? 'learn' : 'practice'] && (
+//                             <motion.div
+//                               className="mobile-dropdown-content"
+//                               initial={{ opacity: 0, height: 0 }}
+//                               animate={{ opacity: 1, height: 'auto' }}
+//                               exit={{ opacity: 0, height: 0 }}
+//                             >
+//                               {link.dropdownItems.map((dropdownItem) => (
+//                                 <Link
+//                                   key={dropdownItem.path}
+//                                   to={dropdownItem.path}
+//                                   className={`mobile-dropdown-link ${activeLink === dropdownItem.path ? 'active' : ''}`}
+//                                   onClick={closeMobileMenu}
+//                                 >
+//                                   {dropdownItem.name}
+//                                 </Link>
+//                               ))}
+//                             </motion.div>
+//                           )}
+//                         </AnimatePresence>
+//                       </>
+//                     ) : (
+//                       <Link
+//                         to={link.path}
+//                         className="mobile-nav-link"
+//                         onClick={closeMobileMenu}
+//                         style={{
+//                           color: activeLink === link.path ? '#2D5D7B' : '#374151',
+//                           background: activeLink === link.path ? '#f0f7ff' : '#f8fafc',
+//                         }}
+//                       >
+//                         <span>{link.name}</span>
+//                       </Link>
+//                     )}
+//                   </div>
+//                 ))}
+//               </div>
+
+//               {/* Bottom Actions */}
+//               <div className="mobile-bottom-actions">
+//                 <button
+//                   className="mobile-action-button"
+//                   onClick={() => {
+//                     setLangDropdownOpen(true);
+//                     closeMobileMenu();
+//                   }}
+//                 >
+//                   <FaGlobe size={14} />
+//                   <span>Language ({i18n.language.toUpperCase()})</span>
+//                 </button>
+//                 <button
+//                   className="mobile-action-button"
+//                   onClick={() => {
+//                     navigate('/user-details');
+//                     closeMobileMenu();
+//                   }}
+//                 >
+//                   <FaUserCircle size={14} />
+//                   <span>View Profile</span>
+//                 </button>
+//                 <button
+//                   className="mobile-action-button"
+//                   onClick={handleLogout}
+//                   style={{ color: '#dc2626', borderColor: '#fecaca' }}
+//                 >
+//                   <FaSignOutAlt size={14} />
+//                   <span>Logout</span>
+//                 </button>
+//               </div>
+//             </motion.div>
+//           </>
+//         )}
+//       </AnimatePresence>
 //     </motion.nav>
 //   );
 // };
 
 // export default Navbar;
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -1956,7 +2707,8 @@ import {
   FaHistory,
   FaPlus,
   FaMinus,
-  FaTrash
+  FaTrash,
+  FaBars,
 } from 'react-icons/fa';
 import { useTranslation } from 'react-i18next';
 import './Navbarrr.css';
@@ -1973,6 +2725,11 @@ const Navbar = ({ isFullScreen, rewardPoints = 0 }) => {
   const [calendarOpen, setCalendarOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [rewardsHistoryOpen, setRewardsHistoryOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [mobileDropdowns, setMobileDropdowns] = useState({
+    learn: false,
+    practice: false
+  });
  
   // MARK: ADDED - Flying coins animation state
   const [showFlyingCoins, setShowFlyingCoins] = useState(false);
@@ -2000,13 +2757,25 @@ const Navbar = ({ isFullScreen, rewardPoints = 0 }) => {
   const languages = [
     { code: 'en', label: 'English' },
     { code: 'te', label: 'తెలుగు' },
-    { code: 'hi', label: ' हिंदी' },
+    { code: 'hi', label: 'హిందీ' },
     { code: 'kn', label: 'ಕನ್ನಡ' },
     { code: 'ta', label: 'தமிழ்' },
     { code: 'ml', label: 'മലയാളം' },
   ];
 
-  // MARK: ADDED - Load rewards history
+  // MARK: ADDED - Mobile detection
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  // MARK: UPDATED - Load rewards history
   const loadRewardsHistory = () => {
     try {
       const savedHistory = localStorage.getItem('rewardsHistory');
@@ -2138,19 +2907,56 @@ const Navbar = ({ isFullScreen, rewardPoints = 0 }) => {
     };
   }, []);
 
-  // MARK: UPDATED - Study plan functions with improved real-time loading
+  // MARK: UPDATED - Study plan functions with improved real-time loading and data validation
   const loadStudyPlans = () => {
     try {
       const savedPlans = localStorage.getItem('studyPlans');
       if (savedPlans) {
         const plans = JSON.parse(savedPlans);
-        // Remove duplicates based on ID
+       
+        // Remove duplicates based on ID and also clean up any invalid dates
         const uniquePlans = plans.filter((plan, index, self) =>
           index === self.findIndex(p => p.id === plan.id)
-        );
+        ).map(plan => ({
+          ...plan,
+          // Ensure studySessions exist and have proper dates starting from current date
+          studySessions: (plan.studySessions || []).filter(session =>
+            session && session.date && !isNaN(new Date(session.date).getTime())
+          ).map(session => {
+            // Normalize date to YYYY-MM-DD format
+            let normalizedDate;
+            try {
+              const dateObj = new Date(session.date);
+              normalizedDate = dateObj.toISOString().split('T')[0];
+            } catch (error) {
+              console.error('Error normalizing date:', error, session.date);
+              normalizedDate = session.date; // fallback to original
+            }
+           
+            return {
+              ...session,
+              date: normalizedDate
+            };
+          })
+        }));
+       
         setStudyPlans(uniquePlans);
+       
+        // Debug: Log study plans and their sessions
+        console.log('=== LOADED STUDY PLANS ===');
+        uniquePlans.forEach(plan => {
+          console.log(`Plan: ${plan.title}`);
+          console.log(`Created: ${plan.createdDate}`);
+          console.log('Sessions:', plan.studySessions?.map(s => ({
+            date: s.date,
+            formatted: new Date(s.date).toLocaleDateString(),
+            title: s.title
+          })));
+          console.log('---');
+        });
       } else {
         setStudyPlans([]);
+        console.log('No study plans found in localStorage');
       }
     } catch (error) {
       console.error('Error loading study plans:', error);
@@ -2221,6 +3027,7 @@ const Navbar = ({ isFullScreen, rewardPoints = 0 }) => {
     }));
   };
 
+  // MARK: UPDATED - Create notification with current date message
   const createNotification = (studyPlan) => {
     const notificationId = `notif_${studyPlan.id}`;
    
@@ -2237,7 +3044,7 @@ const Navbar = ({ isFullScreen, rewardPoints = 0 }) => {
       id: notificationId,
       type: 'study_plan_created',
       title: 'New Study Plan Created',
-      message: `Study plan for ${studyPlan.title} has been added to your calendar`,
+      message: `Study plan for ${studyPlan.title} has been added to your calendar starting from today`,
       date: new Date().toISOString(),
       read: false,
       planId: studyPlan.id
@@ -2317,13 +3124,31 @@ const Navbar = ({ isFullScreen, rewardPoints = 0 }) => {
     }
   };
 
-  // MARK: ADDED - Get today's study plans
+  // MARK: ADDED - Mobile dropdown toggle
+  const toggleMobileDropdown = (dropdown) => {
+    setMobileDropdowns(prev => ({
+      ...prev,
+      [dropdown]: !prev[dropdown]
+    }));
+  };
+
+  // MARK: ADDED - Mobile menu close function
+  const closeMobileMenu = () => {
+    setMobileMenuOpen(false);
+    setMobileDropdowns({
+      learn: false,
+      practice: false
+    });
+  };
+
+  // MARK: UPDATED - Get today's study plans (fixed date comparison)
   const getTodaysStudyPlans = () => {
     const today = new Date().toISOString().split('T')[0];
     const todaysPlans = [];
    
     studyPlans.forEach(plan => {
       plan.studySessions?.forEach(session => {
+        // Direct date comparison for today's sessions
         if (session.date === today && !session.completed) {
           todaysPlans.push({
             ...session,
@@ -2354,25 +3179,38 @@ const Navbar = ({ isFullScreen, rewardPoints = 0 }) => {
     });
   };
 
+  // MARK: UPDATED - Enhanced study plan date filtering with proper date comparison
   const getStudyPlansForDate = (date) => {
+    // Convert both dates to YYYY-MM-DD format for consistent comparison
     const dateString = date.toISOString().split('T')[0];
     const plansForDate = [];
    
+    console.log(`Checking study plans for date: ${dateString}`);
+   
     studyPlans.forEach(plan => {
       plan.studySessions?.forEach(session => {
-        if (session.date === dateString) {
+        // Ensure session date is in same format for comparison
+        const sessionDate = session.date;
+       
+        // Debug log to see what's being compared
+        console.log(`Comparing session date: ${sessionDate} with target: ${dateString}`);
+       
+        if (sessionDate === dateString) {
           plansForDate.push({
             ...session,
             planTitle: plan.title,
-            subject: plan.subject
+            subject: plan.subject,
+            created: plan.createdDate
           });
         }
       });
     });
    
+    console.log(`Found ${plansForDate.length} study plans for ${dateString}`);
     return plansForDate;
   };
 
+  // MARK: UPDATED - Enhanced date comparison functions
   const isToday = (date) => {
     const today = new Date();
     return date.getDate() === today.getDate() &&
@@ -2381,6 +3219,7 @@ const Navbar = ({ isFullScreen, rewardPoints = 0 }) => {
   };
 
   const isSelectedDate = (date) => {
+    if (!selectedDate) return false;
     return date.getDate() === selectedDate.getDate() &&
            date.getMonth() === selectedDate.getMonth() &&
            date.getFullYear() === selectedDate.getFullYear();
@@ -2393,7 +3232,7 @@ const Navbar = ({ isFullScreen, rewardPoints = 0 }) => {
     });
   };
 
-  // MARK: UPDATED - Flying coins animation trigger function with points and history
+  // MARK: UPDATED - Flying coins animation trigger function with proper timeout
   const triggerFlyingCoins = (pointsToAdd = 0, reason = "Activity completed") => {
     setShowFlyingCoins(true);
     if (pointsToAdd > 0) {
@@ -2401,7 +3240,7 @@ const Navbar = ({ isFullScreen, rewardPoints = 0 }) => {
     }
     setTimeout(() => {
       setShowFlyingCoins(false);
-    }, 2000);
+    }, 2000); // Fixed timeout duration - was 20ms, now 2000ms for proper animation
   };
 
   // MARK: UPDATED - Welcome coins animation for login with points and history
@@ -2410,7 +3249,7 @@ const Navbar = ({ isFullScreen, rewardPoints = 0 }) => {
     const welcomeAwarded = sessionStorage.getItem('welcomePointsAwarded');
     if (!welcomeAwarded) {
       setShowFlyingCoins(true);
-      addRewardPointsWithHistory(50, "Daily login reward", 'login');
+      addRewardPointsWithHistory(5, "Daily login reward", 'login');
       sessionStorage.setItem('welcomePointsAwarded', 'true');
      
       setTimeout(() => {
@@ -2418,6 +3257,56 @@ const Navbar = ({ isFullScreen, rewardPoints = 0 }) => {
       }, 3000);
     }
   };
+
+  // MARK: ADDED - Debug function to check all study plans
+
+  // const debugStudyPlans = () => {
+  //   console.log('=== STUDY PLANS DEBUG INFO ===');
+  //   console.log('Total study plans:', studyPlans.length);
+   
+  //   studyPlans.forEach((plan, planIndex) => {
+  //     console.log(`Plan ${planIndex + 1}:`, {
+  //       title: plan.title,
+  //       id: plan.id,
+  //       created: plan.createdDate,
+  //       sessionCount: plan.studySessions?.length || 0,
+  //       sessions: plan.studySessions?.map(s => ({
+  //         date: s.date,
+  //         title: s.title,
+  //         formattedDate: new Date(s.date).toLocaleDateString()
+  //       }))
+  //     });
+  //   });
+   
+  //   // Check today's plans specifically
+  //   const today = new Date();
+  //   const todayPlans = getStudyPlansForDate(today);
+  //   console.log(`Today's plans (${today.toISOString().split('T')[0]}):`, todayPlans);
+  // };
+
+
+  // MARK: ADDED - Debug today's study plans specifically
+const debugTodaysStudyPlans = () => {
+  const today = new Date();
+  const todayString = today.toISOString().split('T')[0];
+  console.log('=== DEBUG TODAYS STUDY PLANS ===');
+  console.log('Today date:', todayString);
+  console.log('Total study plans:', studyPlans.length);
+ 
+  studyPlans.forEach((plan, planIndex) => {
+    console.log(`Plan ${planIndex + 1}: ${plan.title}`);
+    plan.studySessions?.forEach((session, sessionIndex) => {
+      console.log(`  Session ${sessionIndex + 1}:`, {
+        date: session.date,
+        matchesToday: session.date === todayString,
+        title: session.title
+      });
+    });
+  });
+ 
+  const todaysPlans = getTodaysStudyPlans();
+  console.log('Todays plans found:', todaysPlans);
+};
 
   // MARK: UPDATED - Sync reward points from localStorage and props
   useEffect(() => {
@@ -2531,6 +3420,9 @@ const Navbar = ({ isFullScreen, rewardPoints = 0 }) => {
     setLangDropdownOpen(false);
     setRewardsHistoryOpen(false);
 
+    // Close mobile menu when route changes
+    closeMobileMenu();
+
     // Hide navbar in fullscreen mode during tests
     if (isFullScreen) {
       setShowNavbar(false);
@@ -2584,6 +3476,7 @@ const Navbar = ({ isFullScreen, rewardPoints = 0 }) => {
       dropdownItems: [
         { path: '/quick-practice', name: t('quick_practice', 'Quick Practice') },
         { path: '/mock-test', name: t('mock_test', 'Mock Test') },
+        { path: '/spin-wheel', name: t('spin_wheel', 'Spin Wheel') },
       ],
     },
     { path: '/career', name: t('career', 'Career') },
@@ -2839,13 +3732,241 @@ const Navbar = ({ isFullScreen, rewardPoints = 0 }) => {
             border-radius: 4px;
             transition: all 0.2s ease;
             display: flex;
-            align-items: center;
-            justify-content: center;
+            alignItems: 'center';
+            justifyContent: 'center';
           }
          
           .delete-notification-btn:hover {
             background: #fee2e2;
             color: #dc2626;
+          }
+
+          /* MARK: ADDED - Mobile Responsive Styles */
+          @media (max-width: 768px) {
+            .navbar-desktop-links {
+              display: none;
+            }
+           
+            .navbar-mobile-menu {
+              display: flex;
+            }
+           
+            .navbar-container {
+              padding: 0 16px;
+            }
+           
+            .navbar-end {
+              gap: 8px;
+            }
+           
+            .mobile-menu-overlay {
+              position: fixed;
+              top: 0;
+              left: 0;
+              right: 0;
+              bottom: 0;
+              background: rgba(0, 0, 0, 0.5);
+              z-index: 9995;
+            }
+           
+            .mobile-menu-content {
+              position: fixed;
+              top: 0;
+              left: 0;
+              width: 280px;
+              height: 100vh;
+              background: white;
+              z-index: 9996;
+              overflow-y: auto;
+              padding: 20px 0;
+            }
+           
+            .mobile-menu-header {
+              padding: 0 20px 20px;
+              border-bottom: 1px solid #e5e7eb;
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+            }
+           
+            .mobile-nav-links {
+              padding: 20px;
+            }
+           
+            .mobile-nav-item {
+              margin-bottom: 8px;
+            }
+           
+            .mobile-nav-link {
+              display: flex;
+              align-items: center;
+              justify-content: space-between;
+              padding: 12px 16px;
+              background: #f8fafc;
+              border-radius: 8px;
+              text-decoration: none;
+              color: #374151;
+              font-weight: 500;
+            }
+           
+            .mobile-dropdown-content {
+              padding-left: 20px;
+              margin-top: 8px;
+            }
+           
+            .mobile-dropdown-link {
+              display: block;
+              padding: 10px 16px;
+              text-decoration: none;
+              color: #6b7280;
+              border-left: 2px solid #e5e7eb;
+              margin-bottom: 4px;
+            }
+           
+            .mobile-dropdown-link.active {
+              color: #2D5D7B;
+              border-left-color: #2D5D7B;
+              background: #f0f7ff;
+            }
+           
+            .mobile-bottom-actions {
+              padding: 20px;
+              border-top: 1px solid #e5e7eb;
+              margin-top: 20px;
+            }
+           
+            .mobile-avatar-section {
+              display: flex;
+              align-items: center;
+              gap: 12px;
+              padding: 16px;
+              background: #f8fafc;
+              border-radius: 8px;
+              margin-bottom: 16px;
+            }
+           
+            .mobile-action-button {
+              width: '100%';
+              padding: '12px 16px';
+              border: '1px solid #e5e7eb';
+              border-radius: '8px';
+              background: 'white';
+              display: 'flex';
+              align-items: 'center';
+              gap: '8px';
+              margin-bottom: '8px';
+              font-size: '14px';
+              color: '#374151';
+            }
+           
+            .reward-points-mobile {
+              display: flex;
+              align-items: center;
+              gap: 8px;
+              padding: 12px 16px;
+              background: linear-gradient(135deg, #FFD700, #FFA500);
+              border-radius: 20px;
+              color: #744210;
+              font-weight: 600;
+              font-size: 14px;
+              margin: 16px 0;
+            }
+           
+            .mobile-icons-row {
+              display: flex;
+              gap: 12px;
+              padding: 0 20px;
+              margin-bottom: 16px;
+            }
+           
+            .mobile-icon-button {
+              flex: 1;
+              display: flex;
+              flex-direction: column;
+              align-items: center;
+              gap: 4px;
+              padding: 12px 8px;
+              background: #f8fafc;
+              border: 1px solid #e5e7eb;
+              border-radius: 8px;
+              font-size: 12px;
+              color: #374151;
+            }
+           
+            .mobile-icon-button .badge {
+              position: absolute;
+              top: -5px;
+              right: -5px;
+              background: #ef4444;
+              color: white;
+              border-radius: 50%;
+              width: 18px;
+              height: 18px;
+              font-size: 10px;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+            }
+          }
+
+          @media (min-width: 769px) {
+            .navbar-mobile-menu {
+              display: none;
+            }
+           
+            .mobile-menu-overlay {
+              display: none;
+            }
+          }
+
+          @media (max-width: 480px) {
+            .navbar-brand img {
+              height: 28px;
+            }
+           
+            .navbar-brand span {
+              font-size: 1.3rem;
+              margin-left: 6px;
+            }
+           
+            .navbar-end {
+              gap: 6px;
+            }
+           
+            .reward-points-display {
+              padding: 6px 12px;
+              font-size: 12px;
+              min-width: 70px;
+            }
+           
+            .language-button, .calendar-button, .notification-button {
+              padding: 6px 8px;
+              min-width: auto;
+            }
+           
+            .language-button span {
+              display: none;
+            }
+           
+            .mobile-menu-content {
+              width: 100%;
+            }
+          }
+
+          @media (max-width: 360px) {
+            .navbar-container {
+              padding: 0 12px;
+            }
+           
+            .reward-points-display {
+              padding: 4px 8px;
+              font-size: 11px;
+              min-width: 60px;
+            }
+           
+            .navbar-avatar-container span {
+              display: none;
+            }
           }
         `}
       </style>
@@ -2854,7 +3975,9 @@ const Navbar = ({ isFullScreen, rewardPoints = 0 }) => {
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
-        width: '100%'
+        width: '100%',
+        padding: '0 20px',
+        boxSizing: 'border-box'
       }}>
         {/* Logo - Left Side */}
         <div className="navbar-brand">
@@ -2888,7 +4011,7 @@ const Navbar = ({ isFullScreen, rewardPoints = 0 }) => {
           </Link>
         </div>
 
-        {/* Desktop Links - Center */}
+        {/* Desktop Links - Center (Hidden on Mobile) */}
         <div className="navbar-desktop-links">
           <ul style={{
             display: 'flex',
@@ -2914,25 +4037,46 @@ const Navbar = ({ isFullScreen, rewardPoints = 0 }) => {
               >
                 {link.hasDropdown ? (
                   <div className="nav-link-wrapper" style={{ position: 'relative' }}>
-                    <Link
-                      to={link.path}
-                      className={`nav-link ${activeLink === link.path || (link.hasDropdown && activeLink.startsWith(link.path)) ? 'nav-link-active' : ''}`}
+                    <span
+                      className={`nav-link ${
+                        activeLink === link.path ||
+                        (link.hasDropdown && activeLink.startsWith(link.path))
+                          ? 'nav-link-active'
+                          : ''
+                      }`}
                       style={{
                         display: 'flex',
                         alignItems: 'center',
                         gap: '5px',
                         textDecoration: 'none',
-                        color: (activeLink === link.path || (link.hasDropdown && activeLink.startsWith(link.path))) ? '#2D5D7B' : 'inherit',
-                        fontWeight: (activeLink === link.path || (link.hasDropdown && activeLink.startsWith(link.path))) ? '600' : '400',
-                        borderBottom: (activeLink === link.path || (link.hasDropdown && activeLink.startsWith(link.path))) ? '2px solid #2D5D7B' : 'none',
-                        padding: '8px 4px'
+                        color:
+                          activeLink === link.path ||
+                          (link.hasDropdown && activeLink.startsWith(link.path))
+                            ? '#2D5D7B'
+                            : 'inherit',
+                        fontWeight:
+                          activeLink === link.path ||
+                          (link.hasDropdown && activeLink.startsWith(link.path))
+                            ? '600'
+                            : '400',
+                        borderBottom:
+                          activeLink === link.path ||
+                          (link.hasDropdown && activeLink.startsWith(link.path))
+                            ? '2px solid #2D5D7B'
+                            : 'none',
+                        padding: '8px 4px',
+                        cursor: 'pointer',
                       }}
+                      onClick={(e) => e.preventDefault()} // ❌ Stop navigation
                     >
                       {link.name}
                       <FaChevronDown size={10} />
-                    </Link>
+                    </span>
+
                     <AnimatePresence>
-                      {(link.path === '/learn' ? classDropdownOpen : practiceDropdownOpen) && (
+                      {(link.path === '/learn'
+                        ? classDropdownOpen
+                        : practiceDropdownOpen) && (
                         <motion.div
                           className="nav-dropdown"
                           initial={{ opacity: 0, y: -10 }}
@@ -2947,23 +4091,42 @@ const Navbar = ({ isFullScreen, rewardPoints = 0 }) => {
                             boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
                             minWidth: '160px',
                             zIndex: 1000,
-                            padding: '10px 0'
+                            padding: '10px 0',
                           }}
                         >
-                          <ul style={{ margin: 0, padding: 0, listStyle: 'none' }}>
+                          <ul
+                            style={{
+                              margin: 0,
+                              padding: 0,
+                              listStyle: 'none',
+                            }}
+                          >
                             {link.dropdownItems.map((dropdownItem) => (
                               <li key={dropdownItem.path}>
                                 <Link
                                   to={dropdownItem.path}
-                                  className={`dropdown-link ${activeLink === dropdownItem.path ? 'dropdown-link-active' : ''}`}
+                                  className={`dropdown-link ${
+                                    activeLink === dropdownItem.path
+                                      ? 'dropdown-link-active'
+                                      : ''
+                                  }`}
                                   style={{
                                     display: 'block',
                                     padding: '8px 16px',
                                     textDecoration: 'none',
-                                    color: activeLink === dropdownItem.path ? '#2D5D7B' : '#333',
-                                    fontWeight: activeLink === dropdownItem.path ? '600' : '400',
-                                    background: activeLink === dropdownItem.path ? '#f0f7ff' : 'transparent',
-                                    transition: 'background 0.3s, color 0.3s'
+                                    color:
+                                      activeLink === dropdownItem.path
+                                        ? '#2D5D7B'
+                                        : '#333',
+                                    fontWeight:
+                                      activeLink === dropdownItem.path
+                                        ? '600'
+                                        : '400',
+                                    background:
+                                      activeLink === dropdownItem.path
+                                        ? '#f0f7ff'
+                                        : 'transparent',
+                                    transition: 'background 0.3s, color 0.3s',
                                   }}
                                   onMouseEnter={(e) => {
                                     if (activeLink !== dropdownItem.path) {
@@ -2972,7 +4135,10 @@ const Navbar = ({ isFullScreen, rewardPoints = 0 }) => {
                                   }}
                                   onMouseLeave={(e) => {
                                     if (activeLink !== dropdownItem.path) {
-                                      e.target.style.background = activeLink === dropdownItem.path ? '#f0f7ff' : 'transparent';
+                                      e.target.style.background =
+                                        activeLink === dropdownItem.path
+                                          ? '#f0f7ff'
+                                          : 'transparent';
                                     }
                                   }}
                                 >
@@ -2988,15 +4154,18 @@ const Navbar = ({ isFullScreen, rewardPoints = 0 }) => {
                 ) : (
                   <Link
                     to={link.path}
-                    className={`nav-link ${activeLink === link.path ? 'nav-link-active' : ''}`}
+                    className={`nav-link ${
+                      activeLink === link.path ? 'nav-link-active' : ''
+                    }`}
                     style={{
                       display: 'block',
                       textDecoration: 'none',
                       color: activeLink === link.path ? '#2D5D7B' : 'inherit',
                       fontWeight: activeLink === link.path ? '600' : '400',
-                      borderBottom: activeLink === link.path ? '2px solid #2D5D7B' : 'none',
+                      borderBottom:
+                        activeLink === link.path ? '2px solid #2D5D7B' : 'none',
                       padding: '8px 4px',
-                      transition: 'all 0.3s ease'
+                      transition: 'all 0.3s ease',
                     }}
                   >
                     {link.name}
@@ -3020,12 +4189,22 @@ const Navbar = ({ isFullScreen, rewardPoints = 0 }) => {
             <div
               className="nav-link-wrapper"
               style={{ position: 'relative' }}
-              onMouseEnter={() => {
-                // MARK: ADDED - Refresh study plans when hovering over calendar
-                loadStudyPlans();
-                setCalendarOpen(true);
-              }}
-              onMouseLeave={() => setCalendarOpen(false)}
+              // onMouseEnter={() => {
+              //   if (!isMobile) {
+              //     loadStudyPlans();
+              //     setCalendarOpen(true);
+              //   }
+              // }}
+
+              // In the calendar button onMouseEnter, add:
+onMouseEnter={() => {
+  if (!isMobile) {
+    loadStudyPlans();
+    debugTodaysStudyPlans(); // ADD THIS LINE
+    setCalendarOpen(true);
+  }
+}}
+              onMouseLeave={() => !isMobile && setCalendarOpen(false)}
             >
               <button
                 className="calendar-button"
@@ -3046,8 +4225,9 @@ const Navbar = ({ isFullScreen, rewardPoints = 0 }) => {
                   justifyContent: 'center',
                   position: 'relative'
                 }}
-                onMouseEnter={(e) => { e.target.style.background = '#f8f9fa'; e.target.style.borderColor = '#2D5D7B'; }}
-                onMouseLeave={(e) => { e.target.style.background = 'transparent'; e.target.style.borderColor = '#ddd'; }}
+                onMouseEnter={(e) => { if (!isMobile) { e.target.style.background = '#f8f9fa'; e.target.style.borderColor = '#2D5D7B'; } }}
+                onMouseLeave={(e) => { if (!isMobile) { e.target.style.background = 'transparent'; e.target.style.borderColor = '#ddd'; } }}
+                onClick={() => isMobile && setCalendarOpen(!calendarOpen)}
               >
                 <FaCalendarAlt size={14} />
                 {getTodaysStudyPlans().length > 0 && (
@@ -3073,22 +4253,45 @@ const Navbar = ({ isFullScreen, rewardPoints = 0 }) => {
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -10 }}
                     style={{
-                      position: 'absolute',
-                      top: '100%',
-                      right: 0,
+                      position: isMobile ? 'fixed' : 'absolute',
+                      top: isMobile ? '50%' : '100%',
+                      left: isMobile ? '50%' : 'auto',
+                      right: isMobile ? 'auto' : 0,
+                      transform: isMobile ? 'translate(-50%, -50%)' : 'none',
                       background: 'white',
                       borderRadius: '12px',
                       boxShadow: '0 8px 30px rgba(0,0,0,0.15)',
-                      width: '320px',
+                      width: isMobile ? '90vw' : '320px',
+                      maxWidth: isMobile ? '400px' : 'none',
                       zIndex: 1000,
                       padding: '16px',
-                      marginTop: '8px'
+                      marginTop: isMobile ? '0' : '8px'
                     }}
                   >
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
                       <h3 style={{ fontSize: '16px', fontWeight: '600', color: '#1f2937', margin: 0 }}>
                         Study Calendar
                       </h3>
+                      {isMobile && (
+                        <button
+                          onClick={() => setCalendarOpen(false)}
+                          style={{
+                            background: 'none',
+                            border: 'none',
+                            cursor: 'pointer',
+                            padding: '4px',
+                            borderRadius: '4px',
+                            fontSize: '16px',
+                            color: '#6b7280'
+                          }}
+                        >
+                          <FaTimes />
+                        </button>
+                      )}
+                    </div>
+
+                    {/* Calendar Header */}
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
                       <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
                         <button
                           onClick={() => navigateMonth(-1)}
@@ -3122,7 +4325,7 @@ const Navbar = ({ isFullScreen, rewardPoints = 0 }) => {
                       </div>
                     </div>
 
-                    {/* Calendar Header */}
+                    {/* Calendar Header Days */}
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '4px', marginBottom: '8px' }}>
                       {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
                         <div key={day} style={{ textAlign: 'center', fontSize: '11px', color: '#6b7280', fontWeight: '500' }}>
@@ -3142,6 +4345,11 @@ const Navbar = ({ isFullScreen, rewardPoints = 0 }) => {
                         const date = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), day);
                         const hasPlans = getStudyPlansForDate(date).length > 0;
                        
+                        // Debug log for specific dates
+                        if (hasPlans) {
+                          console.log(`Date ${date.toISOString().split('T')[0]} has study plans:`, getStudyPlansForDate(date));
+                        }
+                       
                         return (
                           <div
                             key={day}
@@ -3150,10 +4358,34 @@ const Navbar = ({ isFullScreen, rewardPoints = 0 }) => {
                             style={{
                               backgroundColor: isToday(date) ? '#3b82f6' : isSelectedDate(date) ? '#10b981' : 'transparent',
                               color: isToday(date) || isSelectedDate(date) ? 'white' : '#1f2937',
-                              fontWeight: isToday(date) || isSelectedDate(date) ? '600' : '400'
+                              fontWeight: isToday(date) || isSelectedDate(date) ? '600' : '400',
+                              width: '32px',
+                              height: '32px',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              borderRadius: '50%',
+                              fontSize: '12px',
+                              cursor: 'pointer',
+                              transition: 'all 0.2s',
+                              position: 'relative'
                             }}
                           >
                             {day}
+                            {hasPlans && (
+                              <div
+                                style={{
+                                  position: 'absolute',
+                                  bottom: '2px',
+                                  left: '50%',
+                                  transform: 'translateX(-50%)',
+                                  width: '4px',
+                                  height: '4px',
+                                  backgroundColor: '#ef4444',
+                                  borderRadius: '50%'
+                                }}
+                              />
+                            )}
                           </div>
                         );
                       })}
@@ -3202,11 +4434,12 @@ const Navbar = ({ isFullScreen, rewardPoints = 0 }) => {
               className="nav-link-wrapper"
               style={{ position: 'relative' }}
               onMouseEnter={() => {
-                // MARK: ADDED - Refresh notifications when hovering over bell icon
-                loadNotifications();
-                setNotificationsOpen(true);
+                if (!isMobile) {
+                  loadNotifications();
+                  setNotificationsOpen(true);
+                }
               }}
-              onMouseLeave={() => setNotificationsOpen(false)}
+              onMouseLeave={() => !isMobile && setNotificationsOpen(false)}
             >
               <button
                 className="notification-button"
@@ -3227,8 +4460,9 @@ const Navbar = ({ isFullScreen, rewardPoints = 0 }) => {
                   justifyContent: 'center',
                   position: 'relative'
                 }}
-                onMouseEnter={(e) => { e.target.style.background = '#f8f9fa'; e.target.style.borderColor = '#2D5D7B'; }}
-                onMouseLeave={(e) => { e.target.style.background = 'transparent'; e.target.style.borderColor = '#ddd'; }}
+                onMouseEnter={(e) => { if (!isMobile) { e.target.style.background = '#f8f9fa'; e.target.style.borderColor = '#2D5D7B'; } }}
+                onMouseLeave={(e) => { if (!isMobile) { e.target.style.background = 'transparent'; e.target.style.borderColor = '#ddd'; } }}
+                onClick={() => isMobile && setNotificationsOpen(!notificationsOpen)}
               >
                 <FaBell size={14} />
                 {unreadNotifications > 0 && (
@@ -3260,17 +4494,20 @@ const Navbar = ({ isFullScreen, rewardPoints = 0 }) => {
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -10 }}
                     style={{
-                      position: 'absolute',
-                      top: '100%',
-                      right: 0,
+                      position: isMobile ? 'fixed' : 'absolute',
+                      top: isMobile ? '50%' : '100%',
+                      left: isMobile ? '50%' : 'auto',
+                      right: isMobile ? 'auto' : 0,
+                      transform: isMobile ? 'translate(-50%, -50%)' : 'none',
                       background: 'white',
                       borderRadius: '12px',
                       boxShadow: '0 8px 30px rgba(0,0,0,0.15)',
-                      width: '320px',
-                      maxHeight: '400px',
+                      width: isMobile ? '90vw' : '320px',
+                      maxWidth: isMobile ? '400px' : 'none',
+                      maxHeight: isMobile ? '80vh' : '400px',
                       zIndex: 1000,
                       padding: '0',
-                      marginTop: '8px',
+                      marginTop: isMobile ? '0' : '8px',
                       overflow: 'hidden'
                     }}
                   >
@@ -3284,7 +4521,24 @@ const Navbar = ({ isFullScreen, rewardPoints = 0 }) => {
                       <h3 style={{ fontSize: '16px', fontWeight: '600', color: '#1f2937', margin: 0 }}>
                         Notifications
                       </h3>
-                      <div style={{ display: 'flex', gap: '8px' }}>
+                      <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                        {isMobile && (
+                          <button
+                            onClick={() => setNotificationsOpen(false)}
+                            style={{
+                              background: 'none',
+                              border: 'none',
+                              cursor: 'pointer',
+                              padding: '4px',
+                              borderRadius: '4px',
+                              fontSize: '16px',
+                              color: '#6b7280',
+                              marginRight: '8px'
+                            }}
+                          >
+                            <FaTimes />
+                          </button>
+                        )}
                         {unreadNotifications > 0 && (
                           <button
                             onClick={markAllNotificationsAsRead}
@@ -3318,7 +4572,7 @@ const Navbar = ({ isFullScreen, rewardPoints = 0 }) => {
                       </div>
                     </div>
 
-                    <div style={{ maxHeight: '300px', overflow: 'auto' }}>
+                    <div style={{ maxHeight: isMobile ? '60vh' : '300px', overflow: 'auto' }}>
                       {notifications.length === 0 ? (
                         <div style={{ padding: '32px 16px', textAlign: 'center', color: '#6b7280' }}>
                           <FaBell size={24} style={{ marginBottom: '8px', opacity: 0.5 }} />
@@ -3339,10 +4593,14 @@ const Navbar = ({ isFullScreen, rewardPoints = 0 }) => {
                             }}
                             onClick={() => !notification.read && markNotificationAsRead(notification.id)}
                             onMouseEnter={(e) => {
-                              e.currentTarget.style.backgroundColor = notification.read ? '#f9fafb' : '#e0f2fe';
+                              if (!isMobile) {
+                                e.currentTarget.style.backgroundColor = notification.read ? '#f9fafb' : '#e0f2fe';
+                              }
                             }}
                             onMouseLeave={(e) => {
-                              e.currentTarget.style.backgroundColor = notification.read ? 'transparent' : '#f0f9ff';
+                              if (!isMobile) {
+                                e.currentTarget.style.backgroundColor = notification.read ? 'transparent' : '#f0f9ff';
+                              }
                             }}
                           >
                             {/* MARK: ADDED - Delete notification button */}
@@ -3416,8 +4674,8 @@ const Navbar = ({ isFullScreen, rewardPoints = 0 }) => {
             <div
               className="nav-link-wrapper"
               style={{ position: 'relative' }}
-              onMouseEnter={() => setLangDropdownOpen(true)}
-              onMouseLeave={() => setLangDropdownOpen(false)}
+              onMouseEnter={() => !isMobile && setLangDropdownOpen(true)}
+              onMouseLeave={() => !isMobile && setLangDropdownOpen(false)}
             >
               <button
                 className="language-button"
@@ -3434,14 +4692,15 @@ const Navbar = ({ isFullScreen, rewardPoints = 0 }) => {
                   fontWeight: '500',
                   color: '#333',
                   transition: 'all 0.3s ease',
-                  minWidth: '90px',
+                  minWidth: isMobile ? 'auto' : '90px',
                   justifyContent: 'center'
                 }}
-                onMouseEnter={(e) => { e.target.style.background = '#f8f9fa'; e.target.style.borderColor = '#2D5D7B'; }}
-                onMouseLeave={(e) => { e.target.style.background = 'transparent'; e.target.style.borderColor = '#ddd'; }}
+                onMouseEnter={(e) => { if (!isMobile) { e.target.style.background = '#f8f9fa'; e.target.style.borderColor = '#2D5D7B'; } }}
+                onMouseLeave={(e) => { if (!isMobile) { e.target.style.background = 'transparent'; e.target.style.borderColor = '#ddd'; } }}
+                onClick={() => isMobile && setLangDropdownOpen(!langDropdownOpen)}
               >
                 <FaGlobe size={12} />
-                <span>{i18n.language.toUpperCase()}</span>
+                {!isMobile && <span>{i18n.language.toUpperCase()}</span>}
                 <FaChevronDown size={8} />
               </button>
 
@@ -3453,29 +4712,40 @@ const Navbar = ({ isFullScreen, rewardPoints = 0 }) => {
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -10 }}
                     style={{
-                      position: 'absolute',
-                      top: '100%',
-                      right: 0,
+                      position: isMobile ? 'fixed' : 'absolute',
+                      top: isMobile ? '50%' : '100%',
+                      left: isMobile ? '50%' : 'auto',
+                      right: isMobile ? 'auto' : 0,
+                      transform: isMobile ? 'translate(-50%, -50%)' : 'none',
                       background: 'white',
                       borderRadius: '8px',
                       boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
-                      minWidth: '140px',
+                      minWidth: isMobile ? '80vw' : '140px',
+                      maxWidth: isMobile ? '300px' : 'none',
                       zIndex: 1000,
                       padding: '8px 0',
-                      marginTop: '5px'
+                      marginTop: isMobile ? '0' : '5px'
                     }}
                   >
+                    {isMobile && (
+                      <div style={{ padding: '8px 16px', borderBottom: '1px solid #e5e7eb' }}>
+                        <h4 style={{ margin: 0, fontSize: '14px', fontWeight: '600', color: '#1f2937' }}>Select Language</h4>
+                      </div>
+                    )}
                     <ul style={{ margin: 0, padding: 0, listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '2px' }}>
                       {languages.map((lang) => (
                         <li key={lang.code}>
                           <button
-                            onClick={() => handleLanguageChange(lang.code)}
+                            onClick={() => {
+                              handleLanguageChange(lang.code);
+                              if (isMobile) setLangDropdownOpen(false);
+                            }}
                             className="dropdown-link"
                             style={{
                               width: '100%',
                               border: 'none',
                               background: 'transparent',
-                              padding: '8px 16px',
+                              padding: '12px 16px',
                               textAlign: 'left',
                               cursor: 'pointer',
                               fontSize: '14px',
@@ -3485,14 +4755,33 @@ const Navbar = ({ isFullScreen, rewardPoints = 0 }) => {
                               alignItems: 'center',
                               borderRadius: '0'
                             }}
-                            onMouseEnter={(e) => { e.target.style.background = '#2D5D7B'; e.target.style.color = 'white'; }}
-                            onMouseLeave={(e) => { e.target.style.background = 'transparent'; e.target.style.color = '#333'; }}
+                            onMouseEnter={(e) => { if (!isMobile) { e.target.style.background = '#2D5D7B'; e.target.style.color = 'white'; } }}
+                            onMouseLeave={(e) => { if (!isMobile) { e.target.style.background = 'transparent'; e.target.style.color = '#333'; } }}
                           >
                             {lang.label}
                           </button>
                         </li>
                       ))}
                     </ul>
+                    {isMobile && (
+                      <div style={{ padding: '8px 16px', borderTop: '1px solid #e5e7eb' }}>
+                        <button
+                          onClick={() => setLangDropdownOpen(false)}
+                          style={{
+                            width: '100%',
+                            padding: '8px',
+                            background: '#f3f4f6',
+                            border: 'none',
+                            borderRadius: '4px',
+                            cursor: 'pointer',
+                            fontSize: '14px',
+                            color: '#6b7280'
+                          }}
+                        >
+                          Close
+                        </button>
+                      </div>
+                    )}
                   </motion.div>
                 )}
               </AnimatePresence>
@@ -3505,10 +4794,12 @@ const Navbar = ({ isFullScreen, rewardPoints = 0 }) => {
               className="nav-link-wrapper"
               style={{ position: 'relative' }}
               onMouseEnter={() => {
-                loadRewardsHistory();
-                setRewardsHistoryOpen(true);
+                if (!isMobile) {
+                  loadRewardsHistory();
+                  setRewardsHistoryOpen(true);
+                }
               }}
-              onMouseLeave={() => setRewardsHistoryOpen(false)}
+              onMouseLeave={() => !isMobile && setRewardsHistoryOpen(false)}
             >
               <motion.div
                 className="reward-points-display"
@@ -3525,14 +4816,15 @@ const Navbar = ({ isFullScreen, rewardPoints = 0 }) => {
                   border: '2px solid #FFC107',
                   cursor: 'pointer',
                   boxShadow: '0 2px 8px rgba(255, 193, 7, 0.3)',
-                  minWidth: '80px',
+                  minWidth: isMobile ? '70px' : '80px',
                   justifyContent: 'center',
                   position: 'relative',
                   overflow: 'hidden'
                 }}
                 title="Your Reward Points - Click to view history"
-                whileHover={{ scale: 1.05, boxShadow: '0 4px 12px rgba(255, 193, 7, 0.5)' }}
+                whileHover={{ scale: isMobile ? 1 : 1.05, boxShadow: isMobile ? '0 2px 8px rgba(255, 193, 7, 0.3)' : '0 4px 12px rgba(255, 193, 7, 0.5)' }}
                 whileTap={{ scale: 0.95 }}
+                onClick={() => isMobile && setRewardsHistoryOpen(true)}
               >
                 {/* Animated background effect */}
                 <div style={{
@@ -3587,11 +4879,11 @@ const Navbar = ({ isFullScreen, rewardPoints = 0 }) => {
                       top: 0,
                       right: 0,
                       height: '100vh',
-                      width: '380px',
+                      width: isMobile ? '100vw' : '380px',
                       background: '#fff',
                       boxShadow: '-4px 0 25px rgba(0,0,0,0.2)',
-                      borderTopLeftRadius: '16px',
-                      borderBottomLeftRadius: '16px',
+                      borderTopLeftRadius: isMobile ? '0' : '16px',
+                      borderBottomLeftRadius: isMobile ? '0' : '16px',
                       zIndex: 10000,
                       display: 'flex',
                       flexDirection: 'column',
@@ -3630,15 +4922,27 @@ const Navbar = ({ isFullScreen, rewardPoints = 0 }) => {
                             margin: '4px 0 0 0',
                           }}
                         >
-                       {/* <b>   Total: {currentRewardPoints.toLocaleString()} points </b> */}
-
-                       <b style={{ color: '#8B5A2B' }}>
-  Total: {currentRewardPoints.toLocaleString()} points
-</b>
-
+                          <b style={{ color: '#8B5A2B' }}>
+                            Total: {currentRewardPoints.toLocaleString()} points
+                          </b>
                         </p>
                       </div>
-                      <FaHistory size={18} color="#8B5A2B" />
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                        <button
+                          onClick={() => setRewardsHistoryOpen(false)}
+                          style={{
+                            background: 'none',
+                            border: 'none',
+                            cursor: 'pointer',
+                            padding: '4px',
+                            borderRadius: '4px',
+                            fontSize: '16px',
+                            color: '#6b7280'
+                          }}
+                        >
+                          <FaTimes />
+                        </button>
+                      </div>
                     </div>
 
                     {/* Clear All Button */}
@@ -3789,8 +5093,8 @@ const Navbar = ({ isFullScreen, rewardPoints = 0 }) => {
               position: 'relative',
               cursor: 'pointer',
             }}
-            onMouseEnter={() => setAvatarOpen(true)}
-            onMouseLeave={() => setAvatarOpen(false)}
+            onMouseEnter={() => !isMobile && setAvatarOpen(true)}
+            onMouseLeave={() => !isMobile && setAvatarOpen(false)}
           >
             {/* Avatar with Name */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -3818,9 +5122,11 @@ const Navbar = ({ isFullScreen, rewardPoints = 0 }) => {
                   <FaUserCircle size={28} color="#4B5563" />
                 )}
               </div>
-              <span style={{ fontWeight: 500, color: '#111827', fontSize: '14px' }}>
-                {name || 'User'}
-              </span>
+              {!isMobile && (
+                <span style={{ fontWeight: 500, color: '#111827', fontSize: '14px' }}>
+                  {name || 'User'}
+                </span>
+              )}
             </div>
 
             {/* Dropdown */}
@@ -3913,13 +5219,258 @@ const Navbar = ({ isFullScreen, rewardPoints = 0 }) => {
               )}
             </AnimatePresence>
           </div>
+
+          {/* MARK: ADDED - Mobile Menu Button */}
+          <div className="navbar-mobile-menu">
+            <button
+              onClick={() => setMobileMenuOpen(true)}
+              style={{
+                background: 'transparent',
+                border: '1px solid #ddd',
+                borderRadius: '6px',
+                padding: '8px',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}
+            >
+              <FaBars size={16} color="#333" />
+            </button>
+          </div>
         </div>
       </div>
+
+      {/* MARK: ADDED - Mobile Menu Overlay and Content */}
+      <AnimatePresence>
+        {mobileMenuOpen && (
+          <>
+            <motion.div
+              className="mobile-menu-overlay"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={closeMobileMenu}
+            />
+            <motion.div
+              className="mobile-menu-content"
+              initial={{ x: -280 }}
+              animate={{ x: 0 }}
+              exit={{ x: -280 }}
+              transition={{ type: 'tween', duration: 0.3 }}
+            >
+              <div className="mobile-menu-header">
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <img src={novyaLogo} alt="NOVYA Logo" style={{ height: '30px' }} />
+                  <span style={{
+                    background: 'linear-gradient(90deg, #2D5D7B 0%, #4a8db7 25%, #FF6B6B 50%, #FFD166 75%, #2D5D7B 100%)',
+                    WebkitBackgroundClip: 'text',
+                    backgroundClip: 'text',
+                    color: 'transparent',
+                    fontWeight: '800',
+                    fontSize: '1.4rem',
+                    fontFamily: "'Poppins', sans-serif",
+                  }}>
+                    NOVYA
+                  </span>
+                </div>
+                <button
+                  onClick={closeMobileMenu}
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    cursor: 'pointer',
+                    padding: '4px',
+                    borderRadius: '4px',
+                    fontSize: '18px',
+                    color: '#6b7280'
+                  }}
+                >
+                  <FaTimes />
+                </button>
+              </div>
+
+              {/* User Info Section */}
+              <div className="mobile-avatar-section">
+                <div
+                  style={{
+                    width: '48px',
+                    height: '48px',
+                    borderRadius: '50%',
+                    overflow: 'hidden',
+                    boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    background: '#f0f0f0',
+                  }}
+                >
+                  {avatar ? (
+                    <img
+                      src={avatar}
+                      alt="User Avatar"
+                      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                    />
+                  ) : (
+                    <FaUserCircle size={40} color="#4B5563" />
+                  )}
+                </div>
+                <div>
+                  <div style={{ fontWeight: 600, color: '#111827', fontSize: '16px' }}>
+                    {name || 'User'}
+                  </div>
+                  <div style={{ fontSize: '14px', color: '#6b7280' }}>
+                    Student
+                  </div>
+                </div>
+              </div>
+
+              {/* Reward Points Display */}
+              <div className="reward-points-mobile">
+                <FaCoins size={18} color="#744210" />
+                <span>{currentRewardPoints.toLocaleString()} Points</span>
+              </div>
+
+              {/* Quick Actions Row */}
+              <div className="mobile-icons-row">
+                <button
+                  className="mobile-icon-button"
+                  onClick={() => {
+                    loadStudyPlans();
+                    setCalendarOpen(true);
+                    closeMobileMenu();
+                  }}
+                  style={{ position: 'relative' }}
+                >
+                  <FaCalendarAlt size={18} />
+                  <span>Calendar</span>
+                  {getTodaysStudyPlans().length > 0 && (
+                    <span className="badge"></span>
+                  )}
+                </button>
+                <button
+                  className="mobile-icon-button"
+                  onClick={() => {
+                    loadNotifications();
+                    setNotificationsOpen(true);
+                    closeMobileMenu();
+                  }}
+                  style={{ position: 'relative' }}
+                >
+                  <FaBell size={18} />
+                  <span>Alerts</span>
+                  {unreadNotifications > 0 && (
+                    <span className="badge">{unreadNotifications}</span>
+                  )}
+                </button>
+                <button
+                  className="mobile-icon-button"
+                  onClick={() => {
+                    loadRewardsHistory();
+                    setRewardsHistoryOpen(true);
+                    closeMobileMenu();
+                  }}
+                >
+                  <FaHistory size={18} />
+                  <span>History</span>
+                </button>
+              </div>
+
+              {/* Navigation Links */}
+              <div className="mobile-nav-links">
+                {navLinks.map((link) => (
+                  <div key={link.path} className="mobile-nav-item">
+                    {link.hasDropdown ? (
+                      <>
+                        <button
+                          className="mobile-nav-link"
+                          onClick={() => toggleMobileDropdown(link.path === '/learn' ? 'learn' : 'practice')}
+                        >
+                          <span>{link.name}</span>
+                          <FaChevronDown
+                            size={12}
+                            style={{
+                              transform: mobileDropdowns[link.path === '/learn' ? 'learn' : 'practice'] ? 'rotate(180deg)' : 'none',
+                              transition: 'transform 0.3s ease'
+                            }}
+                          />
+                        </button>
+                        <AnimatePresence>
+                          {mobileDropdowns[link.path === '/learn' ? 'learn' : 'practice'] && (
+                            <motion.div
+                              className="mobile-dropdown-content"
+                              initial={{ opacity: 0, height: 0 }}
+                              animate={{ opacity: 1, height: 'auto' }}
+                              exit={{ opacity: 0, height: 0 }}
+                            >
+                              {link.dropdownItems.map((dropdownItem) => (
+                                <Link
+                                  key={dropdownItem.path}
+                                  to={dropdownItem.path}
+                                  className={`mobile-dropdown-link ${activeLink === dropdownItem.path ? 'active' : ''}`}
+                                  onClick={closeMobileMenu}
+                                >
+                                  {dropdownItem.name}
+                                </Link>
+                              ))}
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
+                      </>
+                    ) : (
+                      <Link
+                        to={link.path}
+                        className="mobile-nav-link"
+                        onClick={closeMobileMenu}
+                        style={{
+                          color: activeLink === link.path ? '#2D5D7B' : '#374151',
+                          background: activeLink === link.path ? '#f0f7ff' : '#f8fafc',
+                        }}
+                      >
+                        <span>{link.name}</span>
+                      </Link>
+                    )}
+                  </div>
+                ))}
+              </div>
+
+              {/* Bottom Actions */}
+              <div className="mobile-bottom-actions">
+                <button
+                  className="mobile-action-button"
+                  onClick={() => {
+                    setLangDropdownOpen(true);
+                    closeMobileMenu();
+                  }}
+                >
+                  <FaGlobe size={14} />
+                  <span>Language ({i18n.language.toUpperCase()})</span>
+                </button>
+                <button
+                  className="mobile-action-button"
+                  onClick={() => {
+                    navigate('/user-details');
+                    closeMobileMenu();
+                  }}
+                >
+                  <FaUserCircle size={14} />
+                  <span>View Profile</span>
+                </button>
+                <button
+                  className="mobile-action-button"
+                  onClick={handleLogout}
+                  style={{ color: '#dc2626', borderColor: '#fecaca' }}
+                >
+                  <FaSignOutAlt size={14} />
+                  <span>Logout</span>
+                </button>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
     </motion.nav>
   );
 };
 
 export default Navbar;
-
-
-

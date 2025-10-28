@@ -570,6 +570,17 @@ function App() {
               <RoleRoute requiredRole="student"><MockTest /></RoleRoute>
             </ProtectedRoute>
           } />
+          <Route
+  path="/spin-wheel"
+  element={
+    <ProtectedRoute>
+      <RoleRoute requiredRole="student">
+        <Navigate to="/practice" />
+      </RoleRoute>
+    </ProtectedRoute>
+  }
+/>
+ 
           <Route path="/career" element={
             <ProtectedRoute>
               <RoleRoute requiredRole="student"><Career /></RoleRoute>

@@ -1178,4 +1178,182 @@
 }
  
  
- 
+/* Mobile Responsiveness for Modal */
+@media (max-width: 768px) {
+  .details-modal {
+    padding: 10px;
+    align-items: flex-start;
+  }
+  
+  .modal-content {
+    max-height: 95vh;
+    border-radius: 16px;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    width: 95%;
+  }
+  
+  .modal-header {
+    padding: 30px 20px 15px;
+  }
+  
+  .modal-header h2 {
+    font-size: 1.5rem;
+  }
+  
+  .modal-header p {
+    font-size: 1rem;
+  }
+  
+  .modal-grid {
+    grid-template-columns: 1fr;
+    min-height: auto;
+  }
+  
+  .student-profile {
+    border-right: none;
+    border-bottom: 1px solid #e5e7eb;
+    padding: 20px;
+  }
+  
+  .performance-details {
+    padding: 20px;
+  }
+  
+  .profile-header {
+    flex-direction: column;
+    text-align: center;
+    gap: 12px;
+  }
+  
+  .profile-avatar {
+    width: 80px;
+    height: 80px;
+  }
+  
+  .interests-list {
+    justify-content: center;
+  }
+  
+  .modal-close {
+    top: 15px;
+    right: 15px;
+    width: 40px;
+    height: 40px;
+    background: rgba(0, 0, 0, 0.2);
+  }
+  
+  .detail-metrics {
+    gap: 15px;
+  }
+  
+  .metric-value {
+    font-size: 1.25rem;
+  }
+  
+  .history-item {
+    padding: 12px;
+  }
+  
+  .profile-section {
+    margin-bottom: 25px;
+  }
+  
+  .detail-section {
+    margin-bottom: 25px;
+  }
+}
+
+@media (max-width: 480px) {
+  .details-modal {
+    padding: 5px;
+  }
+  
+  .modal-content {
+    margin-top: 10px;
+    margin-bottom: 10px;
+    width: 98%;
+    border-radius: 12px;
+  }
+  
+  .modal-header {
+    padding: 25px 15px 15px;
+  }
+  
+  .modal-header h2 {
+    font-size: 1.3rem;
+  }
+  
+  .student-profile,
+  .performance-details {
+    padding: 15px;
+  }
+  
+  .profile-section {
+    margin-bottom: 20px;
+  }
+  
+  .profile-section h4 {
+    font-size: 0.9rem;
+  }
+  
+  .interest-tag {
+    font-size: 0.8rem;
+    padding: 4px 10px;
+  }
+  
+  .strengths-list li, 
+  .achievements-list li, 
+  .recommendations-list li {
+    font-size: 0.9rem;
+  }
+  
+  .detail-section h3 {
+    font-size: 1.1rem;
+  }
+  
+  .metric-label {
+    font-size: 0.9rem;
+  }
+  
+  .metric-value {
+    font-size: 1.1rem;
+  }
+  
+  .history-info {
+    gap: 2px;
+  }
+  
+  .history-title {
+    font-size: 0.9rem;
+  }
+  
+  .history-score, 
+  .history-date {
+    font-size: 0.8rem;
+  }
+  
+  .modal-close {
+    top: 10px;
+    right: 10px;
+    width: 35px;
+    height: 35px;
+  }
+}
+
+/* Ensure modal is always properly positioned on small screens */
+@media (max-height: 600px) {
+  .details-modal {
+    align-items: flex-start;
+    padding-top: 5px;
+  }
+  
+  .modal-content {
+    max-height: 98vh;
+  }
+}
+
+/* Prevent body scroll when modal is open */
+body.modal-open {
+  overflow: hidden;
+} 

@@ -1,9 +1,4 @@
 
-
-
-
-
-
 // import React, { useState, useEffect, useRef } from 'react';
 // import { useParams, useNavigate, useLocation } from 'react-router-dom';
 // import { toast, ToastContainer } from 'react-toastify';
@@ -94,13 +89,16 @@
 //   const getNotesKey = () => `sticky_notes_${classNumber}_${subject}_${chapterNumber}`;
 //   const getHistoryKey = () => `chat_history_${classNumber}_${subject}_${chapterNumber}`;
 
-//   // MARK: UPDATED - Study plan functions with enhanced notification system
+//   // MARK: UPDATED - Study plan functions with enhanced notification system and proper date handling
 //   const saveStudyPlanToCalendar = (studyPlanContent) => {
 //     try {
 //       // Generate a unique ID for this study plan based on content
 //       const planId = `plan_${classNumber}_${subject}_${chapterNumber}_${subtopicName || 'main'}_${Date.now()}`;
      
-//       // Parse the study plan and create calendar events
+//       // Use current date (when user requests the study plan) as start date
+//       const startDate = new Date();
+     
+//       // Parse the study plan and create calendar events starting from current date
 //       const studyPlan = {
 //         id: planId,
 //         title: `${subject} - ${chapterTitle}${subtopicName ? ` - ${subtopicName}` : ''}`,
@@ -109,9 +107,9 @@
 //         chapter: chapterTitle,
 //         subtopic: subtopicName,
 //         class: classNumber,
-//         createdDate: new Date().toISOString(),
-//         // Create study sessions starting from today
-//         studySessions: generateStudySessionsFromPlan(studyPlanContent),
+//         createdDate: startDate.toISOString(),
+//         // Create study sessions starting from the current date (when user requested)
+//         studySessions: generateStudySessionsFromPlan(studyPlanContent, startDate),
 //         completed: false
 //       };
 
@@ -144,7 +142,7 @@
 //       // Force refresh notifications in navbar
 //       window.dispatchEvent(new CustomEvent('refreshNotifications'));
 
-//       console.log('Study plan saved:', studyPlan);
+//       console.log('Study plan saved with start date:', startDate.toLocaleDateString(), studyPlan);
 //       return true;
 //     } catch (error) {
 //       console.error('Error saving study plan:', error);
@@ -152,9 +150,12 @@
 //     }
 //   };
 
-//   const generateStudySessionsFromPlan = (content) => {
+//   // MARK: UPDATED - Generate study sessions starting from the provided start date
+//   const generateStudySessionsFromPlan = (content, startDate) => {
 //     const sessions = [];
-//     const today = new Date();
+   
+//     // Use the provided start date (when user requested the study plan)
+//     const studyStartDate = new Date(startDate);
    
 //     // Simple parsing - you can enhance this based on your AI response format
 //     const lines = content.split('\n');
@@ -164,7 +165,7 @@
 //       if (line.includes('Day') || line.includes('day') || line.includes('Session') || line.includes('session')) {
 //         const session = {
 //           id: Date.now() + sessions.length,
-//           date: new Date(today.getTime() + dayOffset * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+//           date: new Date(studyStartDate.getTime() + dayOffset * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
 //           title: line.trim(),
 //           duration: '60 minutes', // Default duration
 //           completed: false,
@@ -175,11 +176,11 @@
 //       }
 //     }
 
-//     // If no specific sessions found, create a default one for today
+//     // If no specific sessions found, create a default one starting from current date
 //     if (sessions.length === 0) {
 //       sessions.push({
 //         id: Date.now(),
-//         date: today.toISOString().split('T')[0],
+//         date: studyStartDate.toISOString().split('T')[0],
 //         title: `Study ${chapterTitle}`,
 //         duration: '60 minutes',
 //         completed: false,
@@ -187,6 +188,7 @@
 //       });
 //     }
 
+//     console.log('Generated study sessions starting from:', studyStartDate.toLocaleDateString(), sessions);
 //     return sessions;
 //   };
 
@@ -207,7 +209,7 @@
 //       id: notificationId,
 //       type: 'study_plan_created',
 //       title: 'New Study Plan Created',
-//       message: `Study plan for ${studyPlan.title} has been added to your calendar`,
+//       message: `Study plan for ${studyPlan.title} has been added to your calendar starting from ${new Date(studyPlan.createdDate).toLocaleDateString()}`,
 //       date: new Date().toISOString(),
 //       read: false,
 //       planId: studyPlan.id
@@ -237,7 +239,8 @@
 //       const saved = saveStudyPlanToCalendar(content);
 //       if (saved) {
 //         // Add a note that it was saved to calendar
-//         return `${content}\n\n---\n*📅 This study plan has been automatically added to your calendar!*`;
+//         const startDate = new Date().toLocaleDateString();
+//         return `${content}\n\n---\n*📅 This study plan has been automatically added to your calendar starting from ${startDate}!*`;
 //       }
 //     }
 //     return content;
@@ -862,7 +865,7 @@
 //             margin: 6px 0;
 //             paddingLeft: 20px;
 //             fontSize: 14px;
-//             color: #4b5563;
+//             color: '#4b5563';
 //             lineHeight: 1.5;
 //             display: flex;
 //             align-items: flex-start;
@@ -871,7 +874,7 @@
          
 //           .overview-text {
 //             fontSize: 14px;
-//             color: #4b5563;
+//             color: '#4b5563';
 //             lineHeight: 1.5;
 //             margin: 8px 0;
 //           }
@@ -2047,6 +2050,14 @@
 
 
 
+
+
+
+
+
+
+
+
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { toast, ToastContainer } from 'react-toastify';
@@ -2137,47 +2148,16 @@ const LessonPage = () => {
   const getNotesKey = () => `sticky_notes_${classNumber}_${subject}_${chapterNumber}`;
   const getHistoryKey = () => `chat_history_${classNumber}_${subject}_${chapterNumber}`;
 
-  // MARK: ADDED - Centralized reward points function with history tracking
-  const addRewardPointsWithHistory = (points, reason, source = 'video_completion') => {
-    const currentPoints = parseInt(localStorage.getItem('rewardPoints') || '0');
-    const newPoints = currentPoints + points;
-   
-    // Update points in localStorage
-    localStorage.setItem('rewardPoints', newPoints.toString());
-   
-    // Add to rewards history
-    const historyEntry = {
-      id: `reward_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-      points: points,
-      totalPoints: newPoints,
-      reason: reason,
-      source: source,
-      timestamp: new Date().toISOString()
-    };
-   
-    const existingHistory = JSON.parse(localStorage.getItem('rewardsHistory') || '[]');
-    const updatedHistory = [historyEntry, ...existingHistory];
-    localStorage.setItem('rewardsHistory', JSON.stringify(updatedHistory));
-   
-    // Dispatch event to update navbar and other components
-    window.dispatchEvent(new CustomEvent('rewardPointsUpdated', {
-      detail: {
-        rewardPoints: newPoints,
-        addedPoints: points,
-        source: source
-      }
-    }));
-   
-    return historyEntry;
-  };
-
-  // MARK: UPDATED - Study plan functions with enhanced notification system
+  // MARK: UPDATED - Study plan functions with current date start and enhanced notification system
   const saveStudyPlanToCalendar = (studyPlanContent) => {
     try {
       // Generate a unique ID for this study plan based on content
       const planId = `plan_${classNumber}_${subject}_${chapterNumber}_${subtopicName || 'main'}_${Date.now()}`;
      
-      // Parse the study plan and create calendar events
+      // Use current date (when user requests the study plan) as start date
+      const startDate = new Date();
+     
+      // Parse the study plan and create calendar events starting from current date
       const studyPlan = {
         id: planId,
         title: `${subject} - ${chapterTitle}${subtopicName ? ` - ${subtopicName}` : ''}`,
@@ -2186,9 +2166,9 @@ const LessonPage = () => {
         chapter: chapterTitle,
         subtopic: subtopicName,
         class: classNumber,
-        createdDate: new Date().toISOString(),
-        // Create study sessions starting from today
-        studySessions: generateStudySessionsFromPlan(studyPlanContent),
+        createdDate: startDate.toISOString(),
+        // Create study sessions starting from the current date (when user requested)
+        studySessions: generateStudySessionsFromPlan(studyPlanContent, startDate),
         completed: false
       };
 
@@ -2221,7 +2201,7 @@ const LessonPage = () => {
       // Force refresh notifications in navbar
       window.dispatchEvent(new CustomEvent('refreshNotifications'));
 
-      console.log('Study plan saved:', studyPlan);
+      console.log('Study plan saved with start date:', startDate.toLocaleDateString(), studyPlan);
       return true;
     } catch (error) {
       console.error('Error saving study plan:', error);
@@ -2229,43 +2209,97 @@ const LessonPage = () => {
     }
   };
 
-  const generateStudySessionsFromPlan = (content) => {
-    const sessions = [];
-    const today = new Date();
+  // MARK: UPDATED - Generate study sessions starting from the provided start date (current date)
+  // const generateStudySessionsFromPlan = (content, startDate) => {
+  //   const sessions = [];
    
-    // Simple parsing - you can enhance this based on your AI response format
-    const lines = content.split('\n');
-    let dayOffset = 0;
+  //   // Use the provided start date (when user requested the study plan)
+  //   const studyStartDate = new Date(startDate);
    
-    for (const line of lines) {
-      if (line.includes('Day') || line.includes('day') || line.includes('Session') || line.includes('session')) {
-        const session = {
-          id: Date.now() + sessions.length,
-          date: new Date(today.getTime() + dayOffset * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-          title: line.trim(),
-          duration: '60 minutes', // Default duration
-          completed: false,
-          topic: line.trim()
-        };
-        sessions.push(session);
-        dayOffset++;
-      }
-    }
+  //   // Simple parsing - you can enhance this based on your AI response format
+  //   const lines = content.split('\n');
+  //   let dayOffset = 0;
+   
+  //   for (const line of lines) {
+  //     if (line.includes('Day') || line.includes('day') || line.includes('Session') || line.includes('session')) {
+  //       const sessionDate = new Date(studyStartDate);
+  //       sessionDate.setDate(studyStartDate.getDate() + dayOffset);
+       
+  //       const session = {
+  //         id: Date.now() + sessions.length,
+  //         date: sessionDate.toISOString().split('T')[0], // Format as YYYY-MM-DD
+  //         title: line.trim(),
+  //         duration: '60 minutes', // Default duration
+  //         completed: false,
+  //         topic: line.trim()
+  //       };
+  //       sessions.push(session);
+  //       dayOffset++;
+  //     }
+  //   }
 
-    // If no specific sessions found, create a default one for today
-    if (sessions.length === 0) {
-      sessions.push({
-        id: Date.now(),
-        date: today.toISOString().split('T')[0],
-        title: `Study ${chapterTitle}`,
-        duration: '60 minutes',
+  //   // If no specific sessions found, create a default one starting from current date
+  //   if (sessions.length === 0) {
+  //     sessions.push({
+  //       id: Date.now(),
+  //       date: studyStartDate.toISOString().split('T')[0],
+  //       title: `Study ${chapterTitle}`,
+  //       duration: '60 minutes',
+  //       completed: false,
+  //       topic: `Review ${chapterTitle} concepts`
+  //     });
+  //   }
+
+  //   console.log('Generated study sessions starting from:', studyStartDate.toLocaleDateString(), sessions);
+  //   return sessions;
+  // };
+
+
+
+  // MARK: UPDATED - Generate study sessions starting from the provided start date (current date)
+const generateStudySessionsFromPlan = (content, startDate) => {
+  const sessions = [];
+ 
+  // Use the provided start date (when user requested the study plan)
+  const studyStartDate = new Date(startDate);
+ 
+  // Simple parsing - you can enhance this based on your AI response format
+  const lines = content.split('\n');
+  let dayOffset = 0; // Start from day 0 (today)
+ 
+  for (const line of lines) {
+    if (line.includes('Day') || line.includes('day') || line.includes('Session') || line.includes('session')) {
+      const sessionDate = new Date(studyStartDate);
+      sessionDate.setDate(studyStartDate.getDate() + dayOffset);
+     
+      const session = {
+        id: Date.now() + sessions.length,
+        date: sessionDate.toISOString().split('T')[0], // Format as YYYY-MM-DD
+        title: line.trim(),
+        duration: '60 minutes', // Default duration
         completed: false,
-        topic: `Review ${chapterTitle} concepts`
-      });
+        topic: line.trim()
+      };
+      sessions.push(session);
+      dayOffset++; // Increment for next session
     }
+  }
 
-    return sessions;
-  };
+  // If no specific sessions found, create a default one starting from current date
+  if (sessions.length === 0) {
+    sessions.push({
+      id: Date.now(),
+      date: studyStartDate.toISOString().split('T')[0],
+      title: `Study ${chapterTitle}`,
+      duration: '60 minutes',
+      completed: false,
+      topic: `Review ${chapterTitle} concepts`
+    });
+  }
+
+  console.log('Generated study sessions starting from:', studyStartDate.toLocaleDateString(), sessions);
+  return sessions;
+};
 
   // MARK: UPDATED - Enhanced notification creation with immediate dispatch
   const createStudyPlanNotification = (studyPlan) => {
@@ -2284,7 +2318,7 @@ const LessonPage = () => {
       id: notificationId,
       type: 'study_plan_created',
       title: 'New Study Plan Created',
-      message: `Study plan for ${studyPlan.title} has been added to your calendar`,
+      message: `Study plan for ${studyPlan.title} has been added to your calendar starting from ${new Date(studyPlan.createdDate).toLocaleDateString()}`,
       date: new Date().toISOString(),
       read: false,
       planId: studyPlan.id
@@ -2314,7 +2348,8 @@ const LessonPage = () => {
       const saved = saveStudyPlanToCalendar(content);
       if (saved) {
         // Add a note that it was saved to calendar
-        return `${content}\n\n---\n*📅 This study plan has been automatically added to your calendar!*`;
+        const startDate = new Date().toLocaleDateString();
+        // return `${content}\n\n---\n*📅 This study plan has been automatically added to your calendar starting from ${startDate}!*`;
       }
     }
     return content;
@@ -2406,7 +2441,7 @@ const LessonPage = () => {
     }
   }, [activeTab, overviewLoaded]);
 
-  // MARK: UPDATED - Coin animation effect with proper history tracking
+  // Coin animation effect
   useEffect(() => {
     const handleCoinAnimationEnd = (coinId) => {
       setCoins(prev => prev.filter(coin => coin.id !== coinId));
@@ -2414,10 +2449,31 @@ const LessonPage = () => {
 
     coins.forEach(coin => {
       if (coin.animationCompleted && !coin.pointsAdded) {
-        // Mark coin as processed but DON'T add points here
+        // Add points to localStorage
+        const currentPoints = parseInt(localStorage.getItem('rewardPoints') || '0');
+        const newPoints = currentPoints + coin.value;
+        localStorage.setItem('rewardPoints', newPoints.toString());
+       
+        // Dispatch event to update navbar
+        window.dispatchEvent(new CustomEvent('rewardPointsUpdated', {
+          detail: { rewardPoints: newPoints }
+        }));
+       
+        // Mark coin as processed
         setCoins(prev => prev.map(c =>
           c.id === coin.id ? { ...c, pointsAdded: true } : c
         ));
+       
+        // Show toast message only once when all coins are processed
+        const remainingCoins = coins.filter(c => !c.pointsAdded).length;
+        if (remainingCoins === 1 && !toastShown) {
+          setToastShown(true);
+          if (subtopicName) {
+            showRewardToast(`🎉 Congratulations! You earned 10 reward points for completing the subtopic: ${subtopicName}`);
+          } else {
+            showRewardToast(`🎉 Congratulations! You earned 10 reward points for completing the chapter: ${chapterTitle}`);
+          }
+        }
        
         // Remove coin after a delay
         setTimeout(() => {
@@ -2444,21 +2500,20 @@ const LessonPage = () => {
     { id: 1, question: `Practice questions for ${currentLesson.title}${subtopicName ? ` - ${subtopicName}` : ''}` },
   ];
 
-  // MARK: UPDATED - Create coin animation function (now only for visual effect)
   const createCoinAnimation = () => {
     const videoElement = videoRef.current;
     if (!videoElement) return;
 
     const videoRect = videoElement.getBoundingClientRect();
    
-    // Create multiple coins for visual effect only
+    // Create multiple coins for better visual effect
     const newCoins = Array.from({ length: 5 }, (_, index) => ({
       id: Date.now() + index,
       startX: videoRect.left + videoRect.width / 2,
       startY: videoRect.top + videoRect.height / 2,
       endX: window.innerWidth - 100,
       endY: 50,
-      value: 2, // Visual value only, not actual points
+      value: 2,
       delay: index * 100,
       animationCompleted: false,
       pointsAdded: false
@@ -2468,7 +2523,6 @@ const LessonPage = () => {
     setToastShown(false);
   };
 
-  // MARK: UPDATED - Handle video end with proper reward tracking (10 points at once)
   const handleVideoEnd = () => {
     setIsVideoCompleted(true);
     const videoKey = getVideoKey();
@@ -2476,23 +2530,7 @@ const LessonPage = () => {
     if (!sessionStorage.getItem(videoKey) && !skipped && !pointsAwarded) {
       sessionStorage.setItem(videoKey, 'true');
       setPointsAwarded(true);
-      
-      // Create visual coin animation
       createCoinAnimation();
-      
-      // MARK: ADDED - Add all 10 points at once with proper history tracking
-      const rewardReason = subtopicName
-        ? `Video completion: ${chapterTitle} - ${subtopicName}`
-        : `Video completion: ${chapterTitle}`;
-     
-      addRewardPointsWithHistory(10, rewardReason, 'video_completion');
-      
-      // Show toast message
-      if (subtopicName) {
-        showRewardToast(`🎉 Congratulations! You earned 10 reward points for completing the subtopic: ${subtopicName}`);
-      } else {
-        showRewardToast(`🎉 Congratulations! You earned 10 reward points for completing the chapter: ${chapterTitle}`);
-      }
     }
   };
 
@@ -2531,13 +2569,6 @@ const LessonPage = () => {
         practiceAttempted: true,
         quizPassed: isPassed
       }));
-
-      // MARK: ADDED - Reward points for quiz completion
-      if (isPassed) {
-        const quizRewardReason = `Quiz passed: ${chapterTitle}${subtopicName ? ` - ${subtopicName}` : ''}`;
-        addRewardPointsWithHistory(15, quizRewardReason, 'quiz_completion');
-        showRewardToast(`🎉 Great job! You earned 15 reward points for passing the quiz!`);
-      }
     }
   };
 
@@ -2943,7 +2974,7 @@ Study this chapter carefully to master the concepts!
             margin: 6px 0;
             paddingLeft: 20px;
             fontSize: 14px;
-            color: #4b5563;
+            color: '#4b5563';
             lineHeight: 1.5;
             display: flex;
             align-items: flex-start;
@@ -2952,7 +2983,7 @@ Study this chapter carefully to master the concepts!
          
           .overview-text {
             fontSize: 14px;
-            color: #4b5563;
+            color: '#4b5563';
             lineHeight: 1.5;
             margin: 8px 0;
           }

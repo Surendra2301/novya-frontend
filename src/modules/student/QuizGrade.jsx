@@ -301,9 +301,9 @@ function QuizGrade({ classes, onClassClick }) {
           zIndex: 2,
           padding: "0.5rem 1rem",
           borderRadius: "8px",
-          border: "none",
-          background: "#34495e",
-          color: "#fff",
+          border: "1px solid #ccc",
+          background: "#fff",
+          color: "#34495e",
           fontWeight: "700",
           cursor: "pointer",
           boxShadow: "0 4px 12px rgba(0,0,0,0.2)"
