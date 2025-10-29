@@ -1,4 +1,5 @@
 
+
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -12,12 +13,9 @@ import ContactUs from './ContactUs';
 import { Typewriter } from 'react-simple-typewriter';
 import {
   FiLogOut,        
-  FiBell,          
-  FiSettings,
-  FiGlobe,        
-  FiTrendingUp,
   FiMenu,
-  FiX
+  FiX,
+  FiTrendingUp
 } from 'react-icons/fi';
 import {
   HiOutlineUserCircle,
@@ -30,6 +28,8 @@ import {
 } from 'react-icons/hi2';
 import novyaLogo from '../home/assets/NOVYA LOGO.png';
 import { FaPhoneAlt } from 'react-icons/fa';
+import "bootstrap-icons/font/bootstrap-icons.css";
+
 
 const ParentDashboard = () => {
   const [isEditingProfile, setIsEditingProfile] = useState(false);
@@ -48,10 +48,7 @@ const ParentDashboard = () => {
   const [parentName, setParentName] = useState('');
   const [notifications, setNotifications] = useState([]);
   const [showNotifications, setShowNotifications] = useState(false);
-  const [showSettings, setShowSettings] = useState(false);
   const [showLanguageDropdown, setShowLanguageDropdown] = useState(false);
-  const [darkMode, setDarkMode] = useState(false);
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   const mainContentRef = useRef(null);
@@ -99,11 +96,6 @@ const ParentDashboard = () => {
       { id: 4, title: t('notifications.attendance'), message: t('notifications.attendanceMessage'), time: t('notifications.daysAgo', { count: 2 }), read: false },
     ]);
    
-    const savedTheme = localStorage.getItem('themePreference');
-    if (savedTheme === 'dark') {
-      setDarkMode(true);
-    }
-   
     return () => clearTimeout(timer);
   }, [t]);
 
@@ -126,16 +118,6 @@ const ParentDashboard = () => {
       ? `${titles[selectedSection]} | NOVYA - ${t('parentdashboard.platform')}`
       : `${t('parentdashboard.title')} | NOVYA - ${t('parentdashboard.platform')}`;
   }, [selectedSection, t]);
-
-  useEffect(() => {
-    if (darkMode) {
-      document.body.classList.add('dark-mode');
-      localStorage.setItem('themePreference', 'dark');
-    } else {
-      document.body.classList.remove('dark-mode');
-      localStorage.setItem('themePreference', 'light');
-    }
-  }, [darkMode]);
 
   // Update notifications when language changes
   useEffect(() => {
@@ -315,9 +297,6 @@ const ParentDashboard = () => {
       if (showNotifications && !event.target.closest('.notification-container')) {
         setShowNotifications(false);
       }
-      if (showSettings && !event.target.closest('.settings-container')) {
-        setShowSettings(false);
-      }
       if (showLanguageDropdown && !event.target.closest('.language-container')) {
         setShowLanguageDropdown(false);
       }
@@ -325,7 +304,7 @@ const ParentDashboard = () => {
 
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [showNotifications, showSettings, showLanguageDropdown]);
+  }, [showNotifications, showLanguageDropdown]);
 
   const renderSection = () => {
     switch (selectedSection) {
@@ -445,7 +424,7 @@ const ParentDashboard = () => {
   };
 
   return (
-    <div className={`parent-dashboard ${darkMode ? 'dark-mode' : ''}`}>
+    <div className="parent-dashboard">
       {/* Mobile Menu Overlay */}
       {mobileMenuOpen && (
         <div
@@ -455,11 +434,11 @@ const ParentDashboard = () => {
       )}
      
       {/* Sidebar */}
-      <div className={`sidebar ${sidebarCollapsed ? 'collapsed' : ''} ${mobileMenuOpen ? 'mobile-open' : ''}`}>
+      <div className={`sidebar ${mobileMenuOpen ? 'mobile-open' : ''}`}>
         <div className="sidebar-header">
           <div className="sidebar-logo">
             <img src={novyaLogo} alt="NOVYA" />
-            {!sidebarCollapsed && <span>NOVYA</span>}
+            <span>NOVYA</span>
           </div>
        
           <button
@@ -478,16 +457,14 @@ const ParentDashboard = () => {
                 key={section.key}
                 className={`nav-item ${selectedSection === section.key ? 'active' : ''}`}
                 onClick={() => handleSectionSelect(section.key)}
-                title={sidebarCollapsed ? section.label : ''}
+                title={section.label}
               >
                 <div className="nav-icon">
                   <IconComponent />
                 </div>
-                {!sidebarCollapsed && (
-                  <div className="nav-content">
-                    <span className="nav-label">{section.label}</span>
-                  </div>
-                )}
+                <div className="nav-content">
+                  <span className="nav-label">{section.label}</span>
+                </div>
               </button>
             );
           })}
@@ -496,7 +473,7 @@ const ParentDashboard = () => {
         <div className="sidebar-footer">
           <button className="logout-btn" onClick={handleLogout}>
             <FiLogOut />
-            {!sidebarCollapsed && <span>{t('common.logout')}</span>}
+            <span>{t('common.logout')}</span>
           </button>
         </div>
       </div>
@@ -539,10 +516,10 @@ const ParentDashboard = () => {
                   onClick={() => {
                     setShowLanguageDropdown(!showLanguageDropdown);
                     setShowNotifications(false);
-                    setShowSettings(false);
                   }}
+                  title="Language"
                 >
-                  <FiGlobe />
+                  <i className="bi bi-globe2"></i>
                 </button>
 
                 {showLanguageDropdown && (
@@ -578,11 +555,11 @@ const ParentDashboard = () => {
                   className="action-btn"
                   onClick={() => {
                     setShowNotifications(!showNotifications);
-                    setShowSettings(false);
                     setShowLanguageDropdown(false);
                   }}
+                  title="Notifications"
                 >
-                  <FiBell />
+                  <i className="bi bi-bell"></i>
                   {unreadNotificationsCount > 0 && (
                     <span className="notification-badge">{unreadNotificationsCount}</span>
                   )}
@@ -626,59 +603,6 @@ const ParentDashboard = () => {
                       ) : (
                         <p className="no-notifications">{t('common.noNotifications')}</p>
                       )}
-                    </div>
-                  </div>
-                )}
-              </div>
-             
-              {/* Settings */}
-              <div className="settings-container">
-                <button
-                  className="action-btn"
-                  onClick={() => {
-                    setShowSettings(!showSettings);
-                    setShowNotifications(false);
-                    setShowLanguageDropdown(false);
-                  }}
-                >
-                  <FiSettings />
-                </button>
-               
-                {showSettings && (
-                  <div className="settings-dropdown">
-                    <div className="dropdown-header">
-                      <h3>{t('common.settings')}</h3>
-                      <button
-                        className="close-dropdown-btn"
-                        onClick={() => setShowSettings(false)}
-                      >
-                        <FiX />
-                      </button>
-                    </div>
-                   
-                    <div className="settings-option">
-                      <div className="settings-label">
-                        <span>{t('common.darkMode')}</span>
-                      </div>
-                      <div className="theme-toggle">
-                        <label className="switch">
-                          <input
-                            type="checkbox"
-                            checked={darkMode}
-                            onChange={(e) => setDarkMode(e.target.checked)}
-                          />
-                          <span className="slider"></span>
-                        </label>
-                      </div>
-                    </div>
-
-                    <div className="settings-option">
-                      <div className="settings-label">
-                        <span>{t('common.language')}</span>
-                      </div>
-                      <div className="language-preview">
-                        <span>{languages.find(lang => lang.code === i18n.language)?.nativeName}</span>
-                      </div>
                     </div>
                   </div>
                 )}
@@ -867,11 +791,6 @@ const ParentDashboard = () => {
           opacity: ${isLoaded ? 1 : 0};
         }
 
-        .parent-dashboard.dark-mode {
-          background: #0f172a;
-          color: #e2e8f0;
-        }
-
         /* Mobile Overlay */
         .mobile-overlay {
           position: fixed;
@@ -904,15 +823,6 @@ const ParentDashboard = () => {
           box-shadow: 2px 0 10px rgba(0, 0, 0, 0.05);
         }
 
-        .sidebar.collapsed {
-          width: 70px;
-        }
-
-        .dark-mode .sidebar {
-          background: #1e293b;
-          border-right: 1px solid #334155;
-        }
-
         /* Mobile Sidebar */
         @media (max-width: 768px) {
           .sidebar {
@@ -921,15 +831,6 @@ const ParentDashboard = () => {
           }
          
           .sidebar.mobile-open {
-            left: 0;
-          }
-         
-          .sidebar.collapsed {
-            width: 280px;
-            left: -280px;
-          }
-         
-          .sidebar.collapsed.mobile-open {
             left: 0;
           }
         }
@@ -942,10 +843,6 @@ const ParentDashboard = () => {
           border-bottom: 1px solid #e2e8f0;
         }
 
-        .dark-mode .sidebar-header {
-          border-bottom: 1px solid #334155;
-        }
-
         .sidebar-logo {
           display: flex;
           align-items: center;
@@ -953,10 +850,6 @@ const ParentDashboard = () => {
           font-weight: 700;
           font-size: 1.25rem;
           color: #1e293b;
-        }
-
-        .dark-mode .sidebar-logo {
-          color: #e2e8f0;
         }
 
         .sidebar-logo img {
@@ -977,18 +870,9 @@ const ParentDashboard = () => {
           transition: all 0.2s ease;
         }
 
-        .dark-mode .sidebar-toggle {
-          background: #334155;
-          color: #e2e8f0;
-        }
-
         .sidebar-toggle:hover {
           background: #e2e8f0;
           transform: scale(1.05);
-        }
-
-        .dark-mode .sidebar-toggle:hover {
-          background: #475569;
         }
 
         /* Desktop/Mobile Toggle Visibility */
@@ -1036,10 +920,6 @@ const ParentDashboard = () => {
           transform: translateX(4px);
         }
 
-        .dark-mode .nav-item:hover {
-          background: #334155;
-        }
-
         .nav-item.active {
           background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
           color: white;
@@ -1068,10 +948,6 @@ const ParentDashboard = () => {
         .sidebar-footer {
           padding: 1rem;
           border-top: 1px solid #e2e8f0;
-        }
-
-        .dark-mode .sidebar-footer {
-          border-top: 1px solid #334155;
         }
 
         .logout-btn {
@@ -1103,16 +979,8 @@ const ParentDashboard = () => {
           transition: all 0.3s ease;
         }
 
-        .sidebar.collapsed + .main-container {
-          margin-left: 70px;
-        }
-
         @media (max-width: 768px) {
           .main-container {
-            margin-left: 0;
-          }
-         
-          .sidebar.collapsed + .main-container {
             margin-left: 0;
           }
         }
@@ -1133,18 +1001,9 @@ const ParentDashboard = () => {
           font-size: 1.2rem;
         }
 
-        .dark-mode .mobile-menu-btn {
-          background: #334155;
-          color: #e2e8f0;
-        }
-
         .mobile-menu-btn:hover {
           background: #e2e8f0;
           transform: scale(1.05);
-        }
-
-        .dark-mode .mobile-menu-btn:hover {
-          background: #475569;
         }
 
         @media (max-width: 768px) {
@@ -1165,11 +1024,6 @@ const ParentDashboard = () => {
           top: 0;
           z-index: 100;
           backdrop-filter: blur(10px);
-        }
-
-        .dark-mode .top-header {
-          background: #1e293b;
-          border-bottom: 1px solid #334155;
         }
 
         @media (max-width: 768px) {
@@ -1211,10 +1065,6 @@ const ParentDashboard = () => {
           margin: 0.25rem 0 0 0;
         }
 
-        .dark-mode .header-title p {
-          color: #94a3b8;
-        }
-
         @media (max-width: 768px) {
           .header-title p {
             font-size: 0.8rem;
@@ -1241,11 +1091,6 @@ const ParentDashboard = () => {
           border: 1px solid #e2e8f0;
         }
 
-        .dark-mode .time-display {
-          background: #334155;
-          border: 1px solid #475569;
-        }
-
         @media (max-width: 768px) {
           .time-display {
             display: none;
@@ -1258,18 +1103,10 @@ const ParentDashboard = () => {
           color: #1e293b;
         }
 
-        .dark-mode .current-time {
-          color: #e2e8f0;
-        }
-
         .current-date {
           font-size: 0.75rem;
           color: #64748b;
           margin-top: 2px;
-        }
-
-        .dark-mode .current-date {
-          color: #94a3b8;
         }
 
         .header-actions {
@@ -1299,20 +1136,10 @@ const ParentDashboard = () => {
           position: relative;
         }
 
-        .dark-mode .action-btn {
-          background: #334155;
-          border: 1px solid #475569;
-          color: #e2e8f0;
-        }
-
         .action-btn:hover {
           background: #f8fafc;
           transform: translateY(-2px);
           box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        }
-
-        .dark-mode .action-btn:hover {
-          background: #475569;
         }
 
         @media (max-width: 480px) {
@@ -1346,17 +1173,8 @@ const ParentDashboard = () => {
           transition: all 0.3s ease;
         }
 
-        .dark-mode .user-profile {
-          background: #334155;
-          border: 1px solid #475569;
-        }
-
         .user-profile:hover {
           background: #e2e8f0;
-        }
-
-        .dark-mode .user-profile:hover {
-          background: #475569;
         }
 
         @media (max-width: 768px) {
@@ -1397,25 +1215,17 @@ const ParentDashboard = () => {
           color: #1e293b;
         }
 
-        .dark-mode .profile-name {
-          color: #e2e8f0;
-        }
-
         .profile-role {
           font-size: 0.75rem;
           color: #64748b;
         }
 
-        .dark-mode .profile-role {
-          color: #94a3b8;
-        }
-
         /* Dropdown Styles */
-        .notification-container, .settings-container, .language-container {
+        .notification-container, .language-container {
           position: relative;
         }
 
-        .notification-dropdown, .settings-dropdown, .language-dropdown {
+        .notification-dropdown, .language-dropdown {
           position: absolute;
           top: 100%;
           right: 0;
@@ -1432,26 +1242,14 @@ const ParentDashboard = () => {
           padding: 1rem;
         }
 
-        .settings-dropdown {
-          width: 280px;
-          padding: 1rem;
-        }
-
         .language-dropdown {
           width: 200px;
           padding: 1rem;
         }
 
-        .dark-mode .notification-dropdown,
-        .dark-mode .settings-dropdown,
-        .dark-mode .language-dropdown {
-          background: #1e293b;
-          border: 1px solid #334155;
-        }
-
         /* Mobile Dropdown Positioning */
         @media (max-width: 768px) {
-          .notification-dropdown, .settings-dropdown, .language-dropdown {
+          .notification-dropdown, .language-dropdown {
             position: fixed;
             top: 70px !important;
             left: 1rem !important;
@@ -1472,7 +1270,7 @@ const ParentDashboard = () => {
         }
 
         @media (max-width: 480px) {
-          .notification-dropdown, .settings-dropdown, .language-dropdown {
+          .notification-dropdown, .language-dropdown {
             left: 0.5rem !important;
             right: 0.5rem !important;
             top: 65px !important;
@@ -1490,10 +1288,6 @@ const ParentDashboard = () => {
           margin-bottom: 1rem;
           padding-bottom: 0.5rem;
           border-bottom: 1px solid #e2e8f0;
-        }
-
-        .dark-mode .dropdown-header {
-          border-bottom: 1px solid #334155;
         }
 
         .dropdown-header h3 {
@@ -1520,10 +1314,6 @@ const ParentDashboard = () => {
           color: #1e293b;
         }
 
-        .dark-mode .clear-all-btn:hover {
-          color: #e2e8f0;
-        }
-
         .close-dropdown-btn {
           background: transparent;
           border: none;
@@ -1542,10 +1332,6 @@ const ParentDashboard = () => {
           color: #1e293b;
         }
 
-        .dark-mode .close-dropdown-btn:hover {
-          color: #e2e8f0;
-        }
-
         .notification-list {
           max-height: 300px;
           overflow-y: auto;
@@ -1560,16 +1346,8 @@ const ParentDashboard = () => {
           transition: background 0.2s ease;
         }
 
-        .dark-mode .notification-item {
-          border-bottom: 1px solid #334155;
-        }
-
         .notification-item:hover {
           background: #f1f5f9;
-        }
-
-        .dark-mode .notification-item:hover {
-          background: #334155;
         }
 
         .notification-item.unread {
@@ -1591,17 +1369,9 @@ const ParentDashboard = () => {
           color: #64748b;
         }
 
-        .dark-mode .notification-content p {
-          color: #94a3b8;
-        }
-
         .notification-time {
           font-size: 0.7rem;
           color: #94a3b8;
-        }
-
-        .dark-mode .notification-time {
-          color: #cbd5e1;
         }
 
         .unread-dot {
@@ -1618,10 +1388,6 @@ const ParentDashboard = () => {
           font-size: 0.85rem;
           color: #64748b;
           padding: 1rem 0;
-        }
-
-        .dark-mode .no-notifications {
-          color: #94a3b8;
         }
 
         .language-options {
@@ -1648,10 +1414,6 @@ const ParentDashboard = () => {
           background: #f1f5f9;
         }
 
-        .dark-mode .language-option:hover {
-          background: #334155;
-        }
-
         .language-option.active {
           background: #667eea;
           color: white;
@@ -1665,86 +1427,6 @@ const ParentDashboard = () => {
         .language-name {
           font-size: 0.8rem;
           opacity: 0.8;
-        }
-
-        .settings-option {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          margin-bottom: 1rem;
-        }
-
-        .settings-label {
-          display: flex;
-          align-items: center;
-          gap: 0.5rem;
-          font-weight: 600;
-          color: #1e293b;
-        }
-
-        .dark-mode .settings-label {
-          color: #e2e8f0;
-        }
-
-        .theme-toggle {
-          display: flex;
-          align-items: center;
-          gap: 0.75rem;
-        }
-
-        .language-preview {
-          font-size: 0.9rem;
-          color: #64748b;
-          font-weight: 500;
-        }
-
-        .dark-mode .language-preview {
-          color: #94a3b8;
-        }
-
-        .switch {
-          position: relative;
-          display: inline-block;
-          width: 40px;
-          height: 22px;
-        }
-
-        .switch input {
-          opacity: 0;
-          width: 0;
-          height: 0;
-        }
-
-        .slider {
-          position: absolute;
-          cursor: pointer;
-          top: 0;
-          left: 0;
-          right: 0;
-          bottom: 0;
-          background-color: #ccc;
-          transition: 0.4s;
-          border-radius: 22px;
-        }
-
-        .slider:before {
-          position: absolute;
-          content: "";
-          height: 18px;
-          width: 18px;
-          left: 2px;
-          bottom: 2px;
-          background-color: white;
-          transition: 0.4s;
-          border-radius: 50%;
-        }
-
-        input:checked + .slider {
-          background-color: #667eea;
-        }
-
-        input:checked + .slider:before {
-          transform: translateX(18px);
         }
 
         /* Profile Modal Styles */
@@ -1774,11 +1456,6 @@ const ParentDashboard = () => {
           overflow-y: auto;
         }
 
-        .dark-mode .profile-modal-content {
-          background: #1e293b;
-          color: #e2e8f0;
-        }
-
         @media (max-width: 480px) {
           .profile-modal-content {
             padding: 1rem;
@@ -1799,10 +1476,6 @@ const ParentDashboard = () => {
 
         .profile-close-btn:hover {
           color: #1e293b;
-        }
-
-        .dark-mode .profile-close-btn:hover {
-          color: #e2e8f0;
         }
 
         .profile-modal-header {
@@ -1842,10 +1515,6 @@ const ParentDashboard = () => {
           color: #666;
         }
 
-        .dark-mode .profile-modal-info p {
-          color: #94a3b8;
-        }
-
         .profile-modal-details {
           margin-top: 1rem;
           line-height: 1.6;
@@ -1862,10 +1531,6 @@ const ParentDashboard = () => {
           color: #1e293b;
         }
 
-        .dark-mode .profile-input-group label {
-          color: #e2e8f0;
-        }
-
         .profile-input, .profile-textarea {
           width: 100%;
           padding: 0.5rem;
@@ -1874,12 +1539,6 @@ const ParentDashboard = () => {
           font-size: 1rem;
           background: white;
           color: #1e293b;
-        }
-
-        .dark-mode .profile-input, .dark-mode .profile-textarea {
-          background: #334155;
-          border: 1px solid #475569;
-          color: #e2e8f0;
         }
 
         .profile-textarea {
@@ -1912,12 +1571,6 @@ const ParentDashboard = () => {
           background: #f1f5f9;
           border: 1px solid #ddd;
           color: #64748b;
-        }
-
-        .dark-mode .profile-btn-cancel {
-          background: #334155;
-          border: 1px solid #475569;
-          color: #94a3b8;
         }
 
         .profile-btn-save, .profile-btn-edit {
@@ -2071,10 +1724,6 @@ const ParentDashboard = () => {
           color: #1e293b;
         }
 
-        .dark-mode .stats-section h2 {
-          color: #e2e8f0;
-        }
-
         @media (max-width: 768px) {
           .stats-section h2 {
             font-size: 1.3rem;
@@ -2105,18 +1754,9 @@ const ParentDashboard = () => {
           transition: all 0.3s ease;
         }
 
-        .dark-mode .stat-card {
-          background: #1e293b;
-          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-        }
-
         .stat-card:hover {
           transform: translateY(-5px);
           box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
-        }
-
-        .dark-mode .stat-card:hover {
-          box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
         }
 
         @media (max-width: 480px) {
@@ -2155,10 +1795,6 @@ const ParentDashboard = () => {
           margin-bottom: 0.25rem;
         }
 
-        .dark-mode .stat-value {
-          color: #e2e8f0;
-        }
-
         @media (max-width: 480px) {
           .stat-value {
             font-size: 1.3rem;
@@ -2169,10 +1805,6 @@ const ParentDashboard = () => {
           font-size: 0.9rem;
           color: #64748b;
           margin-bottom: 0.25rem;
-        }
-
-        .dark-mode .stat-label {
-          color: #94a3b8;
         }
 
         .stat-change {
@@ -2192,10 +1824,6 @@ const ParentDashboard = () => {
           font-size: 1.5rem;
           margin-bottom: 1.5rem;
           color: #1e293b;
-        }
-
-        .dark-mode .features-section h2 {
-          color: #e2e8f0;
         }
 
         @media (max-width: 768px) {
@@ -2226,18 +1854,9 @@ const ParentDashboard = () => {
           transition: all 0.3s ease;
         }
 
-        .dark-mode .feature-card {
-          background: #1e293b;
-          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-        }
-
         .feature-card:hover {
           transform: translateY(-5px);
           box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
-        }
-
-        .dark-mode .feature-card:hover {
-          box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
         }
 
         @media (max-width: 480px) {
@@ -2263,10 +1882,6 @@ const ParentDashboard = () => {
           color: #1e293b;
         }
 
-        .dark-mode .feature-card h3 {
-          color: #e2e8f0;
-        }
-
         @media (max-width: 480px) {
           .feature-card h3 {
             font-size: 1.1rem;
@@ -2277,10 +1892,6 @@ const ParentDashboard = () => {
           color: #64748b;
           line-height: 1.6;
           font-size: 0.9rem;
-        }
-
-        .dark-mode .feature-card p {
-          color: #94a3b8;
         }
 
         /* Custom scrollbar styles */
@@ -2300,48 +1911,37 @@ const ParentDashboard = () => {
           border-radius: 3px;
         }
 
-        .dark-mode .sidebar-nav::-webkit-scrollbar-thumb,
-        .dark-mode .notification-list::-webkit-scrollbar-thumb {
-          background: rgba(255, 255, 255, 0.2);
-        }
-
         .sidebar-nav::-webkit-scrollbar-thumb:hover,
         .notification-list::-webkit-scrollbar-thumb:hover {
           background: rgba(0, 0, 0, 0.3);
         }
 
-        .dark-mode .sidebar-nav::-webkit-scrollbar-thumb:hover,
-        .dark-mode .notification-list::-webkit-scrollbar-thumb:hover {
-          background: rgba(255, 255, 255, 0.3);
+        .sidebar {
+          color: #1e293b;
         }
 
-        /* Dark mode text color fixes */
-        .dark-mode .sidebar {
+        .nav-item {
+          color: #1e293b;
+        }
+
+        .nav-icon {
+          color: #1e293b;
+        }
+
+        .sidebar-logo {
+          color: #1e293b;
+        }
+
+        .sidebar-footer {
+          color: #1e293b;
+        }
+
+        .logout-btn {
           color: white;
         }
 
-        .dark-mode .nav-item {
-          color: white;
-        }
-
-        .dark-mode .nav-icon {
-          color: white;
-        }
-
-        .dark-mode .sidebar-logo {
-          color: white;
-        }
-
-        .dark-mode .sidebar-footer {
-          color: white;
-        }
-
-        .dark-mode .logout-btn {
-          color: white;
-        }
-
-        .dark-mode .stats-section > h2 {
-          color: #e2e8f0;
+        .stats-section > h2 {
+          color: #1e293b;
         }
       `}</style>
     </div>

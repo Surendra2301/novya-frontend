@@ -488,29 +488,8 @@ const Home1 = () => {
             </motion.div>
           ))}
           
-          {/* Welcome Message */}
-          <motion.div
-            initial={{ scale: 0, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ duration: 0.5, delay: 0.5 }}
-            style={{
-              position: 'absolute',
-              top: '50%',
-              left: '50%',
-              transform: 'translate(-50%, -50%)',
-              background: 'linear-gradient(135deg, #2D5D7B, #A62D69)',
-              color: 'white',
-              padding: '20px 40px',
-              borderRadius: '20px',
-              fontSize: '1.5rem',
-              fontWeight: 'bold',
-              textAlign: 'center',
-              zIndex: 10000,
-              boxShadow: '0 10px 30px rgba(0,0,0,0.3)'
-            }}
-          >
-            🎉 {t('welcome.message')} 🎉
-          </motion.div>
+       
+        
         </div>
       )}
 

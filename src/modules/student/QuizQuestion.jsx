@@ -107,7 +107,8 @@ function QuizQuestion({
   selectedSubtopic,
   classLevel,
   subject,
-  chapter
+  chapter,
+  rewardPoints
 }) {
   const { t } = useTranslation();
   const optionLabels = ["A", "B", "C", "D"];
@@ -122,16 +123,15 @@ function QuizQuestion({
   const [explanations, setExplanations] = useState([]);
   const [loadingExplanations, setLoadingExplanations] = useState(false);
   const resultRef = useRef(null);
-  
+ 
   const {
-    rewardPoints,
     updateRewardPoints,
     calculateEarnedPoints,
     earnedPoints: contextEarnedPoints,
     resetPointsAwarded,
     hasAwardedPoints
   } = useQuiz();
-  
+ 
   const [showPointsMessage, setShowPointsMessage] = useState(false);
   const [quizPointsAwarded, setQuizPointsAwarded] = useState(false);
 
@@ -140,10 +140,10 @@ function QuizQuestion({
   const addRewardPointsWithHistory = (points, reason, source = 'system') => {
     const currentPoints = parseInt(localStorage.getItem('rewardPoints') || '0');
     const newPoints = currentPoints + points;
-    
+   
     localStorage.setItem('rewardPoints', newPoints.toString());
     updateRewardPoints(newPoints);
-    
+   
     const historyEntry = {
       id: `reward_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
       points: points,
@@ -152,21 +152,21 @@ function QuizQuestion({
       source: source,
       timestamp: new Date().toISOString()
     };
-    
+   
     const existingHistory = JSON.parse(localStorage.getItem('rewardsHistory') || '[]');
     const updatedHistory = [historyEntry, ...existingHistory];
     localStorage.setItem('rewardsHistory', JSON.stringify(updatedHistory));
-    
-    window.dispatchEvent(new CustomEvent('rewardPointsUpdated', { 
-      detail: { rewardPoints: newPoints } 
+   
+    window.dispatchEvent(new CustomEvent('rewardPointsUpdated', {
+      detail: { rewardPoints: newPoints }
     }));
-    
+   
     window.dispatchEvent(new StorageEvent('storage', {
       key: 'rewardPoints',
       newValue: newPoints.toString(),
       oldValue: currentPoints.toString()
     }));
-    
+   
     return historyEntry;
   };
 
@@ -237,23 +237,23 @@ function QuizQuestion({
   useEffect(() => {
     if (isFinished && passed && !showPointsMessage && !quizPointsAwarded) {
       const percentage = Math.round((score / quiz.length) * 100);
-      
+     
       if (contextEarnedPoints.totalPoints > 0) {
         console.log(`🎯 Adding quiz points to history: ${contextEarnedPoints.totalPoints}`);
         addRewardPointsWithHistory(
-          contextEarnedPoints.totalPoints, 
-          `Quiz completed: ${score}/${quiz.length} correct answers (Level ${currentLevel})`, 
+          contextEarnedPoints.totalPoints,
+          `Quiz completed: ${score}/${quiz.length} correct answers (Level ${currentLevel})`,
           'quiz_completion'
         );
         setQuizPointsAwarded(true);
       }
-      
+     
       let pointsMessage = `🎉 ${t('quiz_passed_points', { points: contextEarnedPoints.basePoints })}`;
       if (contextEarnedPoints.bonusPoints > 0) {
         pointsMessage += ` + ${t('above_80_bonus_points', { points: contextEarnedPoints.bonusPoints })}`;
       }
       pointsMessage += ` = ${contextEarnedPoints.totalPoints} ${t('total_points')}!`;
-      
+     
       showSnackbar(pointsMessage, 'success');
       setShowPointsMessage(true);
     }
@@ -293,7 +293,7 @@ function QuizQuestion({
       }
 
       const data = await response.json();
-      
+     
       if (data.success && data.explanations) {
         setExplanations(data.explanations);
         showSnackbar(t('explanations_loaded'), 'success');
@@ -387,7 +387,7 @@ function QuizQuestion({
 
   const generateResultImage = async () => {
     if (!resultRef.current) return null;
-    
+   
     setGeneratingImage(true);
     try {
       const canvas = await html2canvas(resultRef.current, {
@@ -399,7 +399,7 @@ function QuizQuestion({
         allowTaint: true,
         logging: false
       });
-      
+     
       return canvas.toDataURL('image/png');
     } catch (error) {
       console.error('Error generating image:', error);
@@ -414,7 +414,7 @@ function QuizQuestion({
     try {
       setGeneratingImage(true);
       showSnackbar(t('generating_image'), 'info');
-      
+     
       const imageDataUrl = await generateResultImage();
       if (!imageDataUrl) {
         showSnackbar('Failed to generate result card', 'error');
@@ -423,13 +423,13 @@ function QuizQuestion({
 
       const response = await fetch(imageDataUrl);
       const blob = await response.blob();
-      
+     
       const percentage = Math.round((score / quiz.length) * 100);
       const fileName = `quiz-result-level-${currentLevel}-${Date.now()}.png`;
       const file = new File([blob], fileName, { type: 'image/png' });
-      
+     
       const shareText = `🎯 I scored ${score}/${quiz.length} (${percentage}%) in Level ${currentLevel} Quiz! 🚀`;
-      
+     
       if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
         try {
           await navigator.share({
@@ -447,10 +447,10 @@ function QuizQuestion({
           document.body.appendChild(link);
           link.click();
           document.body.removeChild(link);
-          
+         
           const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(shareText)}`;
           window.open(whatsappUrl, '_blank');
-          
+         
           showSnackbar('Image downloaded and WhatsApp opened. Please attach the image manually.', 'info');
         }
       } else {
@@ -460,13 +460,13 @@ function QuizQuestion({
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
-        
+       
         const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(shareText)}`;
         window.open(whatsappUrl, '_blank');
-        
+       
         showSnackbar('Native sharing not supported. Image downloaded and WhatsApp opened. Please attach the image manually.', 'info');
       }
-      
+     
     } catch (error) {
       console.error('Error sharing result:', error);
       showSnackbar(t('share_error'), 'error');
@@ -486,7 +486,7 @@ function QuizQuestion({
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-      
+     
       showSnackbar(t('result_downloaded'), 'success');
     } catch (error) {
       console.error('Error downloading image:', error);
@@ -497,7 +497,7 @@ function QuizQuestion({
   const downloadTextReport = () => {
     const percentage = Math.round((score / quiz.length) * 100);
     const isPerfectScore = score === quiz.length;
-    
+   
     let content = `QUIZ RESULT REPORT\n`;
     content += `==================\n\n`;
     content += `Level: ${currentLevel}\n`;
@@ -509,7 +509,7 @@ function QuizQuestion({
     content += `Percentage: ${percentage}%\n`;
     content += `Status: ${passed ? 'PASSED' : 'FAILED'}\n`;
     content += `Reward Points: ${rewardPoints}\n\n`;
-    
+   
     if (passed) {
       content += `🪙 POINTS BREAKDOWN\n`;
       content += `-----------------\n`;
@@ -519,15 +519,15 @@ function QuizQuestion({
       }
       content += `Total Earned: ${contextEarnedPoints.totalPoints} points\n\n`;
     }
-    
+   
     content += `📝 QUESTION REVIEW\n`;
     content += `-----------------\n\n`;
-    
+   
     quiz.forEach((q, i) => {
       const isCorrect = userAnswers[i] === q?.answer;
       const wasHintUsed = hintsUsed[i];
       const explanation = explanations[i]?.explanation || t('explanation_not_available');
-      
+     
       content += `Q${i + 1}: ${q?.question || t('question_not_available')}\n`;
       content += `${t('your_answer')}: ${userAnswers[i] || t('not_answered')} ${isCorrect ? '✓' : '✗'}\n`;
       content += `${t('correct_answer')}: ${q?.answer || t('not_available_short')}\n`;
@@ -541,9 +541,9 @@ function QuizQuestion({
       }
       content += `\n`;
     });
-    
+   
     content += `\n${t('keep_learning')} 🚀`;
-    
+   
     const blob = new Blob([content], { type: 'text/plain' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -553,7 +553,7 @@ function QuizQuestion({
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
-    
+   
     showSnackbar(t('report_downloaded'), 'success');
   };
 
@@ -568,8 +568,8 @@ function QuizQuestion({
         minHeight: '300px',
         p: 4,
         background: passed ?
-          (score === quiz.length ? 
-            'linear-gradient(135deg, #27ae60 0%, #2ecc71 100%)' : 
+          (score === quiz.length ?
+            'linear-gradient(135deg, #27ae60 0%, #2ecc71 100%)' :
             'linear-gradient(135deg, #6c5ce7 0%, #a29bfe 100%)') :
           'linear-gradient(135deg, #e74c3c 0%, #c0392b 100%)',
         color: 'white',
@@ -585,7 +585,7 @@ function QuizQuestion({
       <Typography variant="h4" fontWeight="bold" gutterBottom sx={{ fontSize: '2rem', mb: 2 }}>
         🎯 {t('quiz_result')}
       </Typography>
-      
+     
       <Typography variant="h5" fontWeight="bold" gutterBottom sx={{ fontSize: '1.5rem', mb: 3 }}>
         {t('level')} {currentLevel} {passed ? t('completed') : t('failed')}
       </Typography>
@@ -603,7 +603,7 @@ function QuizQuestion({
           </Typography>
           <Typography variant="h6" sx={{ fontSize: '1rem' }}>{t('score')}</Typography>
         </Box>
-        
+       
         <Box sx={{ textAlign: 'center' }}>
           <Typography variant="h3" fontWeight="bold" sx={{ fontSize: '2.5rem' }}>
             {Math.round((score / quiz.length) * 100)}%
@@ -612,18 +612,18 @@ function QuizQuestion({
         </Box>
       </Box>
 
-      <Box sx={{ 
-        background: 'rgba(255,255,255,0.2)', 
-        p: 2, 
-        borderRadius: 2, 
-        my: 2, 
+      <Box sx={{
+        background: 'rgba(255,255,255,0.2)',
+        p: 2,
+        borderRadius: 2,
+        my: 2,
         width: '100%',
         backdropFilter: 'blur(10px)'
       }}>
         <Typography variant="h6" gutterBottom sx={{ fontSize: '1.1rem', mb: 2 }}>
           ⭐ {t('points')}: {rewardPoints}
         </Typography>
-        
+       
         {passed && (
           <Box sx={{ textAlign: 'left', pl: 1 }}>
             <Typography variant="body1" sx={{ fontSize: '0.9rem', mb: 0.5 }}>
@@ -647,9 +647,9 @@ function QuizQuestion({
     </Box>
   );
 
-  // Modern Top Header
+  // Modern Top Header with Subject Info in Middle
   const ModernHeader = () => (
-    <Box sx={{ 
+    <Box sx={{
       position: 'fixed',
       top: 0,
       left: 0,
@@ -661,9 +661,9 @@ function QuizQuestion({
       boxShadow: '0 8px 32px rgba(0,0,0,0.1)'
     }}>
       <Container maxWidth="lg">
-        <Box sx={{ 
-          display: 'flex', 
-          justifyContent: 'space-between', 
+        <Box sx={{
+          display: 'flex',
+          justifyContent: 'space-between',
           alignItems: 'center',
           py: 2
         }}>
@@ -684,6 +684,39 @@ function QuizQuestion({
             }}
           />
 
+          {/* Middle: Subject Information */}
+          <Box sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            flex: 1,
+            mx: 3,
+            textAlign: 'center'
+          }}>
+            <Typography
+              variant="h6"
+              sx={{
+                color: 'white',
+                fontWeight: 'bold',
+                fontSize: '1.1rem',
+                mb: 0.5,
+                textShadow: '0 2px 4px rgba(0,0,0,0.2)'
+              }}
+            >
+              {classLevel} • {subject}
+            </Typography>
+            <Typography
+              variant="body2"
+              sx={{
+                color: 'rgba(255,255,255,0.9)',
+                fontSize: '0.9rem',
+                textShadow: '0 1px 2px rgba(0,0,0,0.2)'
+              }}
+            >
+              {chapter} • {selectedSubtopic}
+            </Typography>
+          </Box>
+
           {/* Right: Points and Actions */}
           <Stack direction="row" spacing={1.5} alignItems="center">
             <Chip
@@ -702,7 +735,7 @@ function QuizQuestion({
                 '& .MuiChip-icon': { color: '#000' }
               }}
             />
-            
+           
             {isFinished && (
               <>
                 <IconButton
@@ -727,7 +760,7 @@ function QuizQuestion({
                 >
                   <WhatsApp />
                 </IconButton>
-                
+               
                 <IconButton
                   onClick={() => downloadImage()}
                   disabled={generatingImage}
@@ -764,9 +797,9 @@ function QuizQuestion({
         <ModernHeader />
         <Container maxWidth="md" sx={{ pt: 12, pb: 4 }}>
           <Fade in={true}>
-            <Paper elevation={0} sx={{ 
-              p: 5, 
-              textAlign: 'center', 
+            <Paper elevation={0} sx={{
+              p: 5,
+              textAlign: 'center',
               borderRadius: 4,
               background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)',
               border: '1px solid rgba(108,92,231,0.1)'
@@ -778,15 +811,15 @@ function QuizQuestion({
               <Typography variant="body1" color="text.secondary" sx={{ mb: 4, fontSize: '1.1rem' }}>
                 {t('data_issue')}
               </Typography>
-              <Button 
-                variant="contained" 
-                size="large" 
-                onClick={retryQuiz} 
-                startIcon={<Replay />} 
-                sx={{ 
-                  borderRadius: 3, 
-                  px: 5, 
-                  py: 1.5, 
+              <Button
+                variant="contained"
+                size="large"
+                onClick={retryQuiz}
+                startIcon={<Replay />}
+                sx={{
+                  borderRadius: 3,
+                  px: 5,
+                  py: 1.5,
                   fontSize: '1.1rem',
                   background: 'linear-gradient(135deg, #6c5ce7, #a29bfe)',
                   boxShadow: '0 8px 25px rgba(108,92,231,0.3)',
@@ -816,12 +849,12 @@ function QuizQuestion({
         <ModernHeader />
         <Container maxWidth="lg" sx={{ pt: 12, pb: 6 }}>
           <ResultImageComponent />
-          
+         
           {generatingImage && (
-            <Alert 
-              severity="info" 
-              sx={{ 
-                mb: 3, 
+            <Alert
+              severity="info"
+              sx={{
+                mb: 3,
                 borderRadius: 3,
                 background: 'linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%)',
                 border: '1px solid #90caf9'
@@ -839,8 +872,8 @@ function QuizQuestion({
                 textAlign: 'center',
                 borderRadius: 4,
                 background: passed ?
-                  (isPerfectScore ? 
-                    'linear-gradient(135deg, #27ae60 0%, #2ecc71 100%)' : 
+                  (isPerfectScore ?
+                    'linear-gradient(135deg, #27ae60 0%, #2ecc71 100%)' :
                     'linear-gradient(135deg, #6c5ce7 0%, #a29bfe 100%)') :
                   'linear-gradient(135deg, #e74c3c 0%, #c0392b 100%)',
                 color: 'white',
@@ -864,24 +897,24 @@ function QuizQuestion({
                   <Box sx={{ position: 'relative', zIndex: 1 }}>
                     {passed && isPerfectScore && (
                       <Box sx={{ mb: 3 }}>
-                        <EmojiEvents sx={{ 
-                          fontSize: 100, 
+                        <EmojiEvents sx={{
+                          fontSize: 100,
                           filter: 'drop-shadow(0 8px 16px rgba(0,0,0,0.4))',
                           animation: `${float} 3s infinite`
                         }} />
                       </Box>
                     )}
-                    
-                    <Typography variant="h2" gutterBottom fontWeight="900" sx={{ 
+                   
+                    <Typography variant="h2" gutterBottom fontWeight="900" sx={{
                       fontSize: { xs: '2rem', md: '3rem' },
                       textShadow: '0 4px 20px rgba(0,0,0,0.3)',
                       mb: 2
                     }}>
                       {passed ? (isPerfectScore ? `🎉 ${t('perfect_score')}` : `✨ ${t('well_done')}`) : `💪 ${t('try_again')}`}
                     </Typography>
-                    
-                    <Typography variant="h5" sx={{ 
-                      mb: 4, 
+                   
+                    <Typography variant="h5" sx={{
+                      mb: 4,
                       opacity: 0.95,
                       fontSize: { xs: '1.2rem', md: '1.5rem' }
                     }}>
@@ -889,14 +922,14 @@ function QuizQuestion({
                     </Typography>
 
                     {/* Score Display */}
-                    <Box sx={{ 
-                      display: 'flex', 
-                      justifyContent: 'center', 
-                      gap: 3, 
+                    <Box sx={{
+                      display: 'flex',
+                      justifyContent: 'center',
+                      gap: 3,
                       mb: 4,
                       flexWrap: 'wrap'
                     }}>
-                      <Box sx={{ 
+                      <Box sx={{
                         background: 'rgba(255,255,255,0.2)',
                         backdropFilter: 'blur(10px)',
                         borderRadius: 3,
@@ -904,7 +937,7 @@ function QuizQuestion({
                         minWidth: '140px',
                         border: '2px solid rgba(255,255,255,0.3)'
                       }}>
-                        <Typography variant="h2" fontWeight="900" sx={{ 
+                        <Typography variant="h2" fontWeight="900" sx={{
                           fontSize: { xs: '2.5rem', md: '3.5rem' }
                         }}>
                           {score}/{quiz.length}
@@ -913,8 +946,8 @@ function QuizQuestion({
                           {t('score')}
                         </Typography>
                       </Box>
-                      
-                      <Box sx={{ 
+                     
+                      <Box sx={{
                         background: 'rgba(255,255,255,0.2)',
                         backdropFilter: 'blur(10px)',
                         borderRadius: 3,
@@ -922,7 +955,7 @@ function QuizQuestion({
                         minWidth: '140px',
                         border: '2px solid rgba(255,255,255,0.3)'
                       }}>
-                        <Typography variant="h2" fontWeight="900" sx={{ 
+                        <Typography variant="h2" fontWeight="900" sx={{
                           fontSize: { xs: '2.5rem', md: '3.5rem' }
                         }}>
                           {percentage}%
@@ -935,7 +968,7 @@ function QuizQuestion({
 
                     {/* Points Breakdown */}
                     {passed && (
-                      <Box sx={{ 
+                      <Box sx={{
                         background: 'rgba(255,255,255,0.15)',
                         backdropFilter: 'blur(20px)',
                         borderRadius: 3,
@@ -948,8 +981,8 @@ function QuizQuestion({
                           🎁 {t('points_earned')}
                         </Typography>
                         <Stack spacing={1.5}>
-                          <Box sx={{ 
-                            display: 'flex', 
+                          <Box sx={{
+                            display: 'flex',
                             justifyContent: 'space-between',
                             alignItems: 'center',
                             background: 'rgba(255,255,255,0.1)',
@@ -960,8 +993,8 @@ function QuizQuestion({
                             <Typography fontWeight="bold">+{contextEarnedPoints.basePoints} {t('pts')}</Typography>
                           </Box>
                           {hasBonus && (
-                            <Box sx={{ 
-                              display: 'flex', 
+                            <Box sx={{
+                              display: 'flex',
                               justifyContent: 'space-between',
                               alignItems: 'center',
                               background: 'rgba(255,215,0,0.2)',
@@ -974,8 +1007,8 @@ function QuizQuestion({
                             </Box>
                           )}
                           <Divider sx={{ borderColor: 'rgba(255,255,255,0.3)', my: 1 }} />
-                          <Box sx={{ 
-                            display: 'flex', 
+                          <Box sx={{
+                            display: 'flex',
                             justifyContent: 'space-between',
                             alignItems: 'center',
                             background: 'rgba(255,255,255,0.2)',
@@ -991,10 +1024,10 @@ function QuizQuestion({
                     )}
 
                     {!passed && (
-                      <Alert 
-                        severity="warning" 
-                        sx={{ 
-                          background: 'rgba(255,255,255,0.2)', 
+                      <Alert
+                        severity="warning"
+                        sx={{
+                          background: 'rgba(255,255,255,0.2)',
                           color: 'white',
                           border: '2px solid rgba(255,255,255,0.3)',
                           borderRadius: 2,
@@ -1010,17 +1043,17 @@ function QuizQuestion({
               </Paper>
 
               {/* Questions Review Section - Updated with 10 cards */}
-              <Box sx={{ 
+              <Box sx={{
                 background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)',
                 borderRadius: 4,
                 p: 4,
                 mb: 4
               }}>
-                <Box sx={{ 
-                  display: 'flex', 
-                  alignItems: 'center', 
-                  gap: 2, 
-                  mb: 4 
+                <Box sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 2,
+                  mb: 4
                 }}>
                   <TrendingUp sx={{ fontSize: 40, color: '#6c5ce7' }} />
                   <Typography variant="h4" fontWeight="bold" color="text.primary">
@@ -1029,10 +1062,10 @@ function QuizQuestion({
                 </Box>
 
                 {loadingExplanations && (
-                  <Box sx={{ 
-                    display: 'flex', 
-                    justifyContent: 'center', 
-                    alignItems: 'center', 
+                  <Box sx={{
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
                     mb: 4,
                     p: 3,
                     background: 'white',
@@ -1053,7 +1086,7 @@ function QuizQuestion({
 
                     return (
                       <Zoom in={true} key={i} style={{ transitionDelay: `${i * 50}ms` }}>
-                        <Card elevation={0} sx={{ 
+                        <Card elevation={0} sx={{
                           borderRadius: 3,
                           border: `3px solid ${isCorrect ? '#27ae60' : '#e74c3c'}`,
                           overflow: 'hidden',
@@ -1064,9 +1097,9 @@ function QuizQuestion({
                           }
                         }}>
                           {/* Question Header */}
-                          <Box sx={{ 
-                            background: isCorrect ? 
-                              'linear-gradient(135deg, #27ae60, #2ecc71)' : 
+                          <Box sx={{
+                            background: isCorrect ?
+                              'linear-gradient(135deg, #27ae60, #2ecc71)' :
                               'linear-gradient(135deg, #e74c3c, #c0392b)',
                             color: 'white',
                             p: 2.5,
@@ -1075,9 +1108,9 @@ function QuizQuestion({
                             justifyContent: 'space-between'
                           }}>
                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                              <Chip 
-                                label={`Q${i + 1}`} 
-                                sx={{ 
+                              <Chip
+                                label={`Q${i + 1}`}
+                                sx={{
                                   background: 'rgba(255,255,255,0.25)',
                                   color: 'white',
                                   fontWeight: 'bold',
@@ -1095,7 +1128,7 @@ function QuizQuestion({
                                 icon={<Lightbulb sx={{ color: 'white !important' }} />}
                                 label={t('hint_used')}
                                 size="small"
-                                sx={{ 
+                                sx={{
                                   background: 'rgba(255,255,255,0.25)',
                                   color: 'white',
                                   fontWeight: 'bold'
@@ -1136,7 +1169,7 @@ function QuizQuestion({
                                       width: 32,
                                       height: 32,
                                       borderRadius: '50%',
-                                      background: isAnswer || (isSelected && !isAnswer) ? 
+                                      background: isAnswer || (isSelected && !isAnswer) ?
                                         'rgba(255,255,255,0.25)' : '#6c5ce7',
                                       color: isAnswer || (isSelected && !isAnswer) ? 'white' : 'white',
                                       display: 'flex',
@@ -1147,7 +1180,7 @@ function QuizQuestion({
                                     }}>
                                       {optionLabels[j]}
                                     </Box>
-                                    <Typography sx={{ 
+                                    <Typography sx={{
                                       fontWeight: isAnswer ? 'bold' : 'normal',
                                       flex: 1,
                                       color: isAnswer || (isSelected && !isAnswer) ? 'white' : '#000000'
@@ -1161,21 +1194,21 @@ function QuizQuestion({
                             </Stack>
 
                             {/* Answer Summary */}
-                            <Box sx={{ 
-                              display: 'flex', 
-                              gap: 2, 
+                            <Box sx={{
+                              display: 'flex',
+                              gap: 2,
                               mb: 2,
                               flexWrap: 'wrap'
                             }}>
-                              <Chip 
+                              <Chip
                                 label={`${t('your_answer')}: ${userAnswers[i] || t('not_answered')}`}
                                 color={isCorrect ? "success" : "error"}
                                 variant="outlined"
                                 sx={{ fontWeight: 'bold' }}
                               />
-                              <Chip 
+                              <Chip
                                 label={`${t('correct_answer')}: ${q?.answer || t('not_available_short')}`}
-                                sx={{ 
+                                sx={{
                                   background: 'linear-gradient(135deg, #27ae60, #2ecc71)',
                                   color: 'white',
                                   fontWeight: 'bold'
@@ -1185,10 +1218,10 @@ function QuizQuestion({
 
                             {/* Hint Display */}
                             {wasHintUsed && q?.hint && (
-                              <Alert 
-                                severity="info" 
+                              <Alert
+                                severity="info"
                                 icon={<Lightbulb />}
-                                sx={{ 
+                                sx={{
                                   mb: 2,
                                   borderRadius: 2,
                                   background: 'linear-gradient(135deg, #fff9e6, #ffe8a1)',
@@ -1203,16 +1236,16 @@ function QuizQuestion({
 
                             {/* Explanation */}
                             {explanation && (
-                              <Box sx={{ 
+                              <Box sx={{
                                 background: 'linear-gradient(135deg, #e3f2fd, #bbdefb)',
                                 borderRadius: 2,
                                 p: 3,
                                 border: '2px solid #90caf9'
                               }}>
-                                <Typography 
-                                  variant="subtitle1" 
-                                  fontWeight="bold" 
-                                  sx={{ 
+                                <Typography
+                                  variant="subtitle1"
+                                  fontWeight="bold"
+                                  sx={{
                                     mb: 1.5,
                                     color: '#1976d2',
                                     display: 'flex',
@@ -1229,9 +1262,9 @@ function QuizQuestion({
                             )}
 
                             {loadingExplanations && !explanation && (
-                              <Box sx={{ 
-                                display: 'flex', 
-                                alignItems: 'center', 
+                              <Box sx={{
+                                display: 'flex',
+                                alignItems: 'center',
                                 gap: 1.5,
                                 p: 2,
                                 background: '#f8f9fa',
@@ -1261,10 +1294,10 @@ function QuizQuestion({
               </Box>
 
               {/* Action Buttons */}
-              <Box sx={{ 
-                display: 'flex', 
-                gap: 2, 
-                justifyContent: 'center', 
+              <Box sx={{
+                display: 'flex',
+                gap: 2,
+                justifyContent: 'center',
                 flexWrap: 'wrap',
                 mb: 4
               }}>
@@ -1273,16 +1306,16 @@ function QuizQuestion({
                   size="large"
                   onClick={() => backToChapters && backToChapters()}
                   startIcon={<MenuBook />}
-                  sx={{ 
-                    borderRadius: 3, 
-                    px: 4, 
+                  sx={{
+                    borderRadius: 3,
+                    px: 4,
                     py: 1.5,
                     borderWidth: 2,
                     fontSize: '1rem',
                     fontWeight: 'bold',
                     borderColor: '#6c5ce7',
                     color: '#6c5ce7',
-                    '&:hover': { 
+                    '&:hover': {
                       borderWidth: 2,
                       background: 'rgba(108,92,231,0.05)',
                       transform: 'translateY(-2px)'
@@ -1297,16 +1330,16 @@ function QuizQuestion({
                   size="large"
                   onClick={retryQuiz}
                   startIcon={<Replay />}
-                  sx={{ 
-                    borderRadius: 3, 
-                    px: 4, 
+                  sx={{
+                    borderRadius: 3,
+                    px: 4,
                     py: 1.5,
                     borderWidth: 2,
                     fontSize: '1rem',
                     fontWeight: 'bold',
                     borderColor: '#e74c3c',
                     color: '#e74c3c',
-                    '&:hover': { 
+                    '&:hover': {
                       borderWidth: 2,
                       background: 'rgba(231,76,60,0.05)',
                       transform: 'translateY(-2px)'
@@ -1362,19 +1395,19 @@ function QuizQuestion({
           <Box>
             {/* Modern Progress Bar */}
             <Box sx={{ mb: 5 }}>
-              <Box sx={{ 
-                display: 'flex', 
-                justifyContent: 'space-between', 
-                alignItems: 'center', 
+              <Box sx={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
                 mb: 2
               }}>
                 <Typography variant="h6" fontWeight="bold" color="text.primary">
                   {t('question')} {currentQ + 1} {t('of')} {quiz.length}
                 </Typography>
-                
-                <Chip 
+               
+                <Chip
                   label={`${Math.round(progress)}%`}
-                  sx={{ 
+                  sx={{
                     background: 'linear-gradient(135deg, #6c5ce7, #a29bfe)',
                     color: 'white',
                     fontWeight: 'bold',
@@ -1383,9 +1416,9 @@ function QuizQuestion({
                 />
               </Box>
               <Box sx={{ position: 'relative' }}>
-                <LinearProgress 
-                  variant="determinate" 
-                  value={progress} 
+                <LinearProgress
+                  variant="determinate"
+                  value={progress}
                   sx={{
                     height: 12,
                     borderRadius: 3,
@@ -1395,7 +1428,7 @@ function QuizQuestion({
                       borderRadius: 3,
                       boxShadow: '0 0 20px rgba(108,92,231,0.5)'
                     }
-                  }} 
+                  }}
                 />
               </Box>
             </Box>
@@ -1414,12 +1447,12 @@ function QuizQuestion({
                 p: 0.5
               }} />
               <CardContent sx={{ p: 4 }}>
-                <Typography 
-                  variant="h5" 
-                  component="div" 
-                  fontWeight="bold" 
-                  sx={{ 
-                    lineHeight: 1.6, 
+                <Typography
+                  variant="h5"
+                  component="div"
+                  fontWeight="bold"
+                  sx={{
+                    lineHeight: 1.6,
                     color: '#000000',
                     mb: 3
                   }}
@@ -1464,10 +1497,10 @@ function QuizQuestion({
                       )}
                     </Box>
                   ) : (
-                    <Alert 
+                    <Alert
                       severity="info"
                       icon={<Lightbulb />}
-                      sx={{ 
+                      sx={{
                         borderRadius: 2,
                         background: 'linear-gradient(135deg, #fff9e6, #ffe8a1)',
                         border: '2px solid #ffd54f'
@@ -1501,18 +1534,18 @@ function QuizQuestion({
                         justifyContent: 'flex-start',
                         fontSize: '1.1rem',
                         fontWeight: 600,
-                        background: isSelected ? 
-                          'linear-gradient(135deg, #4028f5ff, #a29bfe)' : 
+                        background: isSelected ?
+                          'linear-gradient(135deg, #4028f5ff, #a29bfe)' :
                           'white',
                         color: isSelected ? 'white' : '#000000',
                         borderColor: '#e9ecef',
-                        boxShadow: isSelected ? 
-                          '0 10px 30px rgba(108,92,231,0.3)' : 
+                        boxShadow: isSelected ?
+                          '0 10px 30px rgba(108,92,231,0.3)' :
                           '0 4px 15px rgba(0,0,0,0.05)',
                         '&:hover': {
                           borderWidth: 2,
-                          background: isSelected ? 
-                            'linear-gradient(135deg, #4028f5ff, #9188fd)' : 
+                          background: isSelected ?
+                            'linear-gradient(135deg, #4028f5ff, #9188fd)' :
                             '#f8f9fa',
                           transform: 'translateY(-2px)',
                           boxShadow: isSelected ?
@@ -1528,8 +1561,8 @@ function QuizQuestion({
                         width: 40,
                         height: 40,
                         borderRadius: '50%',
-                        background: isSelected ? 
-                          'rgba(255,255,255,0.25)' : 
+                        background: isSelected ?
+                          'rgba(255,255,255,0.25)' :
                           'linear-gradient(135deg, #6c5ce7, #a29bfe)',
                         color: 'white',
                         display: 'flex',
@@ -1542,8 +1575,8 @@ function QuizQuestion({
                       }}>
                         {optionLabels[i]}
                       </Box>
-                      <Typography sx={{ 
-                        flex: 1, 
+                      <Typography sx={{
+                        flex: 1,
                         textAlign: 'left',
                         lineHeight: 1.5,
                         color: isSelected ? 'white' : '#000000'
@@ -1557,10 +1590,10 @@ function QuizQuestion({
             </Stack>
 
             {/* Modern Navigation */}
-            <Box sx={{ 
-              display: 'flex', 
-              justifyContent: 'space-between', 
-              gap: 3 
+            <Box sx={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              gap: 3
             }}>
               <Button
                 variant="outlined"
@@ -1578,7 +1611,7 @@ function QuizQuestion({
                   fontWeight: 'bold',
                   borderColor: '#6c5ce7',
                   color: '#6c5ce7',
-                  '&:hover': { 
+                  '&:hover': {
                     borderWidth: 2,
                     background: 'rgba(108,92,231,0.05)',
                     transform: 'translateY(-2px)'
@@ -1592,7 +1625,7 @@ function QuizQuestion({
               >
                 {t('previous')}
               </Button>
-              
+             
               <Button
                 variant="contained"
                 size="large"
@@ -1622,8 +1655,8 @@ function QuizQuestion({
         </Fade>
 
         {/* Exit Confirmation Dialog */}
-        <Dialog 
-          open={exitDialogOpen} 
+        <Dialog
+          open={exitDialogOpen}
           onClose={handleExitCancel}
           PaperProps={{
             sx: {
@@ -1647,7 +1680,7 @@ function QuizQuestion({
             </Typography>
           </DialogContent>
           <DialogActions sx={{ p: 3, gap: 2 }}>
-            <Button 
+            <Button
               onClick={handleExitCancel}
               variant="outlined"
               sx={{
@@ -1663,8 +1696,8 @@ function QuizQuestion({
             >
               {t('cancel')}
             </Button>
-            <Button 
-              onClick={handleExitConfirm} 
+            <Button
+              onClick={handleExitConfirm}
               variant="contained"
               sx={{
                 borderRadius: 2,
@@ -1689,10 +1722,10 @@ function QuizQuestion({
           onClose={() => setSnackbar({ ...snackbar, open: false })}
           anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
         >
-          <Alert 
-            onClose={() => setSnackbar({ ...snackbar, open: false })} 
+          <Alert
+            onClose={() => setSnackbar({ ...snackbar, open: false })}
             severity={snackbar.severity}
-            sx={{ 
+            sx={{
               borderRadius: 2,
               minWidth: '300px',
               fontSize: '1rem',
