@@ -1113,6 +1113,7 @@
   "no_reward_history": "अभी तक कोई रिवॉर्ड इतिहास नहीं है",
   "earn_points_hint": "अंक कमाने के लिए गतिविधियाँ पूरी करें!",
   "total_point": "कुल: {{count}} पॉइंट्स",
+  "totalPoints": "कुल: {{points}} अंक",
  
 
 

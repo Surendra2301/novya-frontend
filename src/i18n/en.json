@@ -1106,12 +1106,13 @@
     "earn_more_points": "Earn more by completing videos and tests!",
     "reward_points": "Reward Points",
     "view_profile": "View Profile",
-    "logout": "Logout",
+   "logout": "Logout",
   "reward_points_history": "Reward Points History",
   "clear_all_history": "Clear All History",
   "no_reward_history": "No reward history yet",
   "earn_points_hint": "Complete activities to earn points!",
   "total_point": "Total: {{count}} points",
+   "totalPoints": "Total: {{points}} points",
  
 
 
