@@ -80,7 +80,7 @@
 
       "react-toastify": "^11.0.5",
 
-      "recharts": "^3.0.2",
+      "recharts": "^3.3.0",
 
       "three": "^0.179.1",
 
@@ -152,10 +152,13 @@
 
    },
 
-  "resolutions": {
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0"
-  },
+   "resolutions": {
+
+      "react": "^19.0.0",
+
+      "react-dom": "^19.0.0"
+
+   },
 
    "overrides": {
 

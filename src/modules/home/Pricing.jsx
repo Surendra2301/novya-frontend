@@ -169,7 +169,7 @@ function Pricing() {
                           <div className="text-warning small">{[...Array(5)].map((_, i) => <span key={i}>★</span>)}</div>
                           <span className="ms-2 small text-muted">({c.students})</span>
                         </div>
-                        <div>
+                        {/* <div>
                           <span className="badge w-100"
                                 style={{
                                   backgroundColor: 'rgba(45,93,123,0.1)',
@@ -179,7 +179,7 @@ function Pricing() {
                                 }}>
                             Coming Soon
                           </span>
-                        </div>
+                        </div> */}
                       </div>
                     </div>
                   </div>

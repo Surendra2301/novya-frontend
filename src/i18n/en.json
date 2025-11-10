@@ -1,13 +1,13 @@
 
 {
    
-  "performance": {
-    "title": "Career Performance Dashboard",
-    "subtitle": "Track your progress across different metrics and discover your strengths",
-    "academic": "Academic Performance",
-    "quiz": "Quiz Performance",
-    "mock": "Mock Test Performance"
-  },
+ 
+    "ti_tle": "Career Performance Dashboard",
+    "sub_title": "Track your progress across different metrics and discover your strengths",
+    "aca_demic": "Academic Performance",
+    "qu_iz": "Quiz Performance",
+    "mo_ck": "Mock Test Performance",
+  
   "hero": {
     "title": {
       "shape": "Shape",
@@ -1113,6 +1113,13 @@
   "earn_points_hint": "Complete activities to earn points!",
   "total_point": "Total: {{count}} points",
    "totalPoints": "Total: {{points}} points",
+
+     "Leadership": "Leadership",
+    "daily_summary": "Daily Summary",
+    "typing_master": "Typing Master",
+
+ "add_schedule":  "Add Schedule",
+"no_plans_scheduled": "No plans scheduled for this date",
  
 
 
@@ -1688,14 +1695,14 @@
     "vastQuestionBankDesc": "Access thousands of curated questions across all subjects and difficulty levels",
     "expertCraftedDesc": "Content designed by subject experts and experienced educators"
   },
-  "subjects": {
-    "English": "English",
-    "Telugu": "Telugu",
-    "Mathematics": "Mathematics",
-    "Social": "Social Studies",
-    "Science": "Science",
-    "Computers": "Computer Science"
-  },
+ 
+    "Eng_lish": "English",
+    "Tel_ugu": "Telugu",
+    "Mathe_matics": "Mathematics",
+    "Soc_ial": "Social Studies",
+    "Sci_ence": "Science",
+    "Comp_uters": "Computer Science",
+  
   "steps": {
     "chooseSubject": "Choose Your Subject",
     "startPracticing": "Start Practicing",
@@ -1715,7 +1722,7 @@
     "pointsAdded": "points added to your account!",
     "bonusSpin": "You earned an extra spin!",
     "awesome": "Awesome!",
-    "rewards": {
+    "reward": {
       "10Points": "10 Points",
       "20Points": "20 Points",
       "05Points": "05 Points",
@@ -2041,7 +2048,308 @@
   "Excellent": "Excellent",
   "Good": "Good",
   "Average": "Average",
-  "Needs Improvement": "Needs Improvement"
+  "Needs Improvement": "Needs Improvement",
+
+
+
+
+
+  
+  "leaderboard": {
+    "title": "LEADERBOARD WITH SCORE",
+    "you": "You",
+    "yourPosition": "Your current position",
+    "total": "TOTAL",
+    "filters": {
+      "all": "All Students",
+      "top": "Top 3"
+    },
+    "allSubjects": "All Subjects",
+    "searchPlaceholder": "Search classmates...",
+    "place": "PLACE",
+    "name": "NAME",
+    "noStudents": "No students found",
+    "adjustSearch": "Try adjusting your search or filter",
+    "totalStudents": "Total Students",
+    "highestScore": "Highest Score",
+    "averageScore": "Average Score",
+    "subjects": {
+      "english": "ENGLISH",
+      "maths": "MATHS",
+      "science": "SCIENCE",
+      "social": "SOCIAL",
+      "computer": "COMPUTER"
+    },
+    "studentNames": {
+      "pavan": "Pavan",
+      "naga": "Naga",
+      "anand": "Anand",
+      "sai": "Sai"
+    }
+  },
+
+
+
+
+  
+  "rewards": {
+    "history": "History",
+    "howToEarn": "How to Earn",
+    "howToUse": "How to Use",
+    "clearAllHistory": "Clear All History",
+    "noRewardHistory": "No reward history",
+    "completeActivities": "Complete activities to earn points!",
+    "total": "Total",
+    "waysToEarn": "Ways to Earn Reward Points",
+    "earnDescription": "Complete activities to earn coins and unlock amazing rewards!",
+    "dailyActivities": "Daily Activities",
+    "dailyLogin": "Daily Login",
+    "dailyLoginDesc": "Earn 5 coins every day you log in",
+    "videoLessons": "Video Lessons",
+    "videoLessonsDesc": "Get 10 coins for watching complete chapters without skipping",
+    "dailySpin": "Daily Spin",
+    "dailySpinDesc": "Spin to win 5-20 coins daily",
+    "feedbackEngagement": "Feedback & Engagement",
+    "submitFeedback": "Submit Feedback",
+    "submitFeedbackDesc": "Earn 20 coins for providing valuable feedback",
+    "quiz": "QUIZ",
+    "quizPerformance": "Quiz Performance",
+    "passingScore": "Passing Score (5+)",
+    "passingScoreDesc": "Earn coins equal to your score",
+    "excellentScore": "Excellent Score (80%+)",
+    "excellentScoreDesc": "Get your score + 10 bonus coins",
+    "mock": "MOCK",
+    "mockTestPerformance": "Mock Test Performance",
+    "mockPassingScore": "Passing Score (20+)",
+    "mockPassingScoreDesc": "Earn coins equal to your score",
+    "mockExcellentScore": "Excellent Score (80%+)",
+    "mockExcellentScoreDesc": "Get your score + 10 bonus coins",
+    "coinsAwarded": "Coins are awarded immediately after completing activities",
+    "practiceRegularly": "Practice regularly to maximize your coin earnings!",
+    "usingYourCoins": "Using Your Reward Coins",
+    "usingCoinsDesc": "Use your coins to get help during quizzes and mock tests, or unlock premium features.",
+    "inAppFeatures": "In-App Features",
+    "quizHints": "Quiz Hints",
+    "coinsCount": "{{count}} coins",
+    "quizHintsDesc": "Get helpful hints during quizzes when you're stuck on a question",
+    "mockTestHints": "Mock Test Hints",
+    "mockTestHintsDesc": "Unlock hints during mock tests to help with difficult questions",
+    "skipQuestion": "Skip Question",
+    "skipQuestionDesc": "Skip a difficult question and come back to it later",
+    "howToUseCoins": "How to Use Coins",
+    "howToUseStep1": "During quizzes or mock tests, click the \"Hint\" button when available",
+    "howToUseStep2": "Confirm you want to spend 5 coins for a hint",
+    "howToUseStep3": "The hint will be revealed to help you answer the question",
+    "howToUseStep4": "Coins are deducted automatically from your balance",
+    "howToUseStep5": "Continue earning coins through daily activities and good performance",
+    "importantNotes": "Important Notes",
+    "note1": "Coins expire after 12 months of inactivity",
+    "note2": "Hints can only be used once per question",
+    "note3": "Coins cannot be transferred or exchanged for cash",
+    "note4": "Ensure you have sufficient coins before attempting to use hints",
+    "rewardPointsHistory": "Reward Points History",
+    "totalPoints": "Total Points: {{points}}"
+  },
+
+
+
+
+  
+  "typing": {
+    "title": "Typing Master",
+    "welcomeTitle": "Welcome to Typing Master Pro",
+    "welcomeSubtitle": "Boost your typing speed, accuracy, and rhythm with AI-enhanced lessons.",
+    "startButton": "Start Typing Test",
+    "backToInstructions": "Back to Instructions",
+    "selectDifficulty": "Select Difficulty",
+     "back": "Back",
+    "levels": {
+      "beginner": "Beginner",
+      "intermediate": "Intermediate",
+      "advanced": "Advanced"
+    },
+    "tip1": "🧭 Place fingers on ASDF and JKL;",
+    "tip2": "🚀 Press Enter or click Start to begin",
+    "tip3": "🎯 Focus on accuracy first, then speed",
+    "tip4": "⏱ 60 seconds per test",
+    "tip5": "📊 Live WPM and accuracy tracking",
+    "tip6": "🎲 Random lessons every time",
+    "tip7": "⏹️ Press Ctrl+Enter or click Complete Test to finish early",
+    "timeLeft": "Time Left",
+    "liveWPM": "Live WPM",
+    "accuracy": "Accuracy",
+    "level": "Level",
+    "generatingLesson": "Generating new typing lesson...",
+    "aiUnavailable": "Using local practice text. AI service temporarily unavailable.",
+    "typeSomethingAlert": "Please type something before completing the test!",
+    "pastingDisabled": "Pasting is disabled during typing practice!",
+    "placeholderRunning": "Start typing here... (Press Ctrl+Enter to complete test)",
+    "placeholderStart": "Click or start typing to begin...",
+    "pause": "Pause",
+    "start": "Start",
+    "randomLesson": "Random Lesson",
+    "completeTest": "Complete Test",
+    "completeTip": "Tip: Press Ctrl + Enter to complete test anytime",
+    "results": {
+      "title": "Test Results",
+      "speed": "Speed (WPM)",
+      "wpm": "Words per minute",
+      "accuracy": "Accuracy",
+      "accuracyDesc": "Based on correct keystrokes",
+      "keystrokes": "Keystrokes",
+      "keystrokesDesc": "Total / Correct: {{correct}}",
+      "improvementTips": "Improvement Tips",
+      "tip1": "👆 Keep fingers on home row, use all fingers",
+      "tip2": "🧘‍♀️ Avoid looking at keyboard — focus on screen",
+      "tip3": "⌛ Maintain steady rhythm instead of rushing",
+      "tip4": "🧩 Practice daily for muscle memory",
+      "tip5": "🎯 Accuracy first — speed follows naturally",
+      "tryAgain": "Try Again",
+      "excellent": "🏆 Excellent! You're a typing pro!",
+      "great": "🔥 Great job! Work on small accuracy boosts.",
+      "good": "💪 Good progress! Try to reduce typos.",
+      "keepPracticing": "📚 Keep practicing. Focus on accuracy and rhythm."
+    }
+  },
+
+
+
+   
+   "day_streak": "{{count}} Day Streak!",
+  "steady_learner": "Steady Learner",
+  "focused_mind": "Focused Mind",
+  "learning_legend": "Learning Legend",
+  "max_level": "Max Level!",
+ 
+ 
+ 
+    "steady_learner": "Steady Learner",
+ 
+ 
+ 
+ 
+  "next_milestone": "Next Milestone",
+  "more_for": "more for",
+  "day": "day",
+  "days": "days",
+  "steady_learner": "Steady Learner",
+  "focused_mind": "Focused Mind",
+  "learning_legend": "Learning Legend",
+
+
+
+  
+
+
+ 
+ 
+ 
+  "title": "Learning Analytics",
+  "subtitle": "Track your progress and optimize your learning journey",
+  "common": {
+    "loading": "Loading your learning reports...",
+    "tryAgain": "Try Again",
+    "progress": "Progress",
+    "minutes": "minutes",
+    "points": "points",
+    "to": "to"
+  },
+  "tabs": {
+    "dailyReport": "Daily Report",
+    "weeklyReport": "Weekly Report"
+  },
+  "statCards": {
+    "totalStudyTime": "Total Study Time",
+    "actualTimeSpent": "Actual time spent",
+    "activitiesCompleted": "Activities Completed",
+    "tasksAccomplished": "Tasks accomplished",
+    "productivityScore": "Productivity Score",
+    "todaysEfficiency": "Today's efficiency",
+    "thisWeeksTotal": "This week's total",
+    "weeklyTasks": "Weekly tasks",
+    "averageDailyTime": "Average Daily Time",
+    "dailyAverage": "Daily average",
+    "consistencyScore": "Consistency Score",
+    "learningConsistency": "Learning consistency"
+  },
+  "activityTypes": {
+    "video": "Video Lesson",
+    "ai_assistant": "AI Assistant",
+    "notes": "Notes",
+    "quick_practice": "Quick Practice",
+    "feedback": "Feedback",
+    "typing_practice": "Typing Practice",
+    "spin_wheel": "Spin Wheel",
+    "quiz": "Quiz",
+    "practice": "Mock Test",
+    "general": "Learning Activity"
+  },
+  "activityDetails": {
+    "rating": "Rating",
+    "speed": "Speed",
+    "accuracy": "Accuracy",
+    "level": "Level",
+    "reward": "Reward",
+    "points": "Points",
+    "spinsLeft": "Spins Left",
+    "score": "Score"
+  },
+  "recommendations": {
+    "startJourney": "Start your learning journey with a short activity",
+    "shortStudy": "Even 15 minutes of focused study can make a difference",
+    "greatStart": "Great start! Try to study for 30+ minutes tomorrow",
+    "consistentShort": "Consistent short sessions are better than long irregular ones",
+    "excellentFocus": "Excellent focus! You're building strong study habits",
+    "mixActivities": "Consider mixing different types of learning activities",
+    "outstandingDedication": "Outstanding dedication! Remember to take breaks",
+    "excellentProgress": "You're making excellent progress - keep it up!",
+    "tryQuiz": "Try a quiz to test your knowledge retention",
+    "watchLesson": "Watch a lesson video to learn new concepts",
+    "attemptMock": "Attempt a mock test to simulate exam conditions"
+  },
+  "weeklyInsights": {
+    "outstandingDedication": "Outstanding dedication! You've put in significant study time this week",
+    "greatConsistency": "Great consistency! You're building excellent study habits",
+    "goodProgress": "Good progress! Try to increase your study time gradually",
+    "everyMinuteCounts": "Every minute counts! Try to establish a daily study routine",
+    "excellentConsistency": "Excellent learning consistency! You're building great habits",
+    "goodConsistency": "Good consistency. Try to learn every day for better results",
+    "timeSpent": "You spent {{minutes}} minutes learning this week",
+    "activitiesCompleted": "Completed {{activities}} activities across {{days}} days"
+  },
+  "dailySummary": {
+    "text": "Today you spent {{minutes}} minutes learning, completing {{activities}} activities including {{quizzes}} quizzes, {{mocks}} mock tests, and {{learning}} learning activities."
+  },
+  "timeBreakdown": {
+    "title": "Time Breakdown",
+    "quizzes": "Quizzes",
+    "mockTests": "Mock Tests",
+    "learningActivities": "Learning Activities"
+  },
+  "totalStatistics": {
+    "title": "All Time Statistics",
+    "totalQuizzes": "Total Quizzes",
+    "mockTests": "Mock Tests",
+    "classroomActivities": "ClassRoom Activities",
+    "totalStudyTime": "Total Study Time"
+  },
+  "dailyReport": {
+    "title": "Daily Learning Summary"
+  },
+  "weeklyReport": {
+    "title": "Weekly Learning Overview",
+    "insights": "Weekly Insights",
+    "consistencyProgress": "Consistency Progress",
+    "consistencyDescription": "Your learning consistency for this week"
+  },
+  "activitiesSection": {
+    "title": "Today's Activities",
+    "noActivities": "No activities recorded today. Start learning to see your progress!"
+  },
+  "errors": {
+    "failedToGenerate": "Failed to generate reports. Please try again.",
+    "somethingWentWrong": "Oops! Something went wrong"
+  }
 
 
 }

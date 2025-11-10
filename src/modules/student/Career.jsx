@@ -118,7 +118,7 @@ const Career = () => {
   const performanceMetrics = [
     {
       id: 'academic',
-      title: t('performance.academic'),
+      title: t('aca_demic'),
       icon: <GraduationCap size={24} />,
       metrics: [
         { name: t('metrics.gpa'), value: 3.8, max: 4.0, trend: 'up' },
@@ -162,7 +162,7 @@ const Career = () => {
     },
     {
       id: 'quiz',
-      title: t('performance.quiz'),
+      title: t('qu_iz'),
       icon: <BookOpen size={24} />,
       metrics: [
         {
@@ -216,7 +216,7 @@ const Career = () => {
     },
     {
       id: 'mock',
-      title: t('performance.mock'),
+      title: t('mo_ck'),
       icon: <Clock size={24} />,
       metrics: [
         {
@@ -432,9 +432,9 @@ const Career = () => {
       </section>
 
       <section className="performance-section" ref={metricsRef}>
-        <h2 className="section-title">{t('performance.title')}</h2>
+        <h2 className="section-title">{t('ti_tle')}</h2>
         <p className="section-subtitle">
-          {t('performance.subtitle')}
+          {t('sub_title')}
         </p>
 
         <div className="metrics-grid">
@@ -734,3 +734,6 @@ const getMetricColor = (value, max) => {
 };
 
 export default Career;
+
+
+
