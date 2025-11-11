@@ -11,11 +11,15 @@
 //   Alert,
 // } from "react-bootstrap";
 // import { useTranslation } from 'react-i18next';
+// // import { useQuiz } from './QuizContext'; // ADDED: Import QuizContext
 // import "bootstrap/dist/css/bootstrap.min.css";
 // import "./Keyboard.css";
+// import { useQuiz } from "../QuizContext";
 
 // const TypingMaster = () => {
 //   const { t } = useTranslation();
+//   const { trackLearningActivity } = useQuiz(); // ADDED: Get tracking function from context
+  
 //   const [difficulty, setDifficulty] = useState("Beginner");
 //   const [text, setText] = useState("");
 //   const [input, setInput] = useState("");
@@ -48,6 +52,51 @@
 //   useEffect(() => {
 //     loadLesson();
 //   }, [difficulty, lessonCount]);
+
+//   // NEW: Function to track typing activity in learning history
+//   const trackTypingActivity = (finalSpeed, finalAccuracy, duration) => {
+//     try {
+//       const activityData = {
+//         activityType: 'typing_practice',
+//         title: `Typing Practice - ${difficulty} Level`,
+//         subject: 'Typing',
+//         chapter: 'Keyboard Skills',
+//         duration: Math.round(duration / 60), // Convert to minutes
+//         rewardPoints: calculateTypingReward(finalSpeed, finalAccuracy),
+//         speed: finalSpeed,
+//         accuracy: finalAccuracy,
+//         difficulty: difficulty,
+//         keystrokes: totalKeystrokes,
+//         correctKeystrokes: correctKeystrokes
+//       };
+
+//       // Track the activity
+//       trackLearningActivity(activityData);
+//       console.log('⌨️ Typing activity tracked in learning history');
+//     } catch (error) {
+//       console.error('Error tracking typing activity:', error);
+//     }
+//   };
+
+//   // NEW: Function to calculate reward points based on performance
+//   const calculateTypingReward = (speed, accuracy) => {
+//     let points = 0;
+    
+//     // Base points for completion
+//     points += 5;
+    
+//     // Speed bonus
+//     if (speed >= 40) points += 3;
+//     if (speed >= 60) points += 5;
+//     if (speed >= 80) points += 7;
+    
+//     // Accuracy bonus
+//     if (accuracy >= 85) points += 3;
+//     if (accuracy >= 90) points += 5;
+//     if (accuracy >= 95) points += 7;
+    
+//     return points;
+//   };
 
 //   const generateTypingLesson = async (level) => {
 //   try {
@@ -279,8 +328,14 @@
 //       if (typedText[i] === text[i]) correctChars++;
 //     }
 //     const accuracyPercent = (correctChars / text.length) * 100;
-//     setAccuracy(Number(accuracyPercent.toFixed(1)));
+//     const finalAccuracy = Number(accuracyPercent.toFixed(1));
+    
+//     setAccuracy(finalAccuracy);
 //     setSpeed(speedWPM);
+
+//     // NEW: Track typing activity when results are calculated
+//     const duration = (Date.now() - startTime) / 1000; // Duration in seconds
+//     trackTypingActivity(speedWPM, finalAccuracy, duration);
 //   };
 
 //   const renderColoredText = () =>
@@ -556,7 +611,12 @@
 
 
 
-////activity
+
+
+
+
+
+
 import React, { useState, useEffect, useRef } from "react";
 import {
   Button,
@@ -569,7 +629,6 @@ import {
   Alert,
 } from "react-bootstrap";
 import { useTranslation } from 'react-i18next';
-// import { useQuiz } from './QuizContext'; // ADDED: Import QuizContext
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./Keyboard.css";
 import { useQuiz } from "../QuizContext";
@@ -1005,56 +1064,74 @@ const TypingMaster = () => {
     else message = t('typing.results.keepPracticing');
 
     return (
-      <div className="text-center">
-        <h4 className="fw-bold text-success mb-3">🎯 {t('typing.results.title')}</h4>
-        <Row className="justify-content-center mb-3">
-          <Col md={3}>
-            <Card className="p-3 shadow-sm">
-              <h5>{t('typing.results.speed')}</h5>
-              <h2 className="text-primary">{speed}</h2>
-              <p className="small text-muted">{t('typing.results.wpm')}</p>
-            </Card>
-          </Col>
-          <Col md={3}>
-            <Card className="p-3 shadow-sm">
-              <h5>{t('typing.results.accuracy')}</h5>
-              <h2 className={accuracy >= 90 ? "text-success" : accuracy >= 80 ? "text-warning" : "text-danger"}>
-                {accuracy.toFixed(1)}%
-              </h2>
-              <p className="small text-muted">{t('typing.results.accuracyDesc')}</p>
-            </Card>
-          </Col>
-          <Col md={3}>
-            <Card className="p-3 shadow-sm">
-              <h5>{t('typing.results.keystrokes')}</h5>
-              <h2 className="text-info">{totalKeystrokes}</h2>
-              <p className="small text-muted">{t('typing.results.keystrokesDesc', { correct: correctKeystrokes })}</p>
-            </Card>
-          </Col>
-        </Row>
+      <div className="vh-100 d-flex flex-column justify-content-center align-items-center bg-light">
+        <Card className="p-4 shadow-lg border-0" style={{ width: "90%", maxWidth: "800px" }}>
+          <div className="text-center">
+            <h4 className="fw-bold text-success mb-3">🎯 {t('typing.results.title')}</h4>
+            <Row className="justify-content-center mb-3">
+              <Col md={4}>
+                <Card className="p-3 shadow-sm border-0 bg-primary text-black">
+                  <h5>{t('typing.results.speed')}</h5>
+                  <h2>{speed}</h2>
+                  <p className="small">{t('typing.results.wpm')}</p>
+                </Card>
+              </Col>
+              <Col md={4}>
+                <Card className={`p-3 shadow-sm border-0 ${
+                  accuracy >= 90 ? "bg-success" : accuracy >= 80 ? "bg-warning" : "bg-danger"
+                } text-black`}>
+                  <h5>{t('typing.results.accuracy')}</h5>
+                  <h2>{accuracy.toFixed(1)}%</h2>
+                  <p className="small">{t('typing.results.accuracyDesc')}</p>
+                </Card>
+              </Col>
+              <Col md={4}>
+                <Card className="p-3 shadow-sm border-0 bg-info text-black">
+                  <h5>{t('typing.results.keystrokes')}</h5>
+                  <h2>{totalKeystrokes}</h2>
+                  <p className="small">{t('typing.results.keystrokesDesc', { correct: correctKeystrokes })}</p>
+                </Card>
+              </Col>
+            </Row>
 
-        <Alert variant="info" className="mx-auto w-75">
-          {message}
-        </Alert>
+            <Alert variant="info" className="mx-auto" style={{ maxWidth: "600px" }}>
+              <strong>{message}</strong>
+            </Alert>
 
-        <div className="text-start mx-auto" style={{ maxWidth: "600px" }}>
-          <h6 className="fw-bold">📊 {t('typing.results.improvementTips')}:</h6>
-          <ul>
-            <li>{t('typing.results.tip1')}</li>
-            <li>{t('typing.results.tip2')}</li>
-            <li>{t('typing.results.tip3')}</li>
-            <li>{t('typing.results.tip4')}</li>
-            <li>{t('typing.results.tip5')}</li>
-          </ul>
-        </div>
+            <div className="text-start mx-auto mb-4" style={{ maxWidth: "600px" }}>
+              <h6 className="fw-bold">📊 {t('typing.results.improvementTips')}:</h6>
+              <ul className="mb-0">
+                <li>{t('typing.results.tip1')}</li>
+                <li>{t('typing.results.tip2')}</li>
+                <li>{t('typing.results.tip3')}</li>
+                <li>{t('typing.results.tip4')}</li>
+                <li>{t('typing.results.tip5')}</li>
+              </ul>
+            </div>
 
-        <Button variant="outline-success" className="mt-3 me-2" onClick={onRestart}>
-          🔁 {t('typing.results.tryAgain')}
-        </Button>
+            <div className="mt-3">
+              <Button variant="success" className="me-2 px-4" onClick={onRestart}>
+                🔁 {t('typing.results.tryAgain')}
+              </Button>
+              <Button 
+                variant="outline-secondary" 
+                onClick={() => setShowTutorial(true)}
+              >
+                📚 {t('typing.backToInstructions')}
+              </Button>
+            </div>
+          </div>
+        </Card>
       </div>
     );
   };
 
+  // If test is finished, only show the results component
+  if (finished) {
+    return <TypingResult accuracy={accuracy} speed={speed} onRestart={loadLesson} />;
+  }
+
+  // Show the normal typing interface when test is not finished
   return (
     <div className="vh-100 d-flex flex-column justify-content-center align-items-center bg-white overflow-hidden position-relative">
       <Button
@@ -1105,47 +1182,41 @@ const TypingMaster = () => {
           {renderColoredText()}
         </p>
 
-        {!finished ? (
-          <>
-            <Form.Control
-              as="textarea"
-              rows={3}
-              value={input}
-              onChange={handleChange}
-              onPaste={handlePaste}
-              placeholder={isRunning ? t('typing.placeholderRunning') : t('typing.placeholderStart')}
-              disabled={loading}
-              autoFocus
-            />
+        <Form.Control
+          as="textarea"
+          rows={3}
+          value={input}
+          onChange={handleChange}
+          onPaste={handlePaste}
+          placeholder={isRunning ? t('typing.placeholderRunning') : t('typing.placeholderStart')}
+          disabled={loading}
+          autoFocus
+        />
 
-            <div className="mt-3">
-              <Button
-                variant={isRunning ? "outline-warning" : "outline-success"}
-                className="me-2 mb-2"
-                onClick={() => setIsRunning((r) => !r)}
-                disabled={loading}
-              >
-                {isRunning ? "⏸ " + t('typing.pause') : "▶️ " + t('typing.start')}
-              </Button>
-              <Button variant="outline-info" className="me-2 mb-2" onClick={forceNewRandomLesson} disabled={loading}>
-                🎲 {t('typing.randomLesson')}
-              </Button>
-              <Button 
-                variant="success" 
-                className="mb-2" 
-                onClick={completeTest}
-                disabled={loading || input.length === 0}
-              >
-                {t('typing.completeTest')}
-              </Button>
-            </div>
-            <div className="text-muted small">
-              💡 {t('typing.completeTip')}
-            </div>
-          </>
-        ) : (
-          <TypingResult accuracy={accuracy} speed={speed} onRestart={loadLesson} />
-        )}
+        <div className="mt-3">
+          <Button
+            variant={isRunning ? "outline-warning" : "outline-success"}
+            className="me-2 mb-2"
+            onClick={() => setIsRunning((r) => !r)}
+            disabled={loading}
+          >
+            {isRunning ? "⏸ " + t('typing.pause') : "▶️ " + t('typing.start')}
+          </Button>
+          <Button variant="outline-info" className="me-2 mb-2" onClick={forceNewRandomLesson} disabled={loading}>
+            🎲 {t('typing.randomLesson')}
+          </Button>
+          <Button 
+            variant="success" 
+            className="mb-2" 
+            onClick={completeTest}
+            disabled={loading || input.length === 0}
+          >
+            {t('typing.completeTest')}
+          </Button>
+        </div>
+        <div className="text-muted small">
+          💡 {t('typing.completeTip')}
+        </div>
       </Card>
 
       {!isMobile && (

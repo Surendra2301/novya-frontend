@@ -457,7 +457,8 @@
         "phone": "தொலைபேசி எண்",
         "course": "பாடத்தில் ஆர்வம்",
         "time": "விருப்பமான நேரம்",
-        "message": "கூடுதல் செய்தி"
+        "message": "கூடுதல் செய்தி",
+         "grade": "வகுப்பு"
       },
       "phonePrefix": "+91",
       "placeholders": {
@@ -521,6 +522,11 @@
       "contact": "தொடர்பு கொள்ள"
     }
   },
+"Select_your_grade": "உங்கள் வகுப்பைத் தேர்ந்தெடுக்கவும்",
+    "Grade_7": "தரம் 7",
+  "Grade_8": "தரம் 8", 
+  "Grade_9": "தரம் 9",
+  "Grade_10": "தரம் 10",
 
 
 "userDetails": {
@@ -2076,9 +2082,8 @@
   "focused_mind": "ஒருமுகமான மனம்",
   "learning_legend": "கற்றல் நாயகன்",
   "max_level": "அதிகபட்ச நிலை!",
- 
- 
-"steady_learner": "நிலைத்த கற்பவர்",
+     "streak_label": "தொடர்",
+    "days_label": "நாட்கள்",
  
  
     "next_milestone": "அடுத்த மைல்கல்",
@@ -2106,7 +2111,9 @@
   },
   "tabs": {
     "dailyReport": "தினசரி அறிக்கை",
-    "weeklyReport": "வாராந்திர அறிக்கை"
+    "weeklyReport": "வாராந்திர அறிக்கை",
+    "analytics": "பகுப்பாய்வுகள்",
+    "title": "பகுப்பாய்வுகள்"
   },
   "statCards": {
     "totalStudyTime": "மொத்த படிப்பு நேரம்",

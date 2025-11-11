@@ -498,7 +498,8 @@
         "phone": "फोन नंबर",
         "course": "रुचि का कोर्स",
         "time": "वरीयता समय",
-        "message": "अतिरिक्त संदेश"
+        "message": "अतिरिक्त संदेश",
+        "grade": "कक्षा"
       },
       "phonePrefix": "+91",
       "placeholders": {
@@ -545,6 +546,11 @@
       "timeRequired": "कृपया एक वरीयता समय चुनें"
     }
   },
+"Select_your_grade": "अपनी कक्षा चुनें",
+    "Grade_7": "कक्षा 7",
+  "Grade_8": "कक्षा 8",
+  "Grade_9": "कक्षा 9",
+  "Grade_10": "कक्षा 10",
 
 
 
@@ -2264,9 +2270,8 @@
   "focused_mind": "एकाग्र मन",
   "learning_legend": "सीखने का महारथी",
   "max_level": "अधिकतम स्तर!",
- 
- 
-    "steady_learner": "निरंतर सीखने वाला",
+     "streak_label": "स्ट्रिक",
+    "days_label": "दिन",
  
  
      "next_milestone": "अगला माइलस्टोन",
@@ -2296,7 +2301,9 @@
   },
   "tabs": {
     "dailyReport": "दैनिक रिपोर्ट",
-    "weeklyReport": "साप्ताहिक रिपोर्ट"
+    "weeklyReport": "साप्ताहिक रिपोर्ट",
+     "analytics": "विश्लेषण",
+      "title": "विश्लेषण"
   },
   "statCards": {
     "totalStudyTime": "कुल अध्ययन समय",

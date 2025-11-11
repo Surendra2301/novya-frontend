@@ -503,7 +503,8 @@
         "phone": "ఫోన్ నంబర్",
         "course": "ఆసక్తి కోర్సు",
         "time": "ప్రిఫర్డ్ టైమ్",
-        "message": "అదనపు సందేశం"
+        "message": "అదనపు సందేశం",
+        "grade": "తరగతి"
       },
       "phonePrefix": "+91",
       "placeholders": {
@@ -550,8 +551,11 @@
       "timeRequired": "దయచేసి ప్రిఫర్డ్ టైమ్ ఎంచుకోండి"
     }
   },
-
-
+"Select_your_grade": "మీ తరగతిని ఎంచుకోండి",
+  "Grade_7": "7వ తరగతి",
+  "Grade_8": "8వ తరగతి",
+  "Grade_9": "9వ తరగతి", 
+  "Grade_10": "10వ తరగతి",
 
 
 
@@ -2299,8 +2303,11 @@
   "focused_mind": "ఏకాగ్రత మనస్సు",
   "learning_legend": "విద్యా లెజెండ్",
   "max_level": "గరిష్ట స్థాయి!",
+
+    "streak_label": "సిరీస్",
+    "days_label": "రోజులు",
  
-"steady_learner": "స్థిరమైన విద్యార్థి",
+
  
  
      "next_milestone": "తదుపరి మైలురాయి",
@@ -2331,7 +2338,9 @@
   },
   "tabs": {
     "dailyReport": "డైలీ రిపోర్ట్",
-    "weeklyReport": "వీక్లీ రిపోర్ట్"
+    "weeklyReport": "వీక్లీ రిపోర్ట్",
+     "analytics": "విశ్లేషణలు",
+     "title": "విశ్లేషణలు"
   },
   "statCards": {
     "totalStudyTime": "మొత్తం స్టడీ టైమ్",

@@ -239,8 +239,8 @@
   position: absolute;
   top: -5px;
   right: -5px;
-  background: #ef4444;
-  color: white;
+  background: red;
+  color: black;
   border-radius: 50%;
   width: 16px;
   height: 16px;
@@ -255,7 +255,13 @@
   width: 8px;
   height: 8px;
 }
-
+.notification-button .badge:not(:empty),
+.mobile-icon-button .badge:not(:empty) {
+  background: red!important;
+  color: #000000 !important;
+  font-size: 9px;
+  font-weight: 900;
+}
 /* Mobile Menu Overlay and Content */
 .mobile-menu-overlay {
   position: fixed;
@@ -922,7 +928,7 @@
   top: -5px;
   right: -5px;
   background: #ef4444;
-  color: white;
+  color: black;
   border-radius: 50%;
   width: 16px;
   height: 16px;
@@ -1357,3 +1363,4 @@
   font-weight: 600 !important;
   background: #f0f7ff !important;
 }
+

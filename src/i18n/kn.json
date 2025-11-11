@@ -497,7 +497,8 @@
         "phone": "ಫೋನ್ ನಂಬರ್",
         "course": "ಆಸಕ್ತಿಯ ಕೋರ್ಸ್",
         "time": "ಆದ್ಯತೆ ಸಮಯ",
-        "message": "ಹೆಚ್ಚುವರಿ ಸಂದೇಶ"
+        "message": "ಹೆಚ್ಚುವರಿ ಸಂದೇಶ",
+        "grade": "ತರಗತಿ"
       },
       "phonePrefix": "+91",
       "placeholders": {
@@ -544,8 +545,11 @@
       "timeRequired": "ದಯವಿಟ್ಟು ಆದ್ಯತೆ ಸಮಯವನ್ನು ಆಯ್ಕೆಮಾಡಿ"
     }
   },
-
-
+"Select_your_grade": "ನಿಮ್ಮ ತರಗತಿಯನ್ನು ಆಯ್ಕೆಮಾಡಿ",
+  "Grade_7": "ತರಗತಿ 7", 
+  "Grade_8": "ತರಗತಿ 8",
+  "Grade_9": "ತರಗತಿ 9",
+  "Grade_10": "ತರಗತಿ 10",
 
 
 
@@ -2262,10 +2266,8 @@
   "learning_legend": "ಅಭ್ಯಾಸದ ಪುರಾಣಪುರುಷ",
   "max_level": "ಗರಿಷ್ಠ ಹಂತ!",
  
- 
- "steady_learner": "ಸ್ಥಿರ ಕಲಿಯುವವನು",
- 
- 
+    "streak_label": "ಸರಣಿ",
+    "days_label": "ದಿನಗಳು",
  
     "next_milestone": "ಮುಂದಿನ ಮೈಲಿಗಲ್ಲು",
   "more_for": "ಇನ್ನೂ",
@@ -2291,7 +2293,9 @@
   },
   "tabs": {
     "dailyReport": "ಡೈಲಿ ರಿಪೋರ್ಟ್",
-    "weeklyReport": "ವೀಕ್ಲಿ ರಿಪೋರ್ಟ್"
+    "weeklyReport": "ವೀಕ್ಲಿ ರಿಪೋರ್ಟ್",
+    "analytics": "ವಿಶ್ಲೇಷಣೆ",
+     "title": "ವಿಶ್ಲೇಷಣೆ"
   },
   "statCards": {
     "totalStudyTime": "ಒಟ್ಟು ಸ್ಟಡಿ ಟೈಮ್",

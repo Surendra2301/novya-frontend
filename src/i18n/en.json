@@ -503,7 +503,8 @@
         "phone": "Phone Number",
         "course": "Course of Interest",
         "time": "Preferred Time",
-        "message": "Additional Message"
+        "message": "Additional Message",
+        "grade": "Grade"
       },
       "phonePrefix": "+91",
       "placeholders": {
@@ -550,8 +551,11 @@
       "timeRequired": "Please select a preferred time"
     }
   },
-
-
+ "Select_your_grade": "Select your grade",
+  "Grade_7": "Grade 7",
+  "Grade_8": "Grade 8", 
+  "Grade_9": "Grade 9",
+  "Grade_10": "Grade 10",
 
 
 
@@ -2223,10 +2227,6 @@
  
  
  
-    "steady_learner": "Steady Learner",
- 
- 
- 
  
   "next_milestone": "Next Milestone",
   "more_for": "more for",
@@ -2235,6 +2235,9 @@
   "steady_learner": "Steady Learner",
   "focused_mind": "Focused Mind",
   "learning_legend": "Learning Legend",
+
+      "streak_label": "Streak",
+    "days_label": "days",
 
 
 
@@ -2256,7 +2259,9 @@
   },
   "tabs": {
     "dailyReport": "Daily Report",
-    "weeklyReport": "Weekly Report"
+    "weeklyReport": "Weekly Report",
+     "analytics": "Analytics",
+      "title": "Analytics"
   },
   "statCards": {
     "totalStudyTime": "Total Study Time",
