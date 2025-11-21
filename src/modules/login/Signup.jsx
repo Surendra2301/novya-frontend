@@ -573,32 +573,3 @@ const handleSubmit = (e) => {
 
 export default Signup;
  
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

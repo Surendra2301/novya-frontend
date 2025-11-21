@@ -311,7 +311,7 @@
     "defaultTitle": "ನಮೂದರ ಕೋರ್ಸ್",
     "by": "ಇಂದ",
     "students": "ವಿದ್ಯಾರ್ಥಿಗಳು",
-    "description": "<strong>{{title}}</strong> ಅಡಿಪಾಯದಿಂದ ಕೈಯಲ್ಲಿ ಮಾಡುವ ಯೋಜನೆಗಳೊಂದಿಗೆ ಕಲಿಯಿರಿ.",
+    "description": "{{title}} ಅಡಿಪಾಯದಿಂದ ಕೈಯಲ್ಲಿ ಮಾಡುವ ಯೋಜನೆಗಳೊಂದಿಗೆ ಕಲಿಯಿರಿ.",
     "features": {
       "lifetimeAccess": "ಆಜೀವನಾಂತ್ಯ ತಲುಪುವುದು",
       "certificate": "ಪೂರ್ಣಗೊಂಡ ಸರ್ಟಿಫಿಕೇಟ್",
@@ -1175,7 +1175,7 @@
 
 
 
-  "common": {
+  "commons": {
     "logout": "ಲಾಗ್ ಔಟ್",
     "notifications": "ನೋಟಿಫಿಕೇಷನ್ಗಳು",
     "clear": "ಎಲ್ಲಾ ಕ್ಲಿಯರ್ ಮಾಡಿ",
@@ -2204,10 +2204,10 @@
     "welcomeTitle": "ಟೈಪಿಂಗ್ ಮಾಸ್ಟರ್ ಪ್ರೋಗೆ ಸ್ವಾಗತ",
     "welcomeSubtitle": "AI-ವರ್ಧಿತ ಪಾಠಗಳೊಂದಿಗೆ ನಿಮ್ಮ ಟೈಪಿಂಗ್ ವೇಗ, ನಿಖರತೆ ಮತ್ತು ತಾಳವನ್ನು ಹೆಚ್ಚಿಸಿಕೊಳ್ಳಿ.",
     "startButton": "ಟೈಪಿಂಗ್ ಟೆಸ್ಟ್ ಪ್ರಾರಂಭಿಸಿ",
-    "backToInstructions": "ಸೂಚನೆಗಳಿಗೆ ಹಿಂತಿರುಗಿ",
+    "back To Instructions": "ಸೂಚನೆಗಳಿಗೆ ಹಿಂತಿರುಗಿ",
     "selectDifficulty": "ಕಠಿಣತೆ ಮಟ್ಟ ಆಯ್ಕೆಮಾಡಿ",
-    "back": "ಹಿಂದೆ",
-    "levels": {
+    "back to home": "ಮುಖಪುಟಕ್ಕೆ ಹಿಂದಿರುಗಿ",
+        "levels": {
       "beginner": "ಪ್ರಾರಂಭಿಕ",
       "intermediate": "ಮಧ್ಯಮ",
       "advanced": "ಸುಧಾರಿತ"
@@ -2388,11 +2388,14 @@
   "errors": {
     "failedToGenerate": "ರಿಪೋರ್ಟ್ಗಳನ್ನು ಜನರೇಟ್ ಮಾಡಲು ವಿಫಲವಾಗಿದೆ. ದಯವಿಟ್ಟು ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.",
     "somethingWentWrong": "ಓ! ಏನೋ ತಪ್ಪಾಗಿದೆ"
-  }
+  },
 
 
 
- 
+ "us": {
+  "sub_mit": "ಸಲ್ಲಿಸಿ"
+}
+
  
 
 

@@ -1,516 +1,3 @@
-////old working
-// import { createContext, useContext, useState, useEffect } from 'react';
- 
-// const QuizContext = createContext();
- 
-// export const QuizProvider = ({ children }) => {
-
-//   const [quizResults, setQuizResults] = useState({
-
-//     totalQuizzes: 0,
-
-//     totalScore: 0,
-
-//     totalQuestions: 0,
-
-//     byLevel: {},
-
-//   });
- 
-//   const [mockTestResults, setMockTestResults] = useState({
-
-//     totalTests: 0,
-
-//     totalScore: 0,
-
-//     totalQuestions: 0,
-
-//   });
- 
-//   // History arrays for detailed tracking
-
-//   const [quizHistory, setQuizHistory] = useState([]);
-
-//   const [mockHistory, setMockHistory] = useState([]);
-
-//   const [lessonHistory, setLessonHistory] = useState([]); // NEW: Lesson history state
- 
-//   // Track if quiz is active
-
-//   const [isQuizActive, setIsQuizActive] = useState(false);
- 
-//   // Reward points state and management
-
-//   const [rewardPoints, setRewardPoints] = useState(
-
-//     parseInt(localStorage.getItem("rewardPoints")) || 0
-
-//   );
-
-//   const [earnedPoints, setEarnedPoints] = useState({
-
-//     basePoints: 0,
-
-//     bonusPoints: 0,
-
-//     totalPoints: 0,
-
-//   });
-
-//   const [pointsAwarded, setPointsAwarded] = useState(false);
-
-//   const [quizStarted, setQuizStarted] = useState(false);
-
-//   const [hasAwardedPoints, setHasAwardedPoints] = useState(false);
- 
-//   // Initialize all histories from localStorage
-
-//   useEffect(() => {
-
-//     const savedQuizHistory = localStorage.getItem("quizHistory");
-
-//     const savedMockHistory = localStorage.getItem("mockHistory");
-
-//     const savedLessonHistory = localStorage.getItem("lessonHistory"); // NEW
-
-//     if (savedQuizHistory) setQuizHistory(JSON.parse(savedQuizHistory));
-
-//     if (savedMockHistory) setMockHistory(JSON.parse(savedMockHistory));
-
-//     if (savedLessonHistory) setLessonHistory(JSON.parse(savedLessonHistory)); // NEW
-
-//   }, []);
- 
-//   // Save histories to localStorage whenever they change
-
-//   useEffect(() => {
-
-//     localStorage.setItem("quizHistory", JSON.stringify(quizHistory));
-
-//   }, [quizHistory]);
- 
-//   useEffect(() => {
-
-//     localStorage.setItem("mockHistory", JSON.stringify(mockHistory));
-
-//   }, [mockHistory]);
- 
-//   useEffect(() => {
-
-//     localStorage.setItem("lessonHistory", JSON.stringify(lessonHistory)); // NEW
-
-//   }, [lessonHistory]);
- 
-//   // Save rewardPoints persistently and sync across components
-
-//   useEffect(() => {
-
-//     localStorage.setItem("rewardPoints", rewardPoints.toString());
-
-//     // Dispatch event to sync across all components
-
-//     window.dispatchEvent(new CustomEvent('rewardPointsUpdated', {
-
-//       detail: { rewardPoints }
-
-//     }));
-
-//   }, [rewardPoints]);
- 
-//   // Initialize reward points from localStorage on component mount
-
-//   useEffect(() => {
-
-//     const savedPoints = parseInt(localStorage.getItem('rewardPoints')) || 0;
-
-//     if (savedPoints !== rewardPoints) {
-
-//       setRewardPoints(savedPoints);
-
-//     }
-
-//   }, []);
- 
-//   // Function to calculate earned points - UPDATED BONUS LOGIC
-
-//   const calculateEarnedPoints = (score, totalQuestions) => {
-
-//     const basePoints = score; // 1 point per correct answer
-
-//     const percentage = (score / totalQuestions) * 100;
-
-//     // Fixed 10 points bonus for 80%+ scores instead of 50%
-
-//     const bonusPoints = percentage >= 80 ? 10 : 0;
-
-//     const totalPoints = basePoints + bonusPoints;
-
-//     const earnedPointsData = {
-
-//       basePoints,
-
-//       bonusPoints,
-
-//       totalPoints
-
-//     };
-
-//     setEarnedPoints(earnedPointsData);
-
-//     return earnedPointsData;
-
-//   };
- 
-//   // Function to update global reward points
-
-//   const updateRewardPoints = (points) => {
-
-//     setRewardPoints(points);
-
-//     localStorage.setItem("rewardPoints", points.toString());
-
-//   };
- 
-//   // Function to add earned points after quiz (with protection against multiple awards)
-
-//   const addEarnedPoints = (earned) => {
-
-//     if (!hasAwardedPoints && earned.totalPoints > 0) {
-
-//       const total = rewardPoints + earned.totalPoints;
-
-//       setEarnedPoints(earned);
-
-//       setRewardPoints(total);
-
-//       setHasAwardedPoints(true);
-
-//       setPointsAwarded(true);
-
-//       return true; // Points were awarded
-
-//     }
-
-//     return false; // Points were not awarded (already awarded or zero)
-
-//   };
- 
-//   // Function to start quiz
-
-//   const startQuiz = () => {
-
-//     console.log("Quiz started!");
-
-//     setQuizStarted(true);
-
-//     setIsQuizActive(true);
-
-//     setHasAwardedPoints(false); // Reset points awarded flag when starting new quiz
-
-//     setPointsAwarded(false);
-
-//     setEarnedPoints({ basePoints: 0, bonusPoints: 0, totalPoints: 0 }); // Reset earned points
-
-//   };
- 
-//   // Function to reset quiz
-
-//   const resetQuiz = () => {
-
-//     setQuizStarted(false);
-
-//     setPointsAwarded(false);
-
-//     setHasAwardedPoints(false);
-
-//     setEarnedPoints({ basePoints: 0, bonusPoints: 0, totalPoints: 0 });
-
-//   };
- 
-//   // Reset points awarded flag (for retry scenarios)
-
-//   const resetPointsAwarded = () => {
-
-//     setHasAwardedPoints(false);
-
-//     setPointsAwarded(false);
-
-//   };
- 
-//   const updateQuizResults = (score, totalQuestions, level, className, subject, subtopic) => {
-
-//     setQuizResults(prev => ({
-
-//       totalQuizzes: prev.totalQuizzes + 1,
-
-//       totalScore: prev.totalScore + score,
-
-//       totalQuestions: prev.totalQuestions + totalQuestions,
-
-//       byLevel: {
-
-//         ...prev.byLevel,
-
-//         [level]: (prev.byLevel[level] || 0) + 1,
-
-//       },
-
-//     }));
- 
-//     // Add to history
-
-//     const historyItem = {
-
-//       id: Date.now(),
-
-//       class: className,
-
-//       subject,
-
-//       topic: subtopic,
-
-//       score: Math.round((score / totalQuestions) * 100),
-
-//       questions: totalQuestions,
-
-//       date: new Date().toISOString().split('T')[0]
-
-//     };
-
-//     setQuizHistory(prev => [...prev, historyItem]);
- 
-//     // Award points only if user passed and points haven't been awarded yet
-
-//     if (score >= 5 && !hasAwardedPoints) {
-
-//       const earned = calculateEarnedPoints(score, totalQuestions);
-
-//       const pointsAwarded = addEarnedPoints(earned);
-
-//       console.log(`Points awarded for quiz: ${pointsAwarded ? 'Yes' : 'No'}, Total: ${earned.totalPoints}`);
-
-//     }
-
-//   };
- 
-//   const getQuizHistory = () => {
-
-//     return quizHistory;
-
-//   };
- 
-//   const updateMockTestResults = (score, totalQuestions, className, subject, chapter) => {
-
-//     setMockTestResults(prev => ({
-
-//       totalTests: prev.totalTests + 1,
-
-//       totalScore: prev.totalScore + score,
-
-//       totalQuestions: prev.totalQuestions + totalQuestions,
-
-//     }));
- 
-//     // Add to history
-
-//     const historyItem = {
-
-//       id: Date.now(),
-
-//       class: className,
-
-//       subject,
-
-//       topic: chapter,
-
-//       score: Math.round((score / totalQuestions) * 100),
-
-//       questions: totalQuestions,
-
-//       date: new Date().toISOString().split('T')[0]
-
-//     };
-
-//     setMockHistory(prev => [...prev, historyItem]);
-
-//   };
- 
-//   const getMockHistory = () => {
-
-//     return mockHistory;
-
-//   };
- 
-//   // NEW: Lesson History Functions
-
-//   const getLessonHistory = () => {
-
-//     return lessonHistory;
-
-//   };
- 
-//   const addLessonToHistory = (lessonData) => {
-
-//     try {
-
-//       // Check if this lesson already exists (same class, subject, chapter, subtopic)
-
-//       const existingLessonIndex = lessonHistory.findIndex(lesson => 
-
-//         lesson.class === lessonData.class &&
-
-//         lesson.subject === lessonData.subject &&
-
-//         lesson.chapter === lessonData.chapter &&
-
-//         lesson.subtopic === lessonData.subtopic
-
-//       );
- 
-//       let updatedHistory;
-
-//       if (existingLessonIndex !== -1) {
-
-//         // Update existing lesson
-
-//         updatedHistory = lessonHistory.map((lesson, index) => 
-
-//           index === existingLessonIndex 
-
-//             ? { ...lesson, ...lessonData, id: lesson.id } 
-
-//             : lesson
-
-//         );
-
-//       } else {
-
-//         // Add new lesson
-
-//         const newLesson = {
-
-//           id: Date.now(),
-
-//           date: new Date().toISOString().split('T')[0],
-
-//           timestamp: new Date().toISOString(),
-
-//           ...lessonData
-
-//         };
-
-//         updatedHistory = [newLesson, ...lessonHistory];
-
-//       }
-
-//       setLessonHistory(updatedHistory);
-
-//       return true;
-
-//     } catch (error) {
-
-//       console.error('Error saving lesson history:', error);
-
-//       return false;
-
-//     }
-
-//   };
- 
-//   const updateLessonCompletion = (lessonId, updates) => {
-
-//     try {
-
-//       const updatedHistory = lessonHistory.map(lesson => 
-
-//         lesson.id === lessonId ? { ...lesson, ...updates } : lesson
-
-//       );
-
-//       setLessonHistory(updatedHistory);
-
-//       return true;
-
-//     } catch (error) {
-
-//       console.error('Error updating lesson:', error);
-
-//       return false;
-
-//     }
-
-//   };
- 
-//   // Original endQuiz
-
-//   const endQuiz = () => setIsQuizActive(false);
- 
-//   return (
-// <QuizContext.Provider
-
-//       value={{
-
-//         quizResults,
-
-//         mockTestResults,
-
-//         updateQuizResults,
-
-//         updateMockTestResults,
-
-//         getQuizHistory,
-
-//         getMockHistory,
-
-//         // NEW: Lesson history functions
-
-//         getLessonHistory,
-
-//         addLessonToHistory,
-
-//         updateLessonCompletion,
-
-//         isQuizActive,
-
-//         startQuiz,
-
-//         endQuiz,
-
-//         // Reward points management
-
-//         rewardPoints,
-
-//         updateRewardPoints,
-
-//         calculateEarnedPoints,
-
-//         earnedPoints,
-
-//         pointsAwarded,
-
-//         addEarnedPoints,
-
-//         quizStarted,
-
-//         resetQuiz,
-
-//         resetPointsAwarded,
-
-//         hasAwardedPoints,
-
-//       }}
-// >
-
-//       {children}
-// </QuizContext.Provider>
-
-//   );
-
-// };
- 
-// export const useQuiz = () => useContext(QuizContext);
-
-
 
 // import { createContext, useContext, useState, useEffect } from 'react';
 
@@ -847,6 +334,23 @@
 //     return trackLearningActivity(activityData);
 //   };
 
+//   // NEW: Function to track spin wheel activity
+//   const trackSpinWheel = (spinData) => {
+//     const activityData = {
+//       activityType: 'spin_wheel',
+//       title: spinData.title || 'Daily Spin Wheel',
+//       rewardPoints: spinData.rewardPoints || 0,
+//       duration: spinData.duration || 1,
+//       subject: 'Rewards',
+//       chapter: 'Daily Bonus',
+//       rewardName: spinData.rewardName,
+//       rewardValue: spinData.rewardValue,
+//       spinsRemaining: spinData.spinsRemaining,
+//       ...spinData
+//     };
+//     return trackLearningActivity(activityData);
+//   };
+
 //   const updateLessonCompletion = (lessonId, updates) => {
 //     try {
 //       const updatedHistory = lessonHistory.map(lesson => 
@@ -885,7 +389,8 @@
 //         trackNotesCreation,
 //         trackQuickPractice,
 //         trackFeedbackSubmission,
-//         trackTypingPractice, // NEW: Added typing practice tracking
+//         trackTypingPractice,
+//         trackSpinWheel, // NEW: Added spin wheel tracking
 
 //         isQuizActive,
 //         startQuiz,
@@ -919,337 +424,427 @@
 
 
 
-// import React, { createContext, useContext, useState, useEffect } from 'react';
- 
-// const ScreenTimeContext = createContext();
- 
-// export const ScreenTimeProvider = ({ children }) => {
-//   const [screenTime, setScreenTime] = useState({
-//     daily: 0,
-//     weekly: 0,
-//     total: 0,
-//     sessions: [],
-//     activities: [],
-//     currentActivity: null,
-//     activityStartTime: null
+
+
+
+
+// ////test code
+// import { createContext, useContext, useState, useEffect } from 'react';
+// import { calculateQuickBadges, calculateMockBadges } from "./badgeUtils";
+
+// const QuizContext = createContext();
+
+// export const QuizProvider = ({ children }) => {
+//   const [quizResults, setQuizResults] = useState({
+//     totalQuizzes: 0,
+//     totalScore: 0,
+//     totalQuestions: 0,
+//     byLevel: {},
 //   });
 
-//   const [realTimeUpdate, setRealTimeUpdate] = useState(0);
+//   const [mockTestResults, setMockTestResults] = useState({
+//     totalTests: 0,
+//     totalScore: 0,
+//     totalQuestions: 0,
+//   });
 
-//   // Initialize from localStorage
+//   // History arrays for detailed tracking
+//   const [quizHistory, setQuizHistory] = useState([]);
+//   const [mockHistory, setMockHistory] = useState([]);
+//   const [lessonHistory, setLessonHistory] = useState([]);
+
+//   // Track if quiz is active
+//   const [isQuizActive, setIsQuizActive] = useState(false);
+
+//   // Reward points state and management
+//   const [rewardPoints, setRewardPoints] = useState(
+//     parseInt(localStorage.getItem("rewardPoints")) || 0
+//   );
+
+//   const [earnedPoints, setEarnedPoints] = useState({
+//     basePoints: 0,
+//     bonusPoints: 0,
+//     totalPoints: 0,
+//   });
+
+//   const [pointsAwarded, setPointsAwarded] = useState(false);
+//   const [quizStarted, setQuizStarted] = useState(false);
+//   const [hasAwardedPoints, setHasAwardedPoints] = useState(false);
+
+//   // ⭐ NEW — BADGES
+//   const [badges, setBadges] = useState({
+//     quickBadges: [],
+//     mockBadges: [],
+//     quickHighest: null,
+//     mockHighest: null
+//   });
+
+//   // ---------------------------------------------
+//   // ⭐ TEST MODE — Display All Badges Immediately
+//   // ---------------------------------------------
 //   useEffect(() => {
-//     const savedScreenTime = localStorage.getItem('screenTime');
-//     if (savedScreenTime) {
-//       const parsedData = JSON.parse(savedScreenTime);
-//       if (!parsedData.activities) {
-//         parsedData.activities = [];
-//       }
-//       setScreenTime(parsedData);
-//     }
+//     console.log("⚠️ TEST MODE ENABLED: Fake data loaded to show ALL badges");
 
-//     // Start real-time updates for screen time
-//     const interval = setInterval(() => {
-//       setRealTimeUpdate(prev => prev + 1);
-//     }, 60000); // Update every minute
+//     // Fake Quick Practice History → 25 high scores
+//     const fakeQuiz = Array(25).fill({
+//       score: 95,
+//       avgTimePerQuestion: 60
+//     });
 
-//     return () => clearInterval(interval);
+//     // Fake Mock Test History → 25 high scores
+//     const fakeMock = Array(25).fill({
+//       score: 92
+//     });
+
+//     const quickBadges = calculateQuickBadges(fakeQuiz);
+//     const mockBadges = calculateMockBadges(fakeMock);
+
+//     setBadges({
+//       quickBadges,
+//       mockBadges,
+//       quickHighest: quickBadges[quickBadges.length - 1] || null,
+//       mockHighest: mockBadges[mockBadges.length - 1] || null
+//     });
 //   }, []);
 
-//   // Save to localStorage whenever screenTime changes
+//   // Initialize all histories from localStorage
 //   useEffect(() => {
-//     localStorage.setItem('screenTime', JSON.stringify(screenTime));
-//   }, [screenTime]);
+//     const savedQuizHistory = localStorage.getItem("quizHistory");
+//     const savedMockHistory = localStorage.getItem("mockHistory");
+//     const savedLessonHistory = localStorage.getItem("lessonHistory");
 
-//   // Listen for storage changes (for real-time updates across components)
-//   useEffect(() => {
-//     const handleStorageChange = (e) => {
-//       if (e.key === 'screenTime') {
-//         const newScreenTime = JSON.parse(e.newValue || '{}');
-//         setScreenTime(prev => ({ ...prev, ...newScreenTime }));
-//       }
-//     };
-
-//     window.addEventListener('storage', handleStorageChange);
-//     return () => window.removeEventListener('storage', handleStorageChange);
+//     if (savedQuizHistory) setQuizHistory(JSON.parse(savedQuizHistory));
+//     if (savedMockHistory) setMockHistory(JSON.parse(savedMockHistory));
+//     if (savedLessonHistory) setLessonHistory(JSON.parse(savedLessonHistory));
 //   }, []);
 
-//   // Calculate totals based on activities
-//   const calculateTotals = (activities) => {
-//     const today = new Date().toISOString().split('T')[0];
-//     const oneWeekAgo = new Date();
-//     oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
- 
-//     const dailyTotal = activities
-//       .filter(activity => activity.date === today)
-//       .reduce((total, activity) => total + activity.duration, 0);
- 
-//     const weeklyTotal = activities
-//       .filter(activity => new Date(activity.date) >= oneWeekAgo)
-//       .reduce((total, activity) => total + activity.duration, 0);
- 
-//     const totalOverall = activities
-//       .reduce((total, activity) => total + activity.duration, 0);
- 
-//     return { dailyTotal, weeklyTotal, totalOverall };
-//   };
- 
-//   // Start tracking an activity (call when user starts quiz/lesson/mock test)
-//   const startActivityTracking = (activityType, details = {}) => {
-//     const startTime = Date.now();
-   
-//     setScreenTime(prev => ({
-//       ...prev,
-//       currentActivity: {
-//         id: startTime,
-//         type: activityType,
-//         startTime: startTime,
-//         date: new Date().toISOString().split('T')[0],
-//         ...details
-//       },
-//       activityStartTime: startTime
+//   // Save histories to localStorage whenever they change
+//   useEffect(() => {
+//     localStorage.setItem("quizHistory", JSON.stringify(quizHistory));
+//   }, [quizHistory]);
+
+//   useEffect(() => {
+//     localStorage.setItem("mockHistory", JSON.stringify(mockHistory));
+//   }, [mockHistory]);
+
+//   useEffect(() => {
+//     localStorage.setItem("lessonHistory", JSON.stringify(lessonHistory));
+//   }, [lessonHistory]);
+
+//   // Save rewardPoints persistently and sync across components
+//   useEffect(() => {
+//     localStorage.setItem("rewardPoints", rewardPoints.toString());
+//     window.dispatchEvent(new CustomEvent("rewardPointsUpdated", {
+//       detail: { rewardPoints }
 //     }));
- 
-//     return startTime;
-//   };
- 
-//   // Stop tracking and save the activity (call when user finishes)
-//   const stopActivityTracking = (activityId, additionalDetails = {}) => {
-//     setScreenTime(prev => {
-//       if (!prev.currentActivity || prev.currentActivity.id !== activityId) {
-//         return prev;
-//       }
- 
-//       const endTime = Date.now();
-//       const durationMinutes = Math.round((endTime - prev.currentActivity.startTime) / (1000 * 60));
-     
-//       // Only save if activity lasted at least 1 minute
-//       if (durationMinutes < 1) {
-//         // Still save if it's less than 1 minute but user completed something
-//         const shortActivity = {
-//           ...prev.currentActivity,
-//           endTime,
-//           duration: durationMinutes || 1, // Minimum 1 minute
-//           completed: true,
-//           ...additionalDetails
-//         };
- 
-//         const updatedActivities = [...prev.activities, shortActivity];
-//         const { dailyTotal, weeklyTotal, totalOverall } = calculateTotals(updatedActivities);
- 
-//         return {
-//           ...prev,
-//           activities: updatedActivities,
-//           daily: dailyTotal,
-//           weekly: weeklyTotal,
-//           total: totalOverall,
-//           currentActivity: null,
-//           activityStartTime: null,
-//           sessions: [...prev.sessions, {
-//             startTime: prev.currentActivity.startTime,
-//             endTime: endTime,
-//             duration: durationMinutes || 1,
-//             activity: shortActivity
-//           }]
-//         };
-//       }
- 
-//       const completedActivity = {
-//         ...prev.currentActivity,
-//         endTime,
-//         duration: durationMinutes,
-//         completed: true,
-//         ...additionalDetails
-//       };
- 
-//       const updatedActivities = [...prev.activities, completedActivity];
-//       const { dailyTotal, weeklyTotal, totalOverall } = calculateTotals(updatedActivities);
- 
-//       return {
-//         ...prev,
-//         activities: updatedActivities,
-//         daily: dailyTotal,
-//         weekly: weeklyTotal,
-//         total: totalOverall,
-//         currentActivity: null,
-//         activityStartTime: null,
-//         sessions: [...prev.sessions, {
-//           startTime: prev.currentActivity.startTime,
-//           endTime: endTime,
-//           duration: durationMinutes,
-//           activity: completedActivity
-//         }]
-//       };
-//     });
-//   };
+//   }, [rewardPoints]);
 
-//   // Add general screen time (for login-to-logout tracking)
-//   const addGeneralScreenTime = (minutes) => {
-//     const today = new Date().toISOString().split('T')[0];
-    
-//     setScreenTime(prev => {
-//       const updatedActivities = [...prev.activities];
-      
-//       // Find or create general screen time activity for today
-//       let screenTimeActivity = updatedActivities.find(activity => 
-//         activity.date === today && activity.type === 'general_screen_time'
-//       );
-      
-//       if (!screenTimeActivity) {
-//         screenTimeActivity = {
-//           id: `screen_time_${Date.now()}`,
-//           type: 'general_screen_time',
-//           activityType: 'general_screen_time',
-//           title: 'General Screen Time',
-//           subject: 'Platform',
-//           chapter: 'Usage',
-//           duration: 0,
-//           date: today,
-//           timestamp: new Date().toISOString(),
-//           completed: true
-//         };
-//         updatedActivities.push(screenTimeActivity);
-//       }
-      
-//       // Update duration
-//       screenTimeActivity.duration += minutes;
-//       screenTimeActivity.timestamp = new Date().toISOString();
-      
-//       const { dailyTotal, weeklyTotal, totalOverall } = calculateTotals(updatedActivities);
-      
-//       return {
-//         ...prev,
-//         activities: updatedActivities,
-//         daily: dailyTotal,
-//         weekly: weeklyTotal,
-//         total: totalOverall
-//       };
-//     });
-//   };
- 
-//   // Get current activity
-//   const getCurrentActivity = () => {
-//     return screenTime.currentActivity;
-//   };
- 
-//   // Get today's screen time (real-time)
-//   const getTodayScreenTime = () => {
-//     // Check for ongoing session and add current time
-//     const sessionData = JSON.parse(localStorage.getItem('screenTimeSession') || '{}');
-//     let currentSessionTime = 0;
-    
-//     if (sessionData.loginTime) {
-//       const now = new Date();
-//       const lastUpdate = new Date(sessionData.lastUpdateTime || sessionData.loginTime);
-//       currentSessionTime = Math.floor((now - lastUpdate) / (1000 * 60));
+//   useEffect(() => {
+//     const savedPoints = parseInt(localStorage.getItem("rewardPoints")) || 0;
+//     if (savedPoints !== rewardPoints) {
+//       setRewardPoints(savedPoints);
 //     }
-    
-//     return screenTime.daily + currentSessionTime;
-//   };
- 
-//   // Get weekly screen time
-//   const getWeeklyScreenTime = () => {
-//     return screenTime.weekly;
-//   };
- 
-//   // Get total screen time
-//   const getTotalScreenTime = () => {
-//     return screenTime.total;
-//   };
- 
-//   // Get activities by date range
-//   const getActivitiesByDateRange = (startDate, endDate) => {
-//     return screenTime.activities.filter(activity =>
-//       activity.date >= startDate && activity.date <= endDate
-//     );
-//   };
- 
-//   // Get today's activities
-//   const getTodayActivities = () => {
-//     const today = new Date().toISOString().split('T')[0];
-//     return screenTime.activities.filter(activity => activity.date === today);
-//   };
- 
-//   // Get activities by type
-//   const getActivitiesByType = (type) => {
-//     return screenTime.activities.filter(activity => activity.type === type);
-//   };
- 
-//   // Get time breakdown by activity type
-//   const getTimeBreakdown = (date = null) => {
-//     const targetDate = date || new Date().toISOString().split('T')[0];
-//     const dayActivities = screenTime.activities.filter(activity => activity.date === targetDate);
- 
-//     const quizTime = dayActivities
-//       .filter(activity => activity.type === 'quiz')
-//       .reduce((total, activity) => total + activity.duration, 0);
- 
-//     const mockTime = dayActivities
-//       .filter(activity => activity.type === 'mock_test')
-//       .reduce((total, activity) => total + activity.duration, 0);
- 
-//     const lessonTime = dayActivities
-//       .filter(activity => activity.type === 'lesson')
-//       .reduce((total, activity) => total + activity.duration, 0);
+//   }, []);
 
-//     const generalTime = dayActivities
-//       .filter(activity => activity.type === 'general_screen_time')
-//       .reduce((total, activity) => total + activity.duration, 0);
- 
-//     const totalTime = quizTime + mockTime + lessonTime + generalTime;
- 
-//     return {
-//       quiz: quizTime,
-//       mock: mockTime,
-//       lesson: lessonTime,
-//       general: generalTime,
-//       total: totalTime
-//     };
+//   // --------------------------------------------
+//   // POINTS CALCULATION
+//   // --------------------------------------------
+//   const calculateEarnedPoints = (score, totalQuestions) => {
+//     const basePoints = score;
+//     const percentage = (score / totalQuestions) * 100;
+//     const bonusPoints = percentage >= 80 ? 10 : 0;
+//     const totalPoints = basePoints + bonusPoints;
+
+//     const earned = { basePoints, bonusPoints, totalPoints };
+//     setEarnedPoints(earned);
+//     return earned;
 //   };
- 
-//   // Clear all data (for reset)
-//   const clearScreenTimeData = () => {
-//     const resetData = {
-//       daily: 0,
-//       weekly: 0,
-//       total: 0,
-//       sessions: [],
-//       activities: [],
-//       currentActivity: null,
-//       activityStartTime: null
-//     };
-//     setScreenTime(resetData);
-//     localStorage.setItem('screenTime', JSON.stringify(resetData));
+
+//   const updateRewardPoints = (points) => {
+//     setRewardPoints(points);
+//     localStorage.setItem("rewardPoints", points.toString());
 //   };
- 
+
+//   const addEarnedPoints = (earned) => {
+//     if (!hasAwardedPoints && earned.totalPoints > 0) {
+//       const total = rewardPoints + earned.totalPoints;
+//       setRewardPoints(total);
+//       setHasAwardedPoints(true);
+//       setPointsAwarded(true);
+//       return true;
+//     }
+//     return false;
+//   };
+
+//   const startQuiz = () => {
+//     setQuizStarted(true);
+//     setIsQuizActive(true);
+//     setHasAwardedPoints(false);
+//     setEarnedPoints({ basePoints: 0, bonusPoints: 0, totalPoints: 0 });
+//   };
+
+//   const resetQuiz = () => {
+//     setQuizStarted(false);
+//     setPointsAwarded(false);
+//     setHasAwardedPoints(false);
+//     setEarnedPoints({ basePoints: 0, bonusPoints: 0, totalPoints: 0 });
+//   };
+
+//   const resetPointsAwarded = () => {
+//     setHasAwardedPoints(false);
+//     setPointsAwarded(false);
+//   };
+
+//   // --------------------------------------------
+//   // UPDATE QUIZ RESULTS
+//   // --------------------------------------------
+//   const updateQuizResults = (score, totalQuestions, level, className, subject, subtopic) => {
+//     setQuizResults(prev => ({
+//       totalQuizzes: prev.totalQuizzes + 1,
+//       totalScore: prev.totalScore + score,
+//       totalQuestions: prev.totalQuestions + totalQuestions,
+//       byLevel: {
+//         ...prev.byLevel,
+//         [level]: (prev.byLevel[level] || 0) + 1,
+//       },
+//     }));
+
+//     const historyItem = {
+//       id: Date.now(),
+//       class: className,
+//       subject,
+//       topic: subtopic,
+//       score: Math.round((score / totalQuestions) * 100),
+//       questions: totalQuestions,
+//       date: new Date().toISOString().split("T")[0],
+//     };
+
+//     setQuizHistory(prev => [...prev, historyItem]);
+
+//     // Update Quick Practice badges
+//     const newQuick = calculateQuickBadges([...quizHistory, historyItem]);
+
+//     setBadges(prev => ({
+//       ...prev,
+//       quickBadges: newQuick,
+//       quickHighest: newQuick[newQuick.length - 1] || null
+//     }));
+
+//     if (score >= 5 && !hasAwardedPoints) {
+//       const earned = calculateEarnedPoints(score, totalQuestions);
+//       addEarnedPoints(earned);
+//     }
+//   };
+
+//   const getQuizHistory = () => quizHistory;
+
+//   // --------------------------------------------
+//   // UPDATE MOCK TEST RESULTS
+//   // --------------------------------------------
+//   const updateMockTestResults = (score, totalQuestions, className, subject, chapter) => {
+//     setMockTestResults(prev => ({
+//       totalTests: prev.totalTests + 1,
+//       totalScore: prev.totalScore + score,
+//       totalQuestions: prev.totalQuestions + totalQuestions,
+//     }));
+
+//     const historyItem = {
+//       id: Date.now(),
+//       class: className,
+//       subject,
+//       topic: chapter,
+//       score: Math.round((score / totalQuestions) * 100),
+//       questions: totalQuestions,
+//       date: new Date().toISOString().split("T")[0],
+//     };
+
+//     setMockHistory(prev => [...prev, historyItem]);
+
+//     const newMock = calculateMockBadges([...mockHistory, historyItem]);
+
+//     setBadges(prev => ({
+//       ...prev,
+//       mockBadges: newMock,
+//       mockHighest: newMock[newMock.length - 1] || null
+//     }));
+//   };
+
+//   const getMockHistory = () => mockHistory;
+
+//   // --------------------------------------------
+//   // LESSON / ACTIVITY TRACKING (UNCHANGED)
+//   // --------------------------------------------
+//   const getLessonHistory = () => lessonHistory;
+
+//   const addLessonToHistory = (lessonData) => {
+//     try {
+//       const newActivity = {
+//         id: "activity-" + Date.now(),
+//         date: new Date().toISOString().split("T")[0],
+//         timestamp: new Date().toISOString(),
+//         videoCompleted: lessonData.activityType === "video",
+//         completed: true,
+//         rewardPoints: lessonData.rewardPoints || 0,
+//         duration: lessonData.duration || 15,
+//         ...lessonData,
+//       };
+
+//       const updated = [newActivity, ...lessonHistory];
+//       setLessonHistory(updated);
+
+//       if (lessonData.rewardPoints > 0) {
+//         setRewardPoints(rewardPoints + lessonData.rewardPoints);
+//       }
+
+//       window.dispatchEvent(new Event("storage"));
+//       return true;
+//     } catch (err) {
+//       console.error("Error saving lesson:", err);
+//       return false;
+//     }
+//   };
+
+//   const trackLearningActivity = (data) => {
+//     const activity = {
+//       activityType: "general",
+//       subject: "General",
+//       chapter: "General",
+//       title: "Learning Activity",
+//       duration: 15,
+//       rewardPoints: 5,
+//       completed: true,
+//       timestamp: new Date().toISOString(),
+//       ...data,
+//     };
+//     return addLessonToHistory(activity);
+//   };
+
+//   const trackVideoCompletion = (data) =>
+//     trackLearningActivity({
+//       activityType: "video",
+//       rewardPoints: 10,
+//       duration: data.duration || 20,
+//       ...data
+//     });
+
+//   const trackAIAssistantUsage = (data) =>
+//     trackLearningActivity({
+//       activityType: "ai_assistant",
+//       rewardPoints: 5,
+//       duration: data.duration || 10,
+//       ...data
+//     });
+
+//   const trackNotesCreation = (data) =>
+//     trackLearningActivity({
+//       activityType: "notes",
+//       rewardPoints: 3,
+//       duration: data.duration || 5,
+//       ...data
+//     });
+
+//   const trackQuickPractice = (data) =>
+//     trackLearningActivity({
+//       activityType: "quick_practice",
+//       rewardPoints: 7,
+//       duration: data.duration || 15,
+//       ...data
+//     });
+
+//   const trackFeedbackSubmission = (data) =>
+//     trackLearningActivity({
+//       activityType: "feedback",
+//       rewardPoints: data.rewardPoints || 0,
+//       duration: 5,
+//       ...data
+//     });
+
+//   const trackTypingPractice = (data) =>
+//     trackLearningActivity({
+//       activityType: "typing_practice",
+//       subject: "Typing",
+//       chapter: "Keyboard Skills",
+//       duration: data.duration || 5,
+//       rewardPoints: data.rewardPoints || 0,
+//       ...data
+//     });
+
+//   const trackSpinWheel = (data) =>
+//     trackLearningActivity({
+//       activityType: "spin_wheel",
+//       subject: "Rewards",
+//       chapter: "Daily Bonus",
+//       duration: data.duration || 1,
+//       rewardPoints: data.rewardPoints || 0,
+//       ...data
+//     });
+
+//   const updateLessonCompletion = (id, updates) => {
+//     try {
+//       const updated = lessonHistory.map(l =>
+//         l.id === id ? { ...l, ...updates } : l
+//       );
+//       setLessonHistory(updated);
+//       return true;
+//     } catch (err) {
+//       console.error("Error updating lesson:", err);
+//       return false;
+//     }
+//   };
+
+//   const endQuiz = () => setIsQuizActive(false);
+
 //   return (
-//     <ScreenTimeContext.Provider value={{
-//       screenTime,
-//       startActivityTracking,
-//       stopActivityTracking,
-//       addGeneralScreenTime,
-//       getCurrentActivity,
-//       getTodayScreenTime,
-//       getWeeklyScreenTime,
-//       getTotalScreenTime,
-//       getActivitiesByDateRange,
-//       getTodayActivities,
-//       getActivitiesByType,
-//       getTimeBreakdown,
-//       clearScreenTimeData,
-//       realTimeUpdate
-//     }}>
+//     <QuizContext.Provider
+//       value={{
+//         quizResults,
+//         mockTestResults,
+//         updateQuizResults,
+//         updateMockTestResults,
+//         getQuizHistory,
+//         getMockHistory,
+
+//         // badge system
+//         badges,
+
+//         // Lesson history
+//         getLessonHistory,
+//         addLessonToHistory,
+//         updateLessonCompletion,
+
+//         // activity tracking
+//         trackLearningActivity,
+//         trackVideoCompletion,
+//         trackAIAssistantUsage,
+//         trackNotesCreation,
+//         trackQuickPractice,
+//         trackFeedbackSubmission,
+//         trackTypingPractice,
+//         trackSpinWheel,
+
+//         isQuizActive,
+//         startQuiz,
+//         endQuiz,
+
+//         // reward points
+//         rewardPoints,
+//         updateRewardPoints,
+//         calculateEarnedPoints,
+//         earnedPoints,
+//         pointsAwarded,
+//         addEarnedPoints,
+//         quizStarted,
+//         resetQuiz,
+//         resetPointsAwarded,
+//         hasAwardedPoints,
+//       }}
+//     >
 //       {children}
-//     </ScreenTimeContext.Provider>
+//     </QuizContext.Provider>
 //   );
 // };
- 
-// export const useScreenTime = () => {
-//   const context = useContext(ScreenTimeContext);
-//   if (!context) {
-//     throw new Error('useScreenTime must be used within a ScreenTimeProvider');
-//   }
-//   return context;
-// };
+
+// export const useQuiz = () => useContext(QuizContext);
 
 
 
@@ -1264,10 +859,9 @@
 
 
 
-
-
-
+//badges
 import { createContext, useContext, useState, useEffect } from 'react';
+import { calculateQuickBadges, calculateMockBadges } from "./badgeUtils";
 
 const QuizContext = createContext();
 
@@ -1307,6 +901,11 @@ export const QuizProvider = ({ children }) => {
   const [pointsAwarded, setPointsAwarded] = useState(false);
   const [quizStarted, setQuizStarted] = useState(false);
   const [hasAwardedPoints, setHasAwardedPoints] = useState(false);
+// ⭐ NEW — BADGES
+const [badges, setBadges] = useState({
+  quickBadges: [],
+  mockBadges: []
+});
 
   // Initialize all histories from localStorage
   useEffect(() => {
@@ -1430,6 +1029,9 @@ export const QuizProvider = ({ children }) => {
       date: new Date().toISOString().split('T')[0]
     };
     setQuizHistory(prev => [...prev, historyItem]);
+// ⭐ UPDATE QUICK PRACTICE BADGES
+const newQuickBadges = calculateQuickBadges([...quizHistory, historyItem]);
+setBadges(prev => ({ ...prev, quickBadges: newQuickBadges }));
 
     // Award points only if user passed and points haven't been awarded yet
     if (score >= 5 && !hasAwardedPoints) {
@@ -1461,6 +1063,10 @@ export const QuizProvider = ({ children }) => {
       date: new Date().toISOString().split('T')[0]
     };
     setMockHistory(prev => [...prev, historyItem]);
+    // ⭐ UPDATE MOCK TEST BADGES
+const newMockBadges = calculateMockBadges([...mockHistory, historyItem]);
+setBadges(prev => ({ ...prev, mockBadges: newMockBadges }));
+
   };
 
   const getMockHistory = () => {
@@ -1675,6 +1281,8 @@ export const QuizProvider = ({ children }) => {
         resetQuiz,
         resetPointsAwarded,
         hasAwardedPoints,
+        badges,
+
       }}
     >
       {children}
@@ -1683,3 +1291,11 @@ export const QuizProvider = ({ children }) => {
 };
 
 export const useQuiz = () => useContext(QuizContext);
+
+
+
+
+
+
+
+

@@ -291,7 +291,7 @@
     "defaultTitle": "மாதிரி பாடம்",
     "by": "மூலம்",
     "students": "மாணவர்கள்",
-    "description": "கைகொண்ட திட்டங்களுடன் <strong>{{title}}</strong> ஐ பூஜ்ஜியத்திலிருந்து கற்றுக்கொள்ளுங்கள்.",
+    "description": "கைகொண்ட திட்டங்களுடன் {{title}} ஐ பூஜ்ஜியத்திலிருந்து கற்றுக்கொள்ளுங்கள்.",
     "features": {
       "lifetimeAccess": "வாழ்நாள் முழுவதும் அணுகல்",
       "certificate": "நிறைவு சான்றிதழ்",
@@ -667,7 +667,7 @@
       "mathematics": "கணிதம்",
       "science": "அறிவியல்",
       "languages": "மொழிகள்",
-      "socialstudies": "சமூக அறிவியல்",
+      "socialStudies": "சமூக அறிவியல்",
       "technology": "தொழில்நுட்பம்"
     },
     "courses": {
@@ -1118,7 +1118,7 @@
   
  
 
-  "common": {
+  "commons": {
     "logout": "வெளியேறு",
     "notifications": "அறிவிப்புகள்",
     "clear": "அனைத்தையும் அழி",
@@ -1363,7 +1363,7 @@
       "mathematics": "கணிதம்",
       "science": "அறிவியல்",
       "languages": "மொழிகள்",
-      "socialstudies": "சமூக அறிவியல்",
+      "socialStudies": "சமூக அறிவியல்",
       "technology": "தொழில்நுட்பம்"
     },
     "courses": {
@@ -1436,13 +1436,7 @@
   "classTeacher": "வகுப்பு ஆசிரியர்",
   "progress": "முன்னேற்றம்",
   "guardian": "காப்பாளர்",
-  "subjectsList": {
-    "Mathematics": "கணிதம்",
-    "Science": "அறிவியல்",
-    "English": "ஆங்கிலம்",
-    "Computers": "கணினி",
-    "Social Studies": "சமூக அறிவியல்"
-  },
+
   "assignments": "பணிகள்",
   "trackHomework": "உங்கள் வீட்டுப்பணியைக் கண்காணித்து, புதுப்பித்துக் கொள்ளுங்கள்",
   "mathTask": "கணித பணி",
@@ -2020,10 +2014,10 @@
     "welcomeTitle": "டைப்பிங் மாஸ்டர் ப்ரோவிற்கு வரவேற்கிறோம்",
     "welcomeSubtitle": "AI-மேம்படுத்தப்பட்ட பாடங்களுடன் உங்கள் தட்டச்சு வேகம், துல்லியம் மற்றும் ரிதத்தை மேம்படுத்துங்கள்.",
     "startButton": "டைப்பிங் டெஸ்ட் தொடங்கு",
-    "backToInstructions": "வழிமுறைகளுக்கு திரும்பு",
+    "back To Instructions": "வழிமுறைகளுக்கு திரும்பு",
     "selectDifficulty": "சிரம அளவை தேர்ந்தெடுக்கவும்",
-    "back": "பின்செல்",
-    "levels": {
+    "back to home": "முகப்புக்கு திரும்ப",
+        "levels": {
       "beginner": "தொடக்க",
       "intermediate": "இடைநிலை",
       "advanced": "மேம்பட்ட"
@@ -2206,12 +2200,54 @@
   "errors": {
     "failedToGenerate": "அறிக்கைகளை உருவாக்க முடியவில்லை. தயவு செய்து மீண்டும் முயற்சிக்கவும்.",
     "somethingWentWrong": "அச்சச்சோ! ஏதோ தவறு நடந்துவிட்டது"
-  }
+  },
 
+
+  "title": "எங்களை தொடர்பு கொள்ளுங்கள்",
+
+  "parentName": "பெற்றோர் பெயர்",
+
+  "parentNamePlaceholder": "உங்கள் பெயர்",
+
+  "studentName": "மாணவர் பெயர்",
+
+  "studentNamePlaceholder": "உங்கள் குழந்தையின் பெயர்",
+
+  "studentId": "மாணவர் அடையாள எண்",
+
+  "studentIdPlaceholder": "மாணவர் ஐடி",
+
+  "phoneNumber": "தொலைபேசி எண்",
+
+  "phoneNumberPlaceholder": "10 இலக்க எண்",
+
+  "email": "மின்னஞ்சல்",
+
+  "emailPlaceholder": "சரியான மின்னஞ்சலை உள்ளிடுங்கள்",
+
+  "message": "செய்தி",
+
+  "messagePlaceholder": "உங்கள் செய்தியை உள்ளிடுங்கள்",
+
+  "submit": "சமர்ப்பிக்கவும்",
+
+  "successMessage": "✅ எங்களை தொடர்பு கொண்டதற்கு நன்றி! விரைவில் உங்களை தொடர்புகொள்வோம்.",
 
  
+  "subjectsList": {
+    "Mathematics": "கணிதம்",
+    "Science": "அறிவியல்",
+    "English": "ஆங்கிலம்",
+    "Tamil": "தமிழ்",
+    "Computers": "கணினி",
+    "Social Studies": "சமூக அறிவியல்"
+  },
 
 
+
+"us": {
+  "sub_mit": "சமர்ப்பிக்கவும்"
+}
 
 }
 

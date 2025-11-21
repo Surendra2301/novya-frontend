@@ -308,7 +308,7 @@
     "defaultTitle": "नमूना कोर्स",
     "by": "द्वारा",
     "students": "छात्र",
-    "description": "<strong>{{title}}</strong> को स्क्रैच से व्यावहारिक परियोजनाओं के साथ सीखें।",
+    "description": "{{title}} को स्क्रैच से व्यावहारिक परियोजनाओं के साथ सीखें।",
     "features": {
       "lifetimeAccess": "आजीवन पहुँच",
       "certificate": "समापन प्रमाणपत्र",
@@ -1175,7 +1175,7 @@
  
 
               
-  "common": {
+  "commons": {
     "logout": "लॉग आउट",
     "notifications": "सूचनाएं",
     "clear": "सभी साफ करें",
@@ -2209,10 +2209,10 @@
     "welcomeTitle": "टाइपिंग मास्टर प्रो में आपका स्वागत है",
     "welcomeSubtitle": "AI-एन्हांस्ड पाठों के साथ अपनी टाइपिंग स्पीड, सटीकता और लय बढ़ाएं।",
     "startButton": "टाइपिंग टेस्ट शुरू करें",
-    "backToInstructions": "निर्देशों पर वापस जाएं",
+    "back To Instructions": "निर्देशों पर वापस जाएं",
     "selectDifficulty": "कठिनाई स्तर चुनें",
-    "back": "वापस",
-    "levels": {
+    "back to home": "होम पर वापस जाएँ",
+        "levels": {
       "beginner": "शुरुआती",
       "intermediate": "मध्यम",
       "advanced": "उन्नत"
@@ -2396,6 +2396,12 @@
   "errors": {
     "failedToGenerate": "रिपोर्ट जेनरेट करने में विफल। कृपया पुनः प्रयास करें।",
     "somethingWentWrong": "उफ़! कुछ गलत हो गया"
+  },
+
+
+
+  "us": {
+    "sub_mit": "सबमिट करें"
   }
 
 

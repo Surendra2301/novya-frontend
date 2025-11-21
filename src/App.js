@@ -401,7 +401,7 @@ import TypingMaster from './modules/student/TypingMaster/TypingMaster';
 import DailySummary from './modules/student/DailySummary';
 import LeadershipBoard from './modules/student/LeadershipBoard';
 import { ScreenTimeProvider } from './modules/student/ScreenTime';
- 
+import QuizBadgesGuide from './modules/student/QuizBadges'; 
 
 // Practice & Mock Test Modules
 import PracticeSubjectPage from './modules/student/PracticeSubjectPage';
@@ -481,7 +481,9 @@ function App() {
     '/typing-master',
      '/daily-summary',
      '/leadership',
-    '/screentime'
+    '/screentime',
+    '/quizbadges'
+   
  
   ].some(path => location.pathname.startsWith(path));
 
@@ -562,6 +564,17 @@ function App() {
               <ProfilePage />
             </ProtectedRoute>
           } />
+
+
+          <Route path="/quizbadges" element={
+  <ProtectedRoute>
+    <RoleRoute requiredRole="student">
+      <QuizBadgesGuide />
+    </RoleRoute>
+  </ProtectedRoute>
+} />
+
+          
 
           {/* Student Routes */}
           <Route path="/student/dashboard" element={

@@ -85,7 +85,7 @@ function Pricing() {
 
   const courses = courseImages.map((img, i) => ({
     title: t(`pricing.courses.titles.${i}`),
-    instructor: t('pricing.courses.instructor') + ' ' + ['CBSE', 'NCERT', 'State Board', 'CBSE', 'CBSE', 'NCERT', 'State Board', 'CBSE'][i],
+    instructor: t('pricing.courses.instructor') + ' ' + ['CBSE', 'NCERT', 'CBSE', 'CBSE', 'NCERT', 'CBSE', 'CBSE', 'CBSE'][i],
     rating: (4.5 + (i % 5) * 0.1).toFixed(1),
     students: `${10000 + i * 1000}`,
     originalPrice: `Price TBD`,

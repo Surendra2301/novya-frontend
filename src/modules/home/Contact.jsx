@@ -1,9 +1,9 @@
 
-
 import React, { useState, useEffect } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import contactImg from '../../modules/home/assets/Contact us Image.png';
 
 function Contact() {
   useEffect(() => {
@@ -273,8 +273,8 @@ function Contact() {
           {/* Image Section */}
           <div className="col-lg-6 text-center">
             <img
-              src="/images/ai-removebg.png"
-              alt="AI Illustration"
+              src={contactImg}
+              alt="Contact Illustration"
               className="img-fluid"
               style={{ maxHeight: '500px', width: '100%', objectFit: 'contain' }}
             />
@@ -288,11 +288,4 @@ function Contact() {
 }
 
 export default Contact;
-
-
-
-
-
-
-
 

@@ -25,12 +25,16 @@
 // } from 'react-icons/fa';
 // import { useTranslation } from 'react-i18next';
 // import { useScreenTime } from './ScreenTime'; // Adjust path as needed
+// import { useNotifications } from './useNotifications'; // Add this import
 // import './Navbarrr.css';
 // import novyaLogo from '../home/assets/NOVYA LOGO.png';
 // import RewardPoints from './RewardPoints';
 // import { updateStreak, getTrophyTitle } from './streaksUtil';
 // import Notifications from './Notificattions';
 // import { BarChart, User } from 'lucide-react';
+// import { useQuiz } from "./QuizContext";
+
+
 // const Navbar = ({ isFullScreen }) => {
 //   const [scrolled, setScrolled] = useState(false);
 //   const [activeLink, setActiveLink] = useState('');
@@ -42,6 +46,7 @@
 //   const [calendarOpen, setCalendarOpen] = useState(false);
 //   const [notificationsOpen, setNotificationsOpen] = useState(false);
 //   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+ 
 //   const [mobileDropdowns, setMobileDropdowns] = useState({
 //     learn: false,
 //     practice: false
@@ -50,8 +55,9 @@
 //   const [avatar, setAvatar] = useState(null);
 //   const [name, setName] = useState('');
 //   const [studyPlans, setStudyPlans] = useState([]);
-//   const [notifications, setNotifications] = useState([]);
-//   const [unreadNotifications, setUnreadNotifications] = useState(0);
+ 
+
+ 
 //   const [currentMonth, setCurrentMonth] = useState(new Date());
 //   const [selectedDate, setSelectedDate] = useState(new Date());
 //   // 🔥 Streak Tracking State
@@ -65,10 +71,15 @@
 //   const [scheduleHistory, setScheduleHistory] = useState([]);
 //   const [showAddSchedule, setShowAddSchedule] = useState(false);
 //   const [reminderShown, setReminderShown] = useState({});
+ 
 //   const location = useLocation();
 //   const navigate = useNavigate();
 //   const { t, i18n } = useTranslation();
 //   const { stopGlobalSession } = useScreenTime();
+//     // ✅ Use centralized notification hook to prevent flickering
+//   const { unreadCount } = useNotifications();
+//   const { badges } = useQuiz();
+
 //   const languages = [
 //     { code: 'en', label: 'English' },
 //     { code: 'te', label: 'తెలుగు' },
@@ -77,16 +88,20 @@
 //     { code: 'ta', label: 'தமிழ்' },
 //     { code: 'ml', label: 'മലയാളം' },
 //   ];
+ 
 //   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+
 //   // 🕐 Indian Standard Time (IST) Helper Functions
 //   const getISTDate = (date = new Date()) => {
 //     // Convert to IST (UTC+5:30)
 //     return new Date(date.getTime() + (5.5 * 60 * 60 * 1000));
 //   };
+
 //   const getISTDateString = (date = new Date()) => {
 //     const istDate = getISTDate(date);
 //     return istDate.toISOString().split('T')[0];
 //   };
+
 //   const formatISTDate = (dateString) => {
 //     const date = new Date(dateString + 'T00:00:00+05:30'); // Set to IST timezone
 //     return date.toLocaleDateString(i18n.language, {
@@ -96,16 +111,19 @@
 //       timeZone: 'Asia/Kolkata'
 //     });
 //   };
+
 //   const isTodayIST = (date) => {
 //     const todayIST = getISTDateString();
 //     const compareDate = getISTDateString(date);
 //     return todayIST === compareDate;
 //   };
+
 //   const isFutureDateIST = (date) => {
 //     const todayIST = getISTDateString();
 //     const compareDate = getISTDateString(date);
 //     return compareDate >= todayIST;
 //   };
+
 //   useEffect(() => {
 //     const handleResize = () => {
 //       setIsMobile(window.innerWidth <= 768);
@@ -113,21 +131,23 @@
 //     window.addEventListener('resize', handleResize);
 //     return () => window.removeEventListener('resize', handleResize);
 //   }, []);
+
 //   // 🗓️ Load saved schedules from localStorage
 //   useEffect(() => {
 //     const savedData = localStorage.getItem('userSchedules');
 //     const shownReminders = localStorage.getItem('shownReminders');
-  
+ 
 //     if (savedData) {
 //       const parsedData = JSON.parse(savedData);
 //       setSavedSchedules(parsedData);
 //       updateScheduleHistory(parsedData);
 //     }
-  
+ 
 //     if (shownReminders) {
 //       setReminderShown(JSON.parse(shownReminders));
 //     }
 //   }, []);
+
 //   // 🗓️ Update schedule history list
 //   const updateScheduleHistory = (schedules) => {
 //     const history = Object.entries(schedules)
@@ -139,6 +159,7 @@
 //       .sort((a, b) => new Date(b.date) - new Date(a.date));
 //     setScheduleHistory(history);
 //   };
+
 //   // 🗓️ Save schedule to localStorage
 //   const saveSchedule = (date, note) => {
 //     const dateString = getISTDateString(date);
@@ -146,28 +167,29 @@
 //       ...savedSchedules,
 //       [dateString]: note.trim()
 //     };
-  
+ 
 //     setSavedSchedules(updatedSchedules);
 //     localStorage.setItem('userSchedules', JSON.stringify(updatedSchedules));
 //     updateScheduleHistory(updatedSchedules);
-  
+ 
 //     // Reset editing state
 //     setScheduleInput('');
 //     setEditingDate(null);
 //     setShowAddSchedule(false);
-  
+ 
 //     // 🔔 Show reminder notification if it's today's date in IST and not already shown
 //     const todayIST = getISTDateString();
 //     if (dateString === todayIST && note.trim()) {
 //       showScheduleReminder(note.trim(), dateString);
 //     }
 //   };
+
 //   // 🗓️ Delete schedule
 //   const deleteSchedule = (date) => {
 //     const dateString = getISTDateString(date);
 //     const updatedSchedules = { ...savedSchedules };
 //     delete updatedSchedules[dateString];
-  
+ 
 //     setSavedSchedules(updatedSchedules);
 //     localStorage.setItem('userSchedules', JSON.stringify(updatedSchedules));
 //     updateScheduleHistory(updatedSchedules);
@@ -175,6 +197,7 @@
 //     setEditingDate(null);
 //     setShowAddSchedule(false);
 //   };
+
 //   // 🗓️ Show reminder notification (only once per schedule)
 //   const showScheduleReminder = (note, dateString) => {
 //     // Check if reminder was already shown for this schedule
@@ -183,7 +206,7 @@
 //       return; // Don't show reminder again
 //     }
 //     const displayDate = formatISTDate(dateString);
-  
+ 
 //     // Mark this reminder as shown
 //     const updatedReminderShown = {
 //       ...reminderShown,
@@ -201,26 +224,29 @@
 //       alert(`📅 Reminder for ${displayDate}: ${note}`);
 //     }
 //   };
+
 //   // 🗓️ Request notification permission
 //   useEffect(() => {
 //     if ('Notification' in window && Notification.permission === 'default') {
 //       Notification.requestPermission();
 //     }
 //   }, []);
+
 //   // 🗓️ Check for today's reminder on component mount (only once)
 //   useEffect(() => {
 //     const todayIST = getISTDateString();
 //     const todaySchedule = savedSchedules[todayIST];
-  
+ 
 //     if (todaySchedule) {
 //       const reminderKey = `${todayIST}_${todaySchedule}`;
-    
+   
 //       // Only show reminder if it hasn't been shown before
 //       if (!reminderShown[reminderKey]) {
 //         showScheduleReminder(todaySchedule, todayIST);
 //       }
 //     }
 //   }, [savedSchedules, reminderShown]);
+
 //   // 🗓️ Get combined schedules and study plans for a date
 //   const getCombinedPlansForDate = (date) => {
 //     const dateString = getISTDateString(date);
@@ -257,25 +283,27 @@
 //     });
 //     return combinedPlans;
 //   };
+
 //   // 🗓️ Check if date has any plans (both personal schedules and study plans)
 //   const shouldShowDot = (date) => {
 //     const dateString = getISTDateString(date);
-  
+ 
 //     // Show dot if there are either personal schedules OR study plans
 //     const hasPersonalSchedule = savedSchedules[dateString];
 //     const hasStudyPlans = studyPlans.some(plan =>
 //       plan.studySessions?.some(session => session.date === dateString)
 //     );
-  
+ 
 //     // Only show dot for today and future dates in IST
 //     return (hasPersonalSchedule || hasStudyPlans) && isFutureDateIST(date);
 //   };
+
 //   // 🗓️ Handle date click for viewing/editing
 //   const handleDateClick = (date) => {
 //     setSelectedDate(date);
 //     const dateString = getISTDateString(date);
 //     const existingSchedule = savedSchedules[dateString];
-  
+ 
 //     if (existingSchedule) {
 //       // If schedule exists, show it without editing mode
 //       setEditingDate(null);
@@ -288,14 +316,16 @@
 //       setScheduleInput('');
 //     }
 //   };
+
 //   // 🗓️ Handle add schedule button click
 //   const handleAddScheduleClick = (date) => {
 //     setSelectedDate(date);
 //     const dateString = getISTDateString(date);
 //     setEditingDate(date);
-//     setScheduleInput(savedSchedules[dateString] || '');
+//     setScheduleInput('');
 //     setShowAddSchedule(true);
 //   };
+
 //   // 🗓️ Handle edit schedule button click
 //   const handleEditScheduleClick = (date) => {
 //     setSelectedDate(date);
@@ -304,67 +334,59 @@
 //     setScheduleInput(savedSchedules[dateString] || '');
 //     setShowAddSchedule(true);
 //   };
+
 //   // 🗓️ Handle save schedule
 //   const handleSaveSchedule = () => {
 //     if (editingDate && scheduleInput.trim()) {
 //       saveSchedule(editingDate, scheduleInput);
 //     }
 //   };
+
 //   // 🗓️ Handle cancel editing
 //   const handleCancelEdit = () => {
 //     setScheduleInput('');
 //     setEditingDate(null);
 //     setShowAddSchedule(false);
 //   };
+
 //   // 🔥 Streak Tracking Logic
 //   useEffect(() => {
 //     const streakData = updateStreak();
 //     setStreak(streakData.streak);
 //     setStreakTitle(getTrophyTitle(streakData.streak));
 //   }, []);
+
+//   // ✅ Simplified useEffect without notification flickering
 //   useEffect(() => {
 //     loadStudyPlans();
-//     loadNotifications();
+   
 //     const handleStudyPlanAdded = (event) => {
 //       if (event.detail && event.detail.studyPlan) {
 //         loadStudyPlans();
-//         createNotification(event.detail.studyPlan);
 //       }
 //     };
-//     const handleNotificationAdded = (event) => {
-//       if (event.detail && event.detail.notification) {
-//         loadNotifications();
-//       }
-//     };
+   
 //     const handleStudyPlanUpdated = () => {
 //       loadStudyPlans();
 //     };
+   
 //     const handleStorageChange = (e) => {
 //       if (e.key === 'studyPlans') {
 //         loadStudyPlans();
 //       }
-//       if (e.key === 'studyNotifications') {
-//         loadNotifications();
-//       }
 //     };
+   
 //     window.addEventListener('studyPlanAdded', handleStudyPlanAdded);
-//     window.addEventListener('notificationAdded', handleNotificationAdded);
 //     window.addEventListener('studyPlanUpdated', handleStudyPlanUpdated);
 //     window.addEventListener('storage', handleStorageChange);
-  
-//     const interval = setInterval(() => {
-//       loadStudyPlans();
-//       loadNotifications();
-//     }, 2000);
-  
+   
 //     return () => {
 //       window.removeEventListener('studyPlanAdded', handleStudyPlanAdded);
-//       window.removeEventListener('notificationAdded', handleNotificationAdded);
 //       window.removeEventListener('studyPlanUpdated', handleStudyPlanUpdated);
 //       window.removeEventListener('storage', handleStorageChange);
-//       clearInterval(interval);
 //     };
 //   }, []);
+
 //   const loadStudyPlans = () => {
 //     try {
 //       const savedPlans = localStorage.getItem('studyPlans');
@@ -400,64 +422,14 @@
 //       setStudyPlans([]);
 //     }
 //   };
-//   const loadNotifications = () => {
-//     try {
-//       const savedNotifications = localStorage.getItem('studyNotifications');
-//       if (savedNotifications) {
-//         const notifs = JSON.parse(savedNotifications);
-//         const uniqueNotifs = notifs.filter((notif, index, self) =>
-//           index === self.findIndex(n => n.id === notif.id)
-//         );
-//         setNotifications(uniqueNotifs);
-//         const unread = uniqueNotifs.filter(notif => !notif.read).length;
-//         setUnreadNotifications(unread);
-//       } else {
-//         setNotifications([]);
-//         setUnreadNotifications(0);
-//       }
-//     } catch (error) {
-//       console.error('Error loading notifications:', error);
-//       setNotifications([]);
-//       setUnreadNotifications(0);
-//     }
-//   };
-//   const addNotification = (notification) => {
-//     const existingNotifications = JSON.parse(localStorage.getItem('studyNotifications') || '[]');
-//     const isDuplicate = existingNotifications.some(notif => notif.id === notification.id);
-//     if (isDuplicate) return;
-//     const updatedNotifications = [notification, ...existingNotifications];
-//     localStorage.setItem('studyNotifications', JSON.stringify(updatedNotifications));
-//     setNotifications(updatedNotifications);
-//     setUnreadNotifications(prev => prev + 1);
-  
-//     window.dispatchEvent(new StorageEvent('storage', {
-//       key: 'studyNotifications',
-//       newValue: JSON.stringify(updatedNotifications)
-//     }));
-//   };
-//   const createNotification = (studyPlan) => {
-//     const notificationId = `notif_${studyPlan.id}`;
-//     const existingNotifications = JSON.parse(localStorage.getItem('studyNotifications') || '[]');
-//     const isDuplicateNotification = existingNotifications.some(notif => notif.id === notificationId);
-  
-//     if (isDuplicateNotification) return;
-//     const notification = {
-//       id: notificationId,
-//       type: 'study_plan_created',
-//       title: t('new_study_plan_created'),
-//       message: `Study plan for ${studyPlan.title} has been added to your calendar starting from today`,
-//       date: new Date().toISOString(),
-//       read: false,
-//       planId: studyPlan.id
-//     };
-//     addNotification(notification);
-//   };
+
 //   const toggleMobileDropdown = (dropdown) => {
 //     setMobileDropdowns(prev => ({
 //       ...prev,
 //       [dropdown]: !prev[dropdown]
 //     }));
 //   };
+
 //   const closeMobileMenu = () => {
 //     setMobileMenuOpen(false);
 //     setMobileDropdowns({
@@ -466,10 +438,11 @@
 //     });
 //     setMobileLangDropdownOpen(false);
 //   };
+
 //   const getTodaysStudyPlans = () => {
 //     const todayIST = getISTDateString();
 //     const todaysPlans = [];
-  
+ 
 //     studyPlans.forEach(plan => {
 //       plan.studySessions?.forEach(session => {
 //         if (session.date === todayIST && !session.completed) {
@@ -481,15 +454,18 @@
 //         }
 //       });
 //     });
-  
+ 
 //     return todaysPlans;
 //   };
+
 //   const getDaysInMonth = (date) => {
 //     return new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
 //   };
+
 //   const getFirstDayOfMonth = (date) => {
 //     return new Date(date.getFullYear(), date.getMonth(), 1).getDay();
 //   };
+
 //   const navigateMonth = (direction) => {
 //     setCurrentMonth(prev => {
 //       const newDate = new Date(prev);
@@ -497,15 +473,18 @@
 //       return newDate;
 //     });
 //   };
+
 //   const isToday = (date) => {
 //     return isTodayIST(date);
 //   };
+
 //   const isSelectedDate = (date) => {
 //     if (!selectedDate) return false;
 //     const selectedDateString = getISTDateString(selectedDate);
 //     const compareDateString = getISTDateString(date);
 //     return selectedDateString === compareDateString;
 //   };
+
 //   // 🔥 Get Fire Color based on streak
 //   const getFireColor = () => {
 //     if (streak >= 30) return '#FFD700';
@@ -513,6 +492,7 @@
 //     if (streak >= 7) return '#FFA726';
 //     return '#FF5722';
 //   };
+
 //   // 🔥 Get Next Milestone Info
 //   const getNextMilestone = () => {
 //    if (streak < 7) {
@@ -525,6 +505,7 @@
 //     return { daysLeft: 0, title: t('max_level'), icon: FaTrophy };
 //   }
 // };
+
 //   useEffect(() => {
 //     const userRole = localStorage.getItem('userRole');
 //     let storedData = null;
@@ -539,11 +520,13 @@
 //       setName(`${parsed.firstName || ''} ${parsed.lastName || ''}`);
 //     }
 //   }, []);
+
 //   useEffect(() => {
 //     const handleScroll = () => setScrolled(window.scrollY > 10);
 //     window.addEventListener('scroll', handleScroll);
 //     return () => window.removeEventListener('scroll', handleScroll);
 //   }, []);
+
 //   useEffect(() => {
 //     setActiveLink(location.pathname);
 //     setAvatarOpen(false);
@@ -562,11 +545,13 @@
 //     );
 //     setShowNavbar(!shouldHideNavbar);
 //   }, [location.pathname, isFullScreen]);
+
 //   const handleLanguageChange = (code) => {
 //     i18n.changeLanguage(code);
 //     setLangDropdownOpen(false);
 //     setMobileLangDropdownOpen(false);
 //   };
+
 //   const handleLogout = () => {
 //     // Stop global screen time session before logout
 //     stopGlobalSession();
@@ -575,9 +560,9 @@
 //     const streakData = localStorage.getItem('learningStreak');
 //     const userSchedules = localStorage.getItem('userSchedules');
 //     const shownReminders = localStorage.getItem('shownReminders');
-  
+ 
 //     localStorage.clear();
-  
+ 
 //     if (rewardPointsValue) {
 //       localStorage.setItem('rewardPoints', rewardPointsValue);
 //     }
@@ -593,9 +578,10 @@
 //     if (shownReminders) {
 //       localStorage.setItem('shownReminders', shownReminders);
 //     }
-  
+ 
 //     navigate('/');
 //   };
+
 //   const navLinks = [
 //     { path: '/student/dashboard', name: t('home', 'Home') },
 //     {
@@ -623,9 +609,12 @@
 //     { path: '/career', name: t('career', 'Career') },
 //     { path: '/study-room', name: t('studyRoom', 'Study Room') },
 //   ];
+
 //   if (!showNavbar) return null;
+ 
 //   const nextMilestone = getNextMilestone();
 //   const fireColor = getFireColor();
+
 //   return (
 //     <motion.nav
 //       className={`navbar ${scrolled ? 'navbar-scrolled' : ''}`}
@@ -634,7 +623,7 @@
 //       transition={{ duration: 0.6 }}
 //     >
 //       <div className="navbar-container">
-      
+     
 //         <div className="navbar-left">
 //           <button
 //             className="mobile-toggle-btn"
@@ -655,6 +644,7 @@
 //             </motion.span>
 //           </Link>
 //         </div>
+       
 //         <div className="navbar-center">
 //           <ul className="desktop-nav-links">
 //             {navLinks.map((link) => (
@@ -684,13 +674,22 @@
 //                       if (link.path === '/practice') setPracticeDropdownOpen(false);
 //                     }}
 //                   >
+                   
 //                     <span
+//                       // className={`nav-link ${
+//                       //   activeLink === link.path ||
+//                       //   (link.hasDropdown && activeLink.startsWith(link.path))
+//                       //     ? 'nav-link-active'
+//                       //     : ''
+//                       // }`}
 //                       className={`nav-link ${
-//                         activeLink === link.path ||
-//                         (link.hasDropdown && activeLink.startsWith(link.path))
-//                           ? 'nav-link-active'
-//                           : ''
-//                       }`}
+//   activeLink === link.path ||
+//   (link.hasDropdown &&
+//     (activeLink === link.path || activeLink.startsWith(link.path + '/')))
+//     ? 'nav-link-active'
+//     : ''
+// }`}
+
 //                       onClick={(e) => e.preventDefault()}
 //                       style={{ display: 'flex', alignItems: 'center', gap: '5px', cursor: 'pointer' }}
 //                     >
@@ -758,6 +757,7 @@
 //             ))}
 //           </ul>
 //         </div>
+       
 //         <div className="navbar-right">
 //           {!isMobile && (
 //             <div
@@ -769,9 +769,6 @@
 //                 setStreakDropdownOpen(false);
 //               }}
 //               onMouseLeave={(e) => {
-//                 // if (!e.relatedTarget || !e.relatedTarget.closest('.nav-dropdown')) {
-//                 // setCalendarOpen(false);
-//                 // }
 //                 if (!e.relatedTarget || !(e.relatedTarget instanceof HTMLElement) ||
 //     !e.relatedTarget.closest('.nav-dropdown')) {
 //   setCalendarOpen(false);
@@ -891,12 +888,12 @@
 //                           {Array.from({ length: getFirstDayOfMonth(currentMonth) }).map((_, index) => (
 //                             <div key={`empty-${index}`} style={{ height: '36px' }} />
 //                           ))}
-                        
+                       
 //                           {Array.from({ length: getDaysInMonth(currentMonth) }).map((_, index) => {
 //                             const day = index + 1;
 //                             const date = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), day);
 //                             const hasPlans = shouldShowDot(date);
-                          
+                         
 //                             return (
 //                               <div
 //                                 key={day}
@@ -959,27 +956,30 @@
 //                               <h4 style={{ fontSize: '16px', fontWeight: '600', margin: 0, color: '#374151' }}>
 //                                 {t('study_plans_for')} {formatISTDate(getISTDateString(selectedDate))}
 //                               </h4>
-//                               {!savedSchedules[getISTDateString(selectedDate)] && !showAddSchedule && (
-//                                 <button
-//                                   onClick={() => handleAddScheduleClick(selectedDate)}
-//                                   style={{
-//                                     padding: '6px 12px',
-//                                     background: '#3b82f6',
-//                                     color: 'white',
-//                                     border: 'none',
-//                                     borderRadius: '6px',
-//                                     cursor: 'pointer',
-//                                     fontSize: '12px',
-//                                     display: 'flex',
-//                                     alignItems: 'center',
-//                                     gap: '4px',
-//                                     fontWeight: '500'
-//                                   }}
-//                                 >
-//                                   <FaPlus size={10} />
-//                                   {t('add_schedule')}
-//                                 </button>
-//                               )}
+//                             {!showAddSchedule && (
+//   <div style={{ display: 'flex', gap: '6px' }}>
+//     <button
+//       onClick={() => handleAddScheduleClick(selectedDate)}
+//       style={{
+//         padding: '6px 12px',
+//         background: '#3b82f6',
+//         color: 'white',
+//         border: 'none',
+//         borderRadius: '6px',
+//         cursor: 'pointer',
+//         fontSize: '12px',
+//         display: 'flex',
+//         alignItems: 'center',
+//         gap: '4px',
+//         fontWeight: '500'
+//       }}
+//     >
+//       <FaPlus size={10} />
+//       Add
+//     </button>
+//   </div>
+// )}
+                               
 //                               {savedSchedules[getISTDateString(selectedDate)] && !showAddSchedule && (
 //                                 <button
 //                                   onClick={() => handleEditScheduleClick(selectedDate)}
@@ -1011,7 +1011,7 @@
 //                                 padding: '12px',
 //                                 marginBottom: '12px'
 //                               }}>
-//                                 <div style={{
+//                                 {/* <div style={{
 //                                   display: 'flex',
 //                                   alignItems: 'center',
 //                                   gap: '8px',
@@ -1026,9 +1026,9 @@
 //                                   }}>
 //                                     {savedSchedules[getISTDateString(selectedDate)] ? 'Edit Schedule' : 'Add Schedule'}
 //                                   </h5>
-//                                 </div>
-                              
-//                                 <textarea
+//                                 </div> */}
+                             
+//                                  <textarea
 //                                   value={scheduleInput}
 //                                   onChange={(e) => setScheduleInput(e.target.value)}
 //                                   placeholder="Add your schedule for this date..."
@@ -1051,7 +1051,7 @@
 //                                     e.target.style.borderColor = '#d1d5db';
 //                                   }}
 //                                 />
-                              
+                             
 //                                 <div style={{
 //                                   display: 'flex',
 //                                   gap: '6px',
@@ -1077,7 +1077,7 @@
 //                                     <FaSave size={10} />
 //                                     Save
 //                                   </button>
-                                
+                               
 //                                   {savedSchedules[getISTDateString(selectedDate)] && (
 //                                     <button
 //                                       onClick={() => deleteSchedule(selectedDate)}
@@ -1099,7 +1099,7 @@
 //                                       Delete
 //                                     </button>
 //                                   )}
-                                
+                               
 //                                   <button
 //                                     onClick={handleCancelEdit}
 //                                     style={{
@@ -1118,6 +1118,9 @@
 //                                 </div>
 //                               </div>
 //                             )}
+
+
+
 //                             {/* Plans List */}
 //                             {getCombinedPlansForDate(selectedDate).length === 0 ? (
 //                               <div style={{
@@ -1131,51 +1134,82 @@
 //                             ) : (
 //                               <div style={{ maxHeight: '120px', overflow: 'auto' }}>
 //                                 {getCombinedPlansForDate(selectedDate).map((plan, index) => (
-//                                   <div key={index} style={{
-//                                     background: 'white',
-//                                     borderRadius: '8px',
-//                                     padding: '12px',
-//                                     marginBottom: '8px',
-//                                     borderLeft: `4px solid ${plan.color}`,
-//                                     boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
-//                                   }}>
-//                                     <div style={{
-//                                       fontSize: '14px',
-//                                       fontWeight: '600',
-//                                       color: '#1f2937',
-//                                       marginBottom: '4px'
-//                                     }}>
-//                                       {plan.subject}
-//                                     </div>
-//                                     <div style={{
-//                                       fontSize: '13px',
-//                                       color: '#4b5563',
-//                                       marginBottom: '4px'
-//                                     }}>
-//                                       {plan.topic}
-//                                     </div>
-//                                     <div style={{
-//                                       fontSize: '12px',
-//                                       color: '#6b7280',
-//                                       display: 'flex',
-//                                       alignItems: 'center',
-//                                       gap: '4px'
-//                                     }}>
-//                                       <FaClock size={10} />
-//                                       {plan.duration}
-//                                     </div>
-//                                     {plan.type === 'personal_schedule' && (
-//                                       <div style={{
-//                                         fontSize: '11px',
-//                                         color: '#3b82f6',
-//                                         fontStyle: 'italic',
-//                                         marginTop: '4px'
-//                                       }}>
-//                                         Personal Schedule
-//                                       </div>
-//                                     )}
-//                                   </div>
-//                                 ))}
+//   <div
+//     key={index}
+//     style={{
+//       background: 'white',
+//       borderRadius: '8px',
+//       padding: '12px',
+//       marginBottom: '8px',
+//       borderLeft: `4px solid ${plan.color}`,
+//       boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+//       display: 'flex',
+//       justifyContent: 'space-between',
+//       alignItems: 'flex-start'
+//     }}
+//   >
+//     {/* Left side - plan details */}
+//     <div>
+//       <div style={{
+//         fontSize: '14px',
+//         fontWeight: '600',
+//         color: '#1f2937',
+//         marginBottom: '4px'
+//       }}>
+//         {plan.subject}
+//       </div>
+//       <div style={{
+//         fontSize: '13px',
+//         color: '#4b5563',
+//         marginBottom: '4px'
+//       }}>
+//         {plan.topic}
+//       </div>
+//       <div style={{
+//         fontSize: '12px',
+//         color: '#6b7280',
+//         display: 'flex',
+//         alignItems: 'center',
+//         gap: '4px'
+//       }}>
+//         <FaClock size={10} />
+//         {plan.duration}
+//       </div>
+//       {plan.type === 'personal_schedule' && (
+//         <div style={{
+//           fontSize: '11px',
+//           color: '#3b82f6',
+//           fontStyle: 'italic',
+//           marginTop: '4px'
+//         }}>
+//           Personal Schedule
+//         </div>
+//       )}
+//     </div>
+
+//     {/* Right side - delete button */}
+//     {plan.type === 'personal_schedule' && (
+//       <button
+//         onClick={() => deleteSchedule(new Date(plan.date))}
+//         style={{
+//           background: 'transparent',
+//           border: 'none',
+//           color: '#ef4444',
+//           cursor: 'pointer',
+//           padding: '4px',
+//           borderRadius: '6px',
+//           transition: 'background 0.2s ease'
+//         }}
+//         title="Delete Schedule"
+//         onMouseEnter={(e) => { e.target.style.background = '#fee2e2'; }}
+//         onMouseLeave={(e) => { e.target.style.background = 'transparent'; }}
+//       >
+//         <FaTrash size={12} />
+//       </button>
+//     )}
+//   </div>
+// ))}
+
 //                               </div>
 //                             )}
 //                           </div>
@@ -1203,7 +1237,7 @@
 //                                 Schedule History
 //                               </h4>
 //                             </div>
-                          
+                         
 //                             <div style={{
 //                               maxHeight: '150px',
 //                               overflow: 'auto'
@@ -1246,19 +1280,16 @@
 //               </AnimatePresence>
 //             </div>
 //           )}
+         
 //           {!isMobile && (
 //             <div
 //               className="icon-wrapper"
 //               onMouseEnter={() => {
-//                 loadNotifications();
 //                 setNotificationsOpen(true);
 //                 setCalendarOpen(false);
 //                 setStreakDropdownOpen(false);
 //               }}
 //               onMouseLeave={(e) => {
-//                 // if (!e.relatedTarget || !e.relatedTarget.closest('.nav-dropdown')) {
-//                 // setNotificationsOpen(false);
-//                 // }
 //                 if (!e.relatedTarget || !(e.relatedTarget instanceof HTMLElement) ||
 //     !e.relatedTarget.closest('.nav-dropdown')) {
 //   setNotificationsOpen(false);
@@ -1269,8 +1300,9 @@
 //                 className="nav-icon-btn notification-button"
 //               >
 //                 <FaBell size={14} />
-//                 {unreadNotifications > 0 && (
-//                   <span className="badge">{unreadNotifications}</span>
+//                 {/* ✅ UPDATED: Use unreadCount from centralized hook */}
+//                 {unreadCount > 0 && (
+//                   <span className="badge">{unreadCount}</span>
 //                 )}
 //               </button>
 //               <AnimatePresence>
@@ -1283,6 +1315,7 @@
 //               </AnimatePresence>
 //             </div>
 //           )}
+         
 //           {!isMobile && (
 //             <div
 //               className="language-wrapper"
@@ -1292,8 +1325,13 @@
 //                 setNotificationsOpen(false);
 //                 setStreakDropdownOpen(false);
 //               }}
-//               onMouseLeave={() => {
-//                 setTimeout(() => setLangDropdownOpen(false), 200);
+//               // onMouseLeave={() => {
+//                 // setTimeout(() => setLangDropdownOpen(false), 200);
+//                 onMouseLeave={(e) => {
+//     // ✅ Close only if the cursor truly leaves both button and dropdown
+//     if (!e.relatedTarget || !e.relatedTarget.closest('.language-wrapper')) {
+//       setLangDropdownOpen(false);
+//     }
 //               }}
 //             >
 //               <button
@@ -1305,14 +1343,19 @@
 //               </button>
 //               <AnimatePresence>
 //                 {langDropdownOpen && (
-//                   <motion.div
-//                     className="nav-dropdown language-dropdown"
-//                     initial={{ opacity: 0, y: -10 }}
-//                     animate={{ opacity: 1, y: 0 }}
-//                     exit={{ opacity: 0, y: -10 }}
-//                     onMouseEnter={() => setLangDropdownOpen(true)}
-//                     onMouseLeave={() => setLangDropdownOpen(false)}
-//                   >
+//                  <motion.div
+//   className="nav-dropdown language-dropdown"
+//   initial={{ opacity: 0, y: -10 }}
+//   animate={{ opacity: 1, y: 0 }}
+//   exit={{ opacity: 0, y: -10 }}
+//   onMouseEnter={() => setLangDropdownOpen(true)}
+//   onMouseLeave={(e) => {
+//     if (!e.relatedTarget || !e.relatedTarget.closest('.language-wrapper')) {
+//       setLangDropdownOpen(false);
+//     }
+//   }}
+// >
+
 //                     {languages.map((lang) => (
 //                       <button
 //                         key={lang.code}
@@ -1350,7 +1393,9 @@
 //               </AnimatePresence>
 //             </div>
 //           )}
+         
 //           <RewardPoints isMobile={isMobile} />
+         
 //           <div
 //             className="streak-wrapper"
 //             style={{
@@ -1492,6 +1537,7 @@
 //               )}
 //             </AnimatePresence>
 //           </div>
+         
 //           <div
 //             className="avatar-wrapper"
 //             onMouseEnter={() => {
@@ -1529,9 +1575,7 @@
 //                   <div style={{ padding: '8px 16px', borderBottom: '1px solid #f0f0f0', background: '#fff5f5' }}>
 //                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px', color: '#7c2d12', fontWeight: '600' }}>
 //                       <FaFire size={14} color={fireColor} />
-//                       <span>
-//                         {t("streak_label")}: {streak} {t("days_label")}
-//                       </span>
+//                       <span>Streak: {streak} days</span>
 //                     </div>
 //                     {streakTitle && (
 //                       <div style={{ fontSize: '12px', color: '#9ca3af', marginTop: '2px' }}>
@@ -1539,6 +1583,107 @@
 //                       </div>
 //                     )}
 //                   </div>
+
+
+
+
+//                  <button
+//   onClick={() => navigate('/quizbadges')}
+//   style={{
+//     width: '100%',
+//     border: 'none',
+//     background: 'transparent',
+//     padding: '10px 16px',
+//     cursor: 'pointer',
+//     textAlign: 'left',
+//     fontSize: '14px',
+//     color: '#1F2937',
+//     display: 'flex',
+//     alignItems: 'center',
+//     gap: '8px'
+//   }}
+//   onMouseEnter={(e) => { e.target.style.background = '#f0f0f0'; }}
+//   onMouseLeave={(e) => { e.target.style.background = 'transparent'; }}
+// >
+//   <span style={{ fontSize: '16px' }}>🏆</span>
+//   Badges
+// </button>
+                  
+
+
+// {/* ⭐ BADGES SECTION — BELOW STREAK */}
+// <div style={{ padding: '12px 16px', borderBottom: '1px solid #f0f0f0', background: '#fff' }}>
+//   <div style={{ fontSize: '14px', fontWeight: '600', marginBottom: '6px', color: '#374151' }}>
+//     🎖 Your Badges
+//   </div>
+
+//   {/* QUICK PRACTICE SECTION */}
+//   <div style={{ fontSize: '12px', fontWeight: '600', color: '#6b7280', marginBottom: '4px' }}>
+//     Quick Practice
+//   </div>
+
+//   {badges.quickHighest ? (
+//     <div
+//       style={{
+//         marginBottom: "10px",
+//         background: "#eef2ff",
+//         padding: "6px 10px",
+//         borderRadius: "8px",
+//         display: "flex",
+//         alignItems: "center",
+//         gap: "6px",
+//         fontSize: "13px",
+//         color: "#4338ca",
+//         border: "1px solid #c7d2fe",
+//         fontWeight: "500"
+//       }}
+//     >
+//       <span>
+//         {badges.quickHighest === "Quick Learner" && "📘"}
+//         {badges.quickHighest === "Quick Thinker" && "⚡"}
+//         {badges.quickHighest === "Quick Pro" && "🚀"}
+//         {badges.quickHighest === "Quick Master" && "🔥"}
+//       </span>
+//       <span>{badges.quickHighest}</span>
+//     </div>
+//   ) : (
+//     <div style={{ fontSize: "12px", color: "#9ca3af" }}>No badges yet</div>
+//   )}
+
+//   {/* MOCK TEST SECTION */}
+//   <div style={{ marginTop: "10px", fontSize: "12px", fontWeight: "600", color: "#6b7280", marginBottom: "4px" }}>
+//     Mock Tests
+//   </div>
+
+//   {badges.mockHighest ? (
+//     <div
+//       style={{
+//         marginBottom: "6px",
+//         background: "#ecfdf5",
+//         padding: "6px 10px",
+//         borderRadius: "8px",
+//         display: "flex",
+//         alignItems: "center",
+//         gap: "6px",
+//         fontSize: "13px",
+//         color: "#065f46",
+//         border: "1px solid #a7f3d0",
+//         fontWeight: "500"
+//       }}
+//     >
+//       <span>
+//         {badges.mockHighest === "Mock Rookie" && "🥉"}
+//         {badges.mockHighest === "Mock Challenger" && "🥈"}
+//         {badges.mockHighest === "Mock Pro" && "🥇"}
+//         {badges.mockHighest === "Mock Master" && "👑"}
+//       </span>
+//       <span>{badges.mockHighest}</span>
+//     </div>
+//   ) : (
+//     <div style={{ fontSize: "12px", color: "#9ca3af" }}>No badges yet</div>
+//   )}
+// </div>
+
 //                   <button
 //                     onClick={() => navigate('/user-details')}
 //                     style={{
@@ -1560,7 +1705,7 @@
 //                     <FaUserCircle size={14} />
 //                     {t('view_profile')}
 //                   </button>
-                  
+                 
 //  {/* ✅ Daily Summary Button */}
 //   <Link
 //     to="/daily-summary"
@@ -1586,11 +1731,7 @@
 //     <BarChart fontSize="small" />
 //     {t("daily_summary")}
 //   </Link>
-//       {/* ✅ Leadership Button */}
-//     {/* <Link to="/leadership" className="nav-item leadership-link">
-//       <FaTrophy style={{ marginRight: '6px', color: '#fbbf24' }} />
-//       Leadership
-//     </Link> */}
+ 
 //     <Link
 //   to="/leadership"
 //   style={{
@@ -1642,6 +1783,7 @@
 //           </div>
 //         </div>
 //       </div>
+     
 //       {/* Mobile menu and other components remain the same */}
 //       <AnimatePresence>
 //         {mobileMenuOpen && (
@@ -1702,7 +1844,6 @@
 //                 <button
 //                   className="mobile-icon-button"
 //                   onClick={() => {
-//                     loadNotifications();
 //                     setNotificationsOpen(true);
 //                     closeMobileMenu();
 //                   }}
@@ -1710,11 +1851,20 @@
 //                 >
 //                   <FaBell size={18} />
 //                   <span>Alerts</span>
-//                   {unreadNotifications > 0 && (
-//                     <span className="badge">{unreadNotifications}</span>
+//                   {/* ✅ UPDATED: Use unreadCount from centralized hook */}
+//                   {unreadCount > 0 && (
+//                     <span className="badge">{unreadCount}</span>
 //                   )}
 //                 </button>
-              
+//                 <button
+//                   className="mobile-icon-button"
+//                   onClick={() => {
+//                     closeMobileMenu();
+//                   }}
+//                 >
+//                   <FaHistory size={18} />
+//                   <span>History</span>
+//                 </button>
 //               </div>
 //               <div style={{ padding: '20px' }}>
 //                 {navLinks.map((link) => (
@@ -1862,7 +2012,7 @@
 //                   <FaUserCircle size={14} />
 //                   <span> {t('view_profile')}</span>
 //                 </button>
-                
+               
 //  {/* ✅ Daily Summary Button */}
 //   <Link
 //     to="/daily-summary"
@@ -1888,7 +2038,7 @@
 //     <BarChart fontSize="small" />
 //     {t("daily_summary")}
 //   </Link>
-  
+ 
 //     <Link
 //   to="/leadership"
 //   style={{
@@ -1926,6 +2076,7 @@
 //           </>
 //         )}
 //       </AnimatePresence>
+     
 //       {/* Mobile calendar and notifications remain the same */}
 //       {isMobile && (
 //         <AnimatePresence>
@@ -1957,7 +2108,7 @@
 //                       <FaTimes />
 //                     </button>
 //                   </div>
-                
+               
 //                   <div style={{ padding: '16px', background: '#f8fafc', borderBottom: '1px solid #e5e7eb', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
 //                     <button
 //                       className="calendar-nav-btn"
@@ -1988,12 +2139,12 @@
 //                     {Array.from({ length: getFirstDayOfMonth(currentMonth) }).map((_, index) => (
 //                       <div key={`empty-${index}`} style={{ width: '40px', height: '40px' }} />
 //                     ))}
-                  
+                 
 //                     {Array.from({ length: getDaysInMonth(currentMonth) }).map((_, index) => {
 //                       const day = index + 1;
 //                       const date = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), day);
 //                       const hasPlans = shouldShowDot(date);
-                    
+                   
 //                       return (
 //                         <div
 //                           key={day}
@@ -2091,8 +2242,7 @@
 //                             }}>
 //                               {savedSchedules[getISTDateString(selectedDate)] ? 'Edit Schedule' : 'Add Schedule'}
 //                             </h5>
-//                           </div>
-                        
+//                           </div>                        
 //                           <textarea
 //                             value={scheduleInput}
 //                             onChange={(e) => setScheduleInput(e.target.value)}
@@ -2107,8 +2257,7 @@
 //                               resize: 'vertical',
 //                               fontFamily: 'inherit'
 //                             }}
-//                           />
-                        
+//                           />                        
 //                           <div style={{
 //                             display: 'flex',
 //                             gap: '8px',
@@ -2135,7 +2284,7 @@
 //                               <FaSave size={12} />
 //                               Save
 //                             </button>
-                          
+                         
 //                             {savedSchedules[getISTDateString(selectedDate)] && (
 //                               <button
 //                                 onClick={() => deleteSchedule(selectedDate)}
@@ -2157,7 +2306,7 @@
 //                                 Delete
 //                               </button>
 //                             )}
-                          
+                         
 //                             <button
 //                               onClick={handleCancelEdit}
 //                               style={{
@@ -2229,7 +2378,7 @@
 //                           Schedule History
 //                         </h4>
 //                       </div>
-                    
+                   
 //                       <div style={{
 //                         maxHeight: '200px',
 //                         overflow: 'auto',
@@ -2273,6 +2422,7 @@
 //           )}
 //         </AnimatePresence>
 //       )}
+     
 //       {isMobile && notificationsOpen && (
 //         <Notifications
 //           isMobile={true}
@@ -2282,8 +2432,8 @@
 //     </motion.nav>
 //   );
 // };
-// export default Navbar;
 
+// export default Navbar;
 
 
 
@@ -2331,11 +2481,25 @@ import RewardPoints from './RewardPoints';
 import { updateStreak, getTrophyTitle } from './streaksUtil';
 import Notifications from './Notificattions';
 import { BarChart, User } from 'lucide-react';
+import { useQuiz } from "./QuizContext";
+
 
 const Navbar = ({ isFullScreen }) => {
   const [scrolled, setScrolled] = useState(false);
   const [activeLink, setActiveLink] = useState('');
-  const [avatarOpen, setAvatarOpen] = useState(false);
+  const [avatarOpen, setAvatarOpen] = useState(false);   // <-- important
+
+  let avatarTimeout;
+  const openAvatar = () => {
+    clearTimeout(avatarTimeout);
+    setAvatarOpen(true);
+  };
+  const closeAvatar = () => {
+    avatarTimeout = setTimeout(() => {
+      setAvatarOpen(false);
+    }, 200);
+  };
+  // const [avatarOpen, setAvatarOpen] = useState(false);
   const [classDropdownOpen, setClassDropdownOpen] = useState(false);
   const [practiceDropdownOpen, setPracticeDropdownOpen] = useState(false);
   const [langDropdownOpen, setLangDropdownOpen] = useState(false);
@@ -2353,8 +2517,7 @@ const Navbar = ({ isFullScreen }) => {
   const [name, setName] = useState('');
   const [studyPlans, setStudyPlans] = useState([]);
  
-  // ✅ Use centralized notification hook to prevent flickering
-  const { unreadCount } = useNotifications();
+
  
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(new Date());
@@ -2374,7 +2537,10 @@ const Navbar = ({ isFullScreen }) => {
   const navigate = useNavigate();
   const { t, i18n } = useTranslation();
   const { stopGlobalSession } = useScreenTime();
- 
+    // ✅ Use centralized notification hook to prevent flickering
+  const { unreadCount } = useNotifications();
+  const { badges } = useQuiz();
+
   const languages = [
     { code: 'en', label: 'English' },
     { code: 'te', label: 'తెలుగు' },
@@ -2969,13 +3135,22 @@ const Navbar = ({ isFullScreen }) => {
                       if (link.path === '/practice') setPracticeDropdownOpen(false);
                     }}
                   >
+                   
                     <span
+                      // className={`nav-link ${
+                      //   activeLink === link.path ||
+                      //   (link.hasDropdown && activeLink.startsWith(link.path))
+                      //     ? 'nav-link-active'
+                      //     : ''
+                      // }`}
                       className={`nav-link ${
-                        activeLink === link.path ||
-                        (link.hasDropdown && activeLink.startsWith(link.path))
-                          ? 'nav-link-active'
-                          : ''
-                      }`}
+  activeLink === link.path ||
+  (link.hasDropdown &&
+    (activeLink === link.path || activeLink.startsWith(link.path + '/')))
+    ? 'nav-link-active'
+    : ''
+}`}
+
                       onClick={(e) => e.preventDefault()}
                       style={{ display: 'flex', alignItems: 'center', gap: '5px', cursor: 'pointer' }}
                     >
@@ -3611,8 +3786,13 @@ const Navbar = ({ isFullScreen }) => {
                 setNotificationsOpen(false);
                 setStreakDropdownOpen(false);
               }}
-              onMouseLeave={() => {
-                setTimeout(() => setLangDropdownOpen(false), 200);
+              // onMouseLeave={() => {
+                // setTimeout(() => setLangDropdownOpen(false), 200);
+                onMouseLeave={(e) => {
+    // ✅ Close only if the cursor truly leaves both button and dropdown
+    if (!e.relatedTarget || !e.relatedTarget.closest('.language-wrapper')) {
+      setLangDropdownOpen(false);
+    }
               }}
             >
               <button
@@ -3624,14 +3804,19 @@ const Navbar = ({ isFullScreen }) => {
               </button>
               <AnimatePresence>
                 {langDropdownOpen && (
-                  <motion.div
-                    className="nav-dropdown language-dropdown"
-                    initial={{ opacity: 0, y: -10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -10 }}
-                    onMouseEnter={() => setLangDropdownOpen(true)}
-                    onMouseLeave={() => setLangDropdownOpen(false)}
-                  >
+                 <motion.div
+  className="nav-dropdown language-dropdown"
+  initial={{ opacity: 0, y: -10 }}
+  animate={{ opacity: 1, y: 0 }}
+  exit={{ opacity: 0, y: -10 }}
+  onMouseEnter={() => setLangDropdownOpen(true)}
+  onMouseLeave={(e) => {
+    if (!e.relatedTarget || !e.relatedTarget.closest('.language-wrapper')) {
+      setLangDropdownOpen(false);
+    }
+  }}
+>
+
                     {languages.map((lang) => (
                       <button
                         key={lang.code}
@@ -3815,15 +4000,19 @@ const Navbar = ({ isFullScreen }) => {
           </div>
          
           <div
+            // className="avatar-wrapper"
+            // onMouseEnter={() => {
+            //   setAvatarOpen(true);
+            //   setCalendarOpen(false);
+            //   setNotificationsOpen(false);
+            //   setLangDropdownOpen(false);
+            //   setStreakDropdownOpen(false);
+            // }}
+            // onMouseLeave={() => setAvatarOpen(false)}
+
             className="avatar-wrapper"
-            onMouseEnter={() => {
-              setAvatarOpen(true);
-              setCalendarOpen(false);
-              setNotificationsOpen(false);
-              setLangDropdownOpen(false);
-              setStreakDropdownOpen(false);
-            }}
-            onMouseLeave={() => setAvatarOpen(false)}
+  onMouseEnter={openAvatar}
+  onMouseLeave={closeAvatar}
           >
             <div className="avatar-container">
               {avatar ? (
@@ -3839,8 +4028,10 @@ const Navbar = ({ isFullScreen }) => {
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
-                  onMouseEnter={() => setAvatarOpen(true)}
-                  onMouseLeave={() => setAvatarOpen(false)}
+                  // onMouseEnter={() => setAvatarOpen(true)}
+                  // onMouseLeave={() => setAvatarOpen(false)}
+                   onMouseEnter={openAvatar}
+                   onMouseLeave={closeAvatar}
                 >
                   <div style={{ padding: '12px 16px', borderBottom: '1px solid #f0f0f0', background: 'linear-gradient(135deg, #fff9e6, #fff0cc)' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px', color: '#744210', fontWeight: '600' }}>
@@ -3851,7 +4042,7 @@ const Navbar = ({ isFullScreen }) => {
                   <div style={{ padding: '8px 16px', borderBottom: '1px solid #f0f0f0', background: '#fff5f5' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px', color: '#7c2d12', fontWeight: '600' }}>
                       <FaFire size={14} color={fireColor} />
-                      <span>  {t("streak_label")}: {streak} {t("days_label")}</span>
+                      <span>Streak: {streak} days</span>
                     </div>
                     {streakTitle && (
                       <div style={{ fontSize: '12px', color: '#9ca3af', marginTop: '2px' }}>
@@ -3859,6 +4050,104 @@ const Navbar = ({ isFullScreen }) => {
                       </div>
                     )}
                   </div>
+
+
+
+                                   <button
+  onClick={() => navigate('/quizbadges')}
+  style={{
+    width: '100%',
+    border: 'none',
+    background: 'transparent',
+    padding: '10px 16px',
+    cursor: 'pointer',
+    textAlign: 'left',
+    fontSize: '14px',
+    color: '#1F2937',
+    display: 'flex',
+    alignItems: 'center',
+    gap: '8px'
+  }}
+  onMouseEnter={(e) => { e.target.style.background = '#f0f0f0'; }}
+  onMouseLeave={(e) => { e.target.style.background = 'transparent'; }}
+>
+  <span style={{ fontSize: '16px' }}>🏆</span>
+  Badges
+</button>
+                 
+
+{/* ⭐ BADGES SECTION — BELOW STREAK */}
+<div style={{ padding: '12px 16px', borderBottom: '1px solid #f0f0f0', background: '#fff' }}>
+  <div style={{ fontSize: '14px', fontWeight: '600', marginBottom: '6px', color: '#374151' }}>
+    🎖 Your Badges
+  </div>
+
+  {/* QUICK PRACTICE SECTION */}
+  <div style={{ fontSize: '12px', fontWeight: '600', color: '#6b7280', marginBottom: '4px' }}>
+    Quick Practice
+  </div>
+
+  {badges.quickHighest ? (
+    <div
+      style={{
+        marginBottom: "10px",
+        background: "#eef2ff",
+        padding: "6px 10px",
+        borderRadius: "8px",
+        display: "flex",
+        alignItems: "center",
+        gap: "6px",
+        fontSize: "13px",
+        color: "#4338ca",
+        border: "1px solid #c7d2fe",
+        fontWeight: "500"
+      }}
+    >
+      <span>
+        {badges.quickHighest === "Quick Learner" && "📘"}
+        {badges.quickHighest === "Quick Thinker" && "⚡"}
+        {badges.quickHighest === "Quick Pro" && "🚀"}
+        {badges.quickHighest === "Quick Master" && "🔥"}
+      </span>
+      <span>{badges.quickHighest}</span>
+    </div>
+  ) : (
+    <div style={{ fontSize: "12px", color: "#9ca3af" }}>No badges yet</div>
+  )}
+
+  {/* MOCK TEST SECTION */}
+  <div style={{ marginTop: "10px", fontSize: "12px", fontWeight: "600", color: "#6b7280", marginBottom: "4px" }}>
+    Mock Tests
+  </div>
+
+  {badges.mockHighest ? (
+    <div
+      style={{
+        marginBottom: "6px",
+        background: "#ecfdf5",
+        padding: "6px 10px",
+        borderRadius: "8px",
+        display: "flex",
+        alignItems: "center",
+        gap: "6px",
+        fontSize: "13px",
+        color: "#065f46",
+        border: "1px solid #a7f3d0",
+        fontWeight: "500"
+      }}
+    >
+      <span>
+        {badges.mockHighest === "Mock Rookie" && "🥉"}
+        {badges.mockHighest === "Mock Challenger" && "🥈"}
+        {badges.mockHighest === "Mock Pro" && "🥇"}
+        {badges.mockHighest === "Mock Master" && "👑"}
+      </span>
+      <span>{badges.mockHighest}</span>
+    </div>
+  ) : (
+    <div style={{ fontSize: "12px", color: "#9ca3af" }}>No badges yet</div>
+  )}
+</div>
                   <button
                     onClick={() => navigate('/user-details')}
                     style={{
@@ -4417,8 +4706,7 @@ const Navbar = ({ isFullScreen }) => {
                             }}>
                               {savedSchedules[getISTDateString(selectedDate)] ? 'Edit Schedule' : 'Add Schedule'}
                             </h5>
-                          </div>
-                       
+                          </div>                        
                           <textarea
                             value={scheduleInput}
                             onChange={(e) => setScheduleInput(e.target.value)}
@@ -4433,8 +4721,7 @@ const Navbar = ({ isFullScreen }) => {
                               resize: 'vertical',
                               fontFamily: 'inherit'
                             }}
-                          />
-                       
+                          />                        
                           <div style={{
                             display: 'flex',
                             gap: '8px',
@@ -4611,3 +4898,176 @@ const Navbar = ({ isFullScreen }) => {
 };
 
 export default Navbar;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// //test code
+// {/* ⭐ BADGES SECTION — BELOW STREAK */}
+// <div style={{ padding: '12px 16px', borderBottom: '1px solid #f0f0f0', background: '#fff' }}>
+//   <div style={{ fontSize: '14px', fontWeight: '600', marginBottom: '6px', color: '#374151' }}>
+//     🎖 Your Badges
+//   </div>
+
+//   {/* QUICK PRACTICE SECTION */}
+//   <div style={{ fontSize: '12px', fontWeight: '600', color: '#6b7280', marginBottom: '4px' }}>
+//     Quick Practice
+//   </div>
+
+//   {badges.quickHighest ? (
+//     <div
+//       style={{
+//         marginBottom: "10px",
+//         background: "#eef2ff",
+//         padding: "6px 10px",
+//         borderRadius: "8px",
+//         display: "flex",
+//         alignItems: "center",
+//         gap: "6px",
+//         fontSize: "13px",
+//         color: "#4338ca",
+//         border: "1px solid #c7d2fe",
+//         fontWeight: "500"
+//       }}
+//     >
+//       <span>
+//         {badges.quickHighest === "Quick Learner" && "📘"}
+//         {badges.quickHighest === "Quick Thinker" && "⚡"}
+//         {badges.quickHighest === "Quick Pro" && "🚀"}
+//         {badges.quickHighest === "Quick Master" && "🔥"}
+//       </span>
+//       <span>{badges.quickHighest}</span>
+//     </div>
+//   ) : (
+//     <div style={{ fontSize: "12px", color: "#9ca3af" }}>No badges yet</div>
+//   )}
+
+//   {/* MOCK TEST SECTION */}
+//   <div style={{ marginTop: "10px", fontSize: "12px", fontWeight: "600", color: "#6b7280", marginBottom: "4px" }}>
+//     Mock Tests
+//   </div>
+
+//   {badges.mockHighest ? (
+//     <div
+//       style={{
+//         marginBottom: "6px",
+//         background: "#ecfdf5",
+//         padding: "6px 10px",
+//         borderRadius: "8px",
+//         display: "flex",
+//         alignItems: "center",
+//         gap: "6px",
+//         fontSize: "13px",
+//         color: "#065f46",
+//         border: "1px solid #a7f3d0",
+//         fontWeight: "500"
+//       }}
+//     >
+//       <span>
+//         {badges.mockHighest === "Mock Rookie" && "🥉"}
+//         {badges.mockHighest === "Mock Challenger" && "🥈"}
+//         {badges.mockHighest === "Mock Pro" && "🥇"}
+//         {badges.mockHighest === "Mock Master" && "👑"}
+//       </span>
+//       <span>{badges.mockHighest}</span>
+//     </div>
+//   ) : (
+//     <div style={{ fontSize: "12px", color: "#9ca3af" }}>No badges yet</div>
+//   )}
+// </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+// ////normal
+//                   {/* ⭐ BADGES SECTION — Inserted Below Streak  */}
+// {(badges?.quickBadges?.length > 0 || badges?.mockBadges?.length > 0) && (
+//   <div style={{ padding: '12px 16px', borderBottom: '1px solid #f0f0f0', background: '#fff' }}>
+//     <div style={{ fontSize: '14px', fontWeight: '600', marginBottom: '6px', color: '#374151' }}>
+//       🎖 Your Badges
+//     </div>
+
+//     {/* Quick Practice Badges */}
+//     {badges.quickBadges?.length > 0 && (
+//       <div style={{ marginBottom: '6px' }}>
+//         <div style={{ fontSize: '12px', fontWeight: '600', color: '#6b7280', marginBottom: '4px' }}>
+//           Quick Practice
+//         </div>
+//         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+//           {badges.quickBadges.map((b, i) => (
+//             <div
+//               key={i}
+//               style={{
+//                 background: '#f3f4f6',
+//                 padding: '6px 10px',
+//                 borderRadius: '6px',
+//                 fontSize: '12px',
+//                 display: 'flex',
+//                 alignItems: 'center',
+//                 gap: '4px',
+//                 color: '#111827',
+//                 border: '1px solid #e5e7eb'
+//               }}
+//             >
+//               <span>{b.icon}</span>
+//               <span>{b.name}</span>
+//             </div>
+//           ))}
+//         </div>
+//       </div>
+//     )}
+
+//      {/* Mock Test Badges  */}
+//     {badges.mockBadges?.length > 0 && (
+//       <div>
+//         <div style={{ fontSize: '12px', fontWeight: '600', color: '#6b7280', marginBottom: '4px' }}>
+//           Mock Tests
+//         </div>
+//         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+//           {badges.mockBadges.map((b, i) => (
+//             <div
+//               key={i}
+//               style={{
+//                 background: '#f0fdf4',
+//                 padding: '6px 10px',
+//                 borderRadius: '6px',
+//                 fontSize: '12px',
+//                 display: 'flex',
+//                 alignItems: 'center',
+//                 gap: '4px',
+//                 color: '#065f46',
+//                 border: '1px solid #d1fae5'
+//               }}
+//             >
+//               <span>{b.icon}</span>
+//               <span>{b.name}</span>
+//             </div>
+//           ))}
+//         </div>
+//       </div>
+//     )}
+//   </div>
+// )}

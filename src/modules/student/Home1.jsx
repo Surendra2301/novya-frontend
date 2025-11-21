@@ -1871,7 +1871,9 @@ const Home1 = () => {
                       whiteSpace: "nowrap"
                     }}
                   >
-                    {t('dashboard.active')}
+
+                    {/* {t('dashboard.active')} */}
+
                   </motion.span>
                 </div>
                 <div className="course-meta">

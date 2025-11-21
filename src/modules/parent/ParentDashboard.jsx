@@ -473,7 +473,7 @@ const ParentDashboard = () => {
         <div className="sidebar-footer">
           <button className="logout-btn" onClick={handleLogout}>
             <FiLogOut />
-            <span>{t('common.logout')}</span>
+            <span>{t('logout')}</span>
           </button>
         </div>
       </div>
@@ -525,7 +525,7 @@ const ParentDashboard = () => {
                 {showLanguageDropdown && (
                   <div className="language-dropdown">
                     <div className="dropdown-header">
-                      <h3>{t('common.language')}</h3>
+                      <h3>{t('language')}</h3>
                       <button
                         className="close-dropdown-btn"
                         onClick={() => setShowLanguageDropdown(false)}
@@ -568,13 +568,13 @@ const ParentDashboard = () => {
                 {showNotifications && (
                   <div className="notification-dropdown">
                     <div className="dropdown-header">
-                      <h3>{t('common.notifications')}</h3>
+                      <h3>{t('commons.notifications')}</h3>
                       <div className="header-actions-right">
                         <button
                           className="clear-all-btn"
                           onClick={() => setNotifications([])}
                         >
-                          {t('common.clear')}
+                          {t('commons.clear')}
                         </button>
                         <button
                           className="close-dropdown-btn"
@@ -601,7 +601,7 @@ const ParentDashboard = () => {
                           </div>
                         ))
                       ) : (
-                        <p className="no-notifications">{t('common.noNotifications')}</p>
+                        <p className="no-notifications">{t('commons.noNotifications')}</p>
                       )}
                     </div>
                   </div>
@@ -621,7 +621,7 @@ const ParentDashboard = () => {
                 {!isMobile && (
                   <div className="profile-info">
                     <span className="profile-name">{parentName}</span>
-                    <span className="profile-role">{t('common.role')}: {t('common.parent')}</span>
+                    <span className="profile-role">{t('commons.role')}: {t('commons.parent')}</span>
                   </div>
                 )}
               </div>
@@ -675,9 +675,9 @@ const ParentDashboard = () => {
                       ) : (
                         <div className="profile-modal-info">
                           <h3>
-                            {editedParentData.firstName || t('common.parent')} {editedParentData.lastName || ""}
+                            {editedParentData.firstName || t('commons.parent')} {editedParentData.lastName || ""}
                           </h3>
-                          <p>{t('common.role')}: {t('common.parent')}</p>
+                          <p>{t('commons.role')}: {t('commons.parent')}</p>
                         </div>
                       )}
                     </div>
@@ -728,16 +728,16 @@ const ParentDashboard = () => {
                       ) : (
                         <>
                           <p>
-                            <strong>{t('profile.email')}:</strong> {editedParentData.email || t('common.notProvided')}
+                            <strong>{t('profile.email')}:</strong> {editedParentData.email || t('commons.notProvided')}
                           </p>
                           <p>
-                            <strong>{t('profile.contact')}:</strong> {editedParentData.phone || t('common.notProvided')}
+                            <strong>{t('profile.contact')}:</strong> {editedParentData.phone || t('commons.notProvided')}
                           </p>
                           <p>
-                            <strong>{t('profile.username')}:</strong> {editedParentData.userName || t('common.notProvided')}
+                            <strong>{t('profile.username')}:</strong> {editedParentData.userName || t('commons.notProvided')}
                           </p>
                           <p>
-                            <strong>{t('profile.address')}:</strong> {editedParentData.address || t('common.notProvided')}
+                            <strong>{t('profile.address')}:</strong> {editedParentData.address || t('commons.notProvided')}
                           </p>
                         </>
                       )}
@@ -750,13 +750,13 @@ const ParentDashboard = () => {
                             onClick={handleCancelEdit}
                             className="profile-btn profile-btn-cancel"
                           >
-                            {t('common.cancel')}
+                            {t('commons.cancel')}
                           </button>
                           <button
                             onClick={handleSaveProfile}
                             className="profile-btn profile-btn-save"
                           >
-                            {t('common.saveChanges')}
+                            {t('commons.saveChanges')}
                           </button>
                         </>
                       ) : (
@@ -764,7 +764,7 @@ const ParentDashboard = () => {
                           onClick={handleEditProfile}
                           className="profile-btn profile-btn-edit"
                         >
-                          {t('common.editProfile')}
+                          {t('commons.editProfile')}
                         </button>
                       )}
                     </div>

@@ -14,7 +14,7 @@ import Navbar from './Navbarrr';
 const Career = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { quizResults, mockTestResults, getQuizHistory, getMockHistory } = useQuiz();
+const { quizResults, mockTestResults, getQuizHistory, getMockHistory, badges } = useQuiz();
 
   // ✅ Safe initialization of quiz and mock results
   const [safeQuizResults, setSafeQuizResults] = useState({
@@ -397,6 +397,20 @@ const Career = () => {
           </div>
         </div>
       </section>
+{/* ⭐ USER BADGES DISPLAY */}
+<section className="badge-section">
+  <h2 className="badge-title">Your Badges</h2>
+
+  <div className="badge-list">
+    {badges.quickBadges.map((b, i) => (
+      <span key={i} className="badge-item">{b}</span>
+    ))}
+
+    {badges.mockBadges.map((b, i) => (
+      <span key={i} className="badge-item">{b}</span>
+    ))}
+  </div>
+</section>
 
       <section className="stats-section">
         <div className="stats-container">
@@ -734,6 +748,3 @@ const getMetricColor = (value, max) => {
 };
 
 export default Career;
-
-
-

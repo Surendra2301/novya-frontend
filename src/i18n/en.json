@@ -318,7 +318,7 @@
     "defaultTitle": "Sample Course",
     "by": "By",
     "students": "students",
-    "description": "Learn <strong>{{title}}</strong> from scratch with hands-on projects.",
+    "description": "Learn {{title}} from scratch with hands-on projects.",
     "features": {
       "lifetimeAccess": "Lifetime access",
       "certificate": "Certificate of Completion",
@@ -725,7 +725,7 @@
       "mathematics": "Mathematics",
       "science": "Science",
       "languages": "Languages",
-      "socialstudies": "socialstudies",
+      "socialStudies": "SocialStudies",
       "technology": "Technology"
     },
     "courses": {
@@ -1179,7 +1179,7 @@
 
  
   
-  "common": {
+  "commons": {
     "logout": "Logout",
     "notifications": "Notifications",
     "clear": "Clear All",
@@ -1354,6 +1354,7 @@
   "Enter Email": "Enter Email",
   "Enter your message": "Enter your message",
   "Submit": "Submit",
+
   "Thank you for contacting us!": "Thank you for contacting us!",
   "We will reach out to you soon.": "We will reach out to you soon.",
   "is required": "is required",
@@ -1500,7 +1501,7 @@
       "mathematics": "Mathematics",
       "science": "Science",
       "languages": "Languages",
-      "socialstudies": "socialstudies",
+      "socialStudies": "socialstudies",
       "technology": "Technology"
     },
     "courses": {
@@ -1573,22 +1574,7 @@
 
 
 
-  "studentProfile": "Student Profile",
-  "personalInformation": "Personal Information",
-  "guardianAndContact": "Guardian & Contact",
-  "subjects": "Subjects",
-  "gender": "Gender",
-  "dateOfBirth": "Date of Birth",
-  "classTeacher": "Class Teacher",
-  "progress": "Progress",
-  "guardian": "Guardian",
-  "subjectsList": {
-    "Mathematics": "Mathematics",
-    "Science": "Science",
-    "English": "English",
-    "Computers": "Computers",
-    "Social Studies": "Social Studies"
-  },
+ 
 
 
 
@@ -2164,10 +2150,10 @@
     "welcomeTitle": "Welcome to Typing Master Pro",
     "welcomeSubtitle": "Boost your typing speed, accuracy, and rhythm with AI-enhanced lessons.",
     "startButton": "Start Typing Test",
-    "backToInstructions": "Back to Instructions",
+    "back To Instructions": "Back to Instructions",
     "selectDifficulty": "Select Difficulty",
-     "back": "Back",
-    "levels": {
+     "back to home": "Back to home",
+         "levels": {
       "beginner": "Beginner",
       "intermediate": "Intermediate",
       "advanced": "Advanced"
@@ -2354,8 +2340,10 @@
   "errors": {
     "failedToGenerate": "Failed to generate reports. Please try again.",
     "somethingWentWrong": "Oops! Something went wrong"
-  }
+  },
 
-
+"us": {
+    "sub_mit": "Submit"
+}
 }
 

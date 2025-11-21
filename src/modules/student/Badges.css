@@ -1,0 +1,441 @@
+.badges-guide-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 20px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.badges-guide-container h1 {
+  text-align: center;
+  color: #2c3e50;
+  margin-bottom: 30px;
+  font-size: 2.5em;
+}
+
+/* Tabs */
+.tabs {
+  display: flex;
+  margin-bottom: 30px;
+  border-bottom: 2px solid #e0e0e0;
+}
+
+.tab {
+  padding: 15px 30px;
+  border: none;
+  background: none;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+  transition: all 0.3s ease;
+  color: #666;
+}
+
+.tab.active {
+  color: #3498db;
+  border-bottom-color: #3498db;
+  background-color: #f8f9fa;
+}
+
+.tab:hover {
+  background-color: #f8f9fa;
+  color: #2980b9;
+}
+
+/* Badges Layout */
+.badges-layout {
+  display: grid;
+  grid-template-columns: 1fr 1.5fr;
+  gap: 30px;
+  margin-bottom: 40px;
+}
+
+/* Badges List */
+.badges-list h2 {
+  color: #34495e;
+  margin-bottom: 20px;
+  font-size: 1.5em;
+}
+
+.badges-grid {
+  display: grid;
+  gap: 15px;
+}
+
+.badge-card {
+  background: white;
+  border: 2px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 20px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.badge-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.badge-card.selected {
+  border-color: #3498db;
+  background-color: #f0f7ff;
+}
+
+.badge-card.locked {
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+}
+
+.badge-card.unlocked {
+  background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+  border-color: #28a745;
+}
+
+.badge-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.badge-icon {
+  font-size: 1.5em;
+  margin-right: 10px;
+}
+
+.badge-name {
+  font-weight: 700;
+  font-size: 16px;
+  color: #2c3e50;
+  flex: 1;
+}
+
+.lock-icon {
+  color: #6c757d;
+  font-size: 0.9em;
+}
+
+.badge-card.unlocked .lock-icon {
+  color: #28a745;
+}
+
+.badge-status {
+  font-size: 0.8em;
+  font-weight: 600;
+  text-transform: uppercase;
+  padding: 4px 8px;
+  border-radius: 12px;
+  display: inline-block;
+}
+
+.badge-card.locked .badge-status {
+  background-color: #6c757d;
+  color: white;
+}
+
+.badge-card.unlocked .badge-status {
+  background-color: #28a745;
+  color: white;
+}
+
+/* Badge Details */
+.badge-details {
+  min-height: 400px;
+}
+
+.details-card {
+  background: white;
+  border-radius: 15px;
+  padding: 30px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+  border: 1px solid #e0e0e0;
+}
+
+.details-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 25px;
+  padding-bottom: 20px;
+  border-bottom: 2px solid #f8f9fa;
+}
+
+.badge-icon-large {
+  font-size: 2.5em;
+  margin-right: 15px;
+}
+
+.details-header h3 {
+  color: #2c3e50;
+  font-size: 1.8em;
+  margin: 0;
+  flex: 1;
+}
+
+.difficulty {
+  font-weight: bold;
+  font-size: 1.2em;
+  padding: 5px 12px;
+  border-radius: 20px;
+  background-color: #f8f9fa;
+}
+
+.difficulty-1 { color: #27ae60; }
+.difficulty-2 { color: #f39c12; }
+.difficulty-3 { color: #e74c3c; }
+.difficulty-4 { color: #8e44ad; }
+
+.details-content {
+  space-y: 20px;
+}
+
+.detail-item {
+  margin-bottom: 25px;
+}
+
+.detail-item strong {
+  color: #2c3e50;
+  font-size: 1.1em;
+  display: block;
+  margin-bottom: 8px;
+}
+
+.detail-item p {
+  color: #495057;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.detail-item ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.detail-item li {
+  padding: 8px 0;
+  color: #495057;
+  border-bottom: 1px solid #f8f9fa;
+}
+
+.detail-item li:before {
+  content: "✓ ";
+  color: #28a745;
+  font-weight: bold;
+  margin-right: 8px;
+}
+
+.badge-actions {
+  margin-top: 30px;
+  text-align: center;
+}
+
+.unlock-btn, .lock-btn {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.unlock-btn {
+  background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+  color: white;
+}
+
+.unlock-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+}
+
+.lock-btn {
+  background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%);
+  color: white;
+}
+
+.lock-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(108, 117, 125, 0.3);
+}
+
+.no-selection {
+  text-align: center;
+  padding: 60px 20px;
+  color: #6c757d;
+  background: white;
+  border-radius: 15px;
+  border: 2px dashed #dee2e6;
+}
+
+.no-selection h3 {
+  margin: 20px 0 10px;
+  color: #6c757d;
+}
+
+/* Progress Calculator */
+.progress-calculator {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 30px;
+  border-radius: 15px;
+  margin: 40px 0;
+  color: white;
+}
+
+.progress-calculator h3 {
+  margin-bottom: 25px;
+  text-align: center;
+  font-size: 1.5em;
+}
+
+.input-group {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+  background: rgba(255,255,255,0.1);
+  padding: 15px 20px;
+  border-radius: 8px;
+  backdrop-filter: blur(10px);
+}
+
+.input-group label {
+  font-weight: 600;
+  min-width: 200px;
+}
+
+.input-group input {
+  padding: 10px 15px;
+  border: none;
+  border-radius: 6px;
+  width: 120px;
+  font-size: 16px;
+}
+
+.quick-practice-inputs,
+.mock-test-inputs {
+  display: grid;
+  gap: 15px;
+}
+
+.calculate-btn {
+  width: 100%;
+  background: #ffffff;
+  color: #667eea;
+  border: none;
+  padding: 15px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 20px;
+}
+
+.calculate-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+/* General Tips */
+.general-tips {
+  margin-top: 40px;
+}
+
+.general-tips h3 {
+  text-align: center;
+  color: #2c3e50;
+  margin-bottom: 30px;
+  font-size: 1.8em;
+}
+
+.tips-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 30px;
+}
+
+.tip-card {
+  background: white;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  border-left: 5px solid #3498db;
+}
+
+.tip-card h4 {
+  color: #2c3e50;
+  margin-bottom: 15px;
+  font-size: 1.3em;
+}
+
+.tip-card ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.tip-card li {
+  padding: 8px 0;
+  border-bottom: 1px solid #ecf0f1;
+  color: #555;
+}
+
+.tip-card li:before {
+  content: "✓ ";
+  color: #27ae60;
+  font-weight: bold;
+  margin-right: 8px;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .badges-layout {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  
+  .badge-details {
+    min-height: auto;
+  }
+}
+
+@media (max-width: 768px) {
+  .tabs {
+    flex-direction: column;
+  }
+  
+  .tab {
+    text-align: center;
+  }
+  
+  .details-header {
+    flex-direction: column;
+    text-align: center;
+    gap: 15px;
+  }
+  
+  .badge-icon-large {
+    margin-right: 0;
+  }
+  
+  .tips-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .input-group {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .input-group label {
+    margin-bottom: 8px;
+  }
+  
+  .input-group input {
+    width: 100%;
+  }
+}

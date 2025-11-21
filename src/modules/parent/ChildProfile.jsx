@@ -139,7 +139,7 @@ const ChildProfile = () => {
               </h3>
               <div className="subjects-grid">
                 {child.subjects.map((subject, index) => (
-                  <div key={index} className="subject-badge">{t(`subjectsList.${subject}`)}</div>
+                  <div key={index} className="subject-badge">{t(`subjectsList.${subject}`,subject)}</div>
                 ))}
               </div>
             </div>

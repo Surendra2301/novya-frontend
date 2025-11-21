@@ -66,9 +66,16 @@
 }
 
 .tutorial-list li {
-  margin: 10px 0;
-  animation: fadeInUp 1.2s ease both;
+
+  text-align: start;
+
+  direction: ltr;
+
+  unicode-bidi: plaintext;
+
 }
+
+ 
 
 /* ✨ Flying Keys Animation */
 .keyboard-bg {
